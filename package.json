@@ -1,0 +1,10 @@
+{
+    "name": "unihelp",
+    "version": "1.0.0",
+    "description": "UniHelp - University student platform",
+    "scripts": {
+        "client": "cd client && npm run dev",
+        "server": "cd server && npm run dev",
+        "dev": "cd client && npm run dev"
+    }
+}
