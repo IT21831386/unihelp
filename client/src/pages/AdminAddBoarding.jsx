@@ -98,210 +98,220 @@ const AdminAddBoarding = () => {
     }
   };
 
-  const SectionTitle = ({ children }) => (
-    <h3 className="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-100 pb-2 mt-8">
+  const SectionTitle = ({ children, icon }) => (
+    <h4 className="fw-bold text-dark mt-5 mb-4 border-bottom pb-2 d-flex align-items-center gap-2">
+      {icon && <i className={`bi ${icon} text-primary`}></i>}
       {children}
-    </h3>
+    </h4>
   );
-
-  const InputGroup = ({ label, children }) => (
-    <div className="flex flex-col gap-1.5 flex-1">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      {children}
-    </div>
-  );
-
-  const inputStyles = "w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm";
-  const selectStyles = "w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm appearance-none cursor-pointer";
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 flex justify-center py-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="bg-light min-vh-100 py-5 font-sans" style={{ fontFamily: "'Inter', sans-serif" }}>
       <Toaster position="top-center" />
       
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-8 py-6 border-b border-gray-100 bg-white">
-          <h2 className="text-2xl font-bold text-gray-900">Add New Boarding Place</h2>
-          <p className="text-gray-500 mt-1 text-sm">List a new property for students with complete details and high-quality images.</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="px-8 py-6 space-y-6">
-          
-          {/* Basic Info */}
-          <SectionTitle>Basic Information</SectionTitle>
-          <div className="space-y-5">
-            <InputGroup label="Property Title">
-              <input type="text" name="title" value={formData.title} onChange={handleChange} required className={inputStyles} placeholder="E.g., Boys Boarding Near NSBM" />
-            </InputGroup>
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-12 col-xl-10 col-xxl-9">
             
-            <InputGroup label="Description">
-              <textarea name="description" value={formData.description} onChange={handleChange} required rows={3} className={inputStyles} placeholder="Describe the boarding place, surroundings, and house rules..." />
-            </InputGroup>
-            
-            <div className="flex flex-col sm:flex-row gap-5">
-              <InputGroup label="Price / Month">
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium pb-0.5">₨</span>
-                  <input type="number" name="price" value={formData.price} onChange={handleChange} required className={`${inputStyles} pl-10`} placeholder="18000" />
-                </div>
-              </InputGroup>
-              <InputGroup label="Currency">
-                <input type="text" name="currency" value={formData.currency} onChange={handleChange} className={inputStyles} placeholder="LKR" />
-              </InputGroup>
-            </div>
-          </div>
-
-          {/* Location Info */}
-          <SectionTitle>Location Details</SectionTitle>
-          <div className="space-y-5">
-            <InputGroup label="Full Address">
-              <input type="text" name="address" value={formData.address} onChange={handleChange} required className={inputStyles} placeholder="123 High Level Road" />
-            </InputGroup>
-            
-            <div className="flex flex-col sm:flex-row gap-5">
-              <InputGroup label="City">
-                <input type="text" name="city" value={formData.city} onChange={handleChange} required className={inputStyles} placeholder="Homagama" />
-              </InputGroup>
-              <InputGroup label="District">
-                <input type="text" name="district" value={formData.district} onChange={handleChange} required className={inputStyles} placeholder="Colombo" />
-              </InputGroup>
-            </div>
-          </div>
-
-          {/* Property Specs */}
-          <SectionTitle>Room & Occupancy Details</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <InputGroup label="Property Type">
-                <div className="relative">
-                  <select name="propertyType" value={formData.propertyType} onChange={handleChange} className={selectStyles}>
-                      <option value="Room">Room</option>
-                      <option value="House">House</option>
-                      <option value="Apartment">Apartment</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 pointer-events-none">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
+              <div className="card-header bg-white border-bottom-0 py-4 px-4 px-md-5 pt-5 pb-3">
+                <h2 className="fw-bolder text-dark mb-1 d-flex align-items-center gap-3">
+                  <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px' }}>
+                    <i className="bi bi-house-add fs-4"></i>
                   </div>
-                </div>
-              </InputGroup>
-              
-              <InputGroup label="Total Rooms">
-                <input type="number" name="totalRooms" value={formData.totalRooms} onChange={handleChange} required className={inputStyles} placeholder="4" />
-              </InputGroup>
+                  Add New Boarding Place
+                </h2>
+                <p className="text-secondary mb-0 ms-5 ps-3">List a new property for students with complete details and high-quality images.</p>
+              </div>
 
-              <InputGroup label="Available Rooms">
-                <input type="number" name="availableRooms" value={formData.availableRooms} onChange={handleChange} required className={inputStyles} placeholder="2" />
-              </InputGroup>
+              <div className="card-body px-4 px-md-5 py-4 bg-white">
+                <form onSubmit={handleSubmit} className="needs-validation">
+                  
+                  {/* Basic Info */}
+                  <SectionTitle icon="bi-info-circle">Basic Information</SectionTitle>
+                  <div className="row g-4">
+                    <div className="col-12">
+                      <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Property Title</label>
+                      <input type="text" name="title" value={formData.title} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="E.g., Boys Boarding Near NSBM" />
+                    </div>
+                    
+                    <div className="col-12">
+                      <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Description</label>
+                      <textarea name="description" value={formData.description} onChange={handleChange} required rows={3} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Describe the boarding place, surroundings, and house rules..." />
+                    </div>
+                    
+                    <div className="col-md-8">
+                      <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Price / Month</label>
+                      <div className="input-group input-group-lg shadow-sm">
+                        <span className="input-group-text bg-white text-secondary border-0 border-end" style={{ borderTopLeftRadius: '0.5rem', borderBottomLeftRadius: '0.5rem' }}>₨</span>
+                        <input type="number" name="price" value={formData.price} onChange={handleChange} required className="form-control bg-light border-0" placeholder="18000" />
+                      </div>
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Currency</label>
+                      <input type="text" name="currency" value={formData.currency} onChange={handleChange} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="LKR" />
+                    </div>
+                  </div>
 
-              <InputGroup label="Max Occupants Per Room">
-                <input type="number" name="maxOccupantsPerRoom" value={formData.maxOccupantsPerRoom} onChange={handleChange} required className={inputStyles} placeholder="2" />
-              </InputGroup>
-          </div>
+                  {/* Location Info */}
+                  <SectionTitle icon="bi-geo-alt">Location Details</SectionTitle>
+                  <div className="row g-4">
+                    <div className="col-12">
+                      <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Full Address</label>
+                      <input type="text" name="address" value={formData.address} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="123 High Level Road" />
+                    </div>
+                    
+                    <div className="col-md-6">
+                      <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">City</label>
+                      <input type="text" name="city" value={formData.city} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Homagama" />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">District</label>
+                      <input type="text" name="district" value={formData.district} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Colombo" />
+                    </div>
+                  </div>
 
-          {/* Amenities */}
-          <SectionTitle>Amenities & Inclusions</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 bg-gray-50 p-6 rounded-xl border border-gray-100">
-            {['attachedBathroom', 'furnished', 'wifi', 'parking', 'kitchen', 'laundry', 'waterIncluded', 'electricityIncluded', 'smokingAllowed', 'petsAllowed'].map(field => (
-              <label key={field} className="flex items-center gap-3 cursor-pointer group">
-                <input 
-                  type="checkbox" 
-                  name={field} 
-                  checked={formData[field]} 
-                  onChange={handleChange} 
-                  className="w-5 h-5 border-gray-300 rounded text-blue-600 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer transition-colors"
-                />
-                <span className="text-gray-700 text-sm font-medium group-hover:text-gray-900 transition-colors select-none">
-                  {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                </span>
-              </label>
-            ))}
-          </div>
+                  {/* Property Specs */}
+                  <SectionTitle icon="bi-building">Room & Occupancy Details</SectionTitle>
+                  <div className="row g-4">
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Property Type</label>
+                        <select name="propertyType" value={formData.propertyType} onChange={handleChange} className="form-select form-select-lg bg-light border-0 shadow-sm">
+                            <option value="Room">Room</option>
+                            <option value="House">House</option>
+                            <option value="Apartment">Apartment</option>
+                        </select>
+                      </div>
+                      
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Total Rooms</label>
+                        <input type="number" name="totalRooms" value={formData.totalRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="4" />
+                      </div>
 
-          {/* Preferences & Status */}
-          <SectionTitle>Preferences & Status</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <InputGroup label="Gender Preference">
-                <div className="relative">
-                  <select name="genderPreference" value={formData.genderPreference} onChange={handleChange} className={selectStyles}>
-                      <option value="Male">Male Only</option>
-                      <option value="Female">Female Only</option>
-                      <option value="Any">Anyone</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 pointer-events-none"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></div>
-                </div>
-              </InputGroup>
-              
-              <InputGroup label="Availability Status">
-                 <div className="relative">
-                  <select name="availabilityStatus" value={formData.availabilityStatus} onChange={handleChange} className={selectStyles}>
-                      <option value="Available">Available</option>
-                      <option value="Full">Full</option>
-                      <option value="Under Maintenance">Under Maintenance</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 pointer-events-none"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></div>
-                </div>
-              </InputGroup>
-          </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Available Rooms</label>
+                        <input type="number" name="availableRooms" value={formData.availableRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
+                      </div>
 
-          {/* Contact Info */}
-          <SectionTitle>Contact Details</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <InputGroup label="Owner Name">
-                  <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} required className={inputStyles} placeholder="Nimal Perera" />
-              </InputGroup>
-              <InputGroup label="Contact Number">
-                  <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required className={inputStyles} placeholder="0771234567" />
-              </InputGroup>
-               <InputGroup label="Email Address">
-                  <input type="email" name="email" value={formData.email} onChange={handleChange} required className={inputStyles} placeholder="nimal@example.com" />
-              </InputGroup>
-          </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Max Occupants Per Room</label>
+                        <input type="number" name="maxOccupantsPerRoom" value={formData.maxOccupantsPerRoom} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
+                      </div>
+                  </div>
 
-          {/* Images */}
-          <SectionTitle>Property Images</SectionTitle>
-          <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl px-6 py-10 text-center hover:bg-gray-100 transition-colors">
-            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
-            </svg>
-            <div className="flex text-sm text-gray-600 justify-center">
-              <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 px-3 py-1 border border-gray-200 shadow-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500">
-                <span>Upload files</span>
-                <input type="file" multiple accept="image/*" onChange={handleImageChange} required={images.length === 0} className="sr-only" />
-              </label>
-              <p className="pl-2 pt-1">or drag and drop</p>
+                  {/* Amenities */}
+                  <SectionTitle icon="bi-stars">Amenities & Inclusions</SectionTitle>
+                  <div className="bg-light p-4 rounded-4 shadow-sm">
+                    <div className="row g-3">
+                      {['attachedBathroom', 'furnished', 'wifi', 'parking', 'kitchen', 'laundry', 'waterIncluded', 'electricityIncluded', 'smokingAllowed', 'petsAllowed'].map(field => (
+                        <div key={field} className="col-sm-6 col-lg-4">
+                          <div className="form-check form-switch p-0 d-flex align-items-center gap-3 bg-white p-3 rounded-3 shadow-sm" style={{ border: '1px solid #f0f0f0' }}>
+                            <input 
+                              type="checkbox" 
+                              role="switch"
+                              name={field} 
+                              checked={formData[field]} 
+                              onChange={handleChange} 
+                              className="form-check-input m-0 ms-2"
+                              style={{ width: '2.5em', height: '1.25em', cursor: 'pointer' }}
+                            />
+                            <label className="form-check-label text-dark fw-medium" style={{ cursor: 'pointer' }}>
+                              {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Preferences & Status */}
+                  <SectionTitle icon="bi-check2-circle">Preferences & Status</SectionTitle>
+                  <div className="row g-4">
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Gender Preference</label>
+                        <select name="genderPreference" value={formData.genderPreference} onChange={handleChange} className="form-select form-select-lg bg-light border-0 shadow-sm">
+                            <option value="Male">Male Only</option>
+                            <option value="Female">Female Only</option>
+                            <option value="Any">Anyone</option>
+                        </select>
+                      </div>
+                      
+                      <div className="col-md-6">
+                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Availability Status</label>
+                        <select name="availabilityStatus" value={formData.availabilityStatus} onChange={handleChange} className="form-select form-select-lg bg-light border-0 shadow-sm" style={{ fontWeight: 500 }}>
+                            <option value="Available">Available</option>
+                            <option value="Full">Full</option>
+                            <option value="Under Maintenance">Under Maintenance</option>
+                        </select>
+                      </div>
+                  </div>
+
+                  {/* Contact Info */}
+                  <SectionTitle icon="bi-telephone">Contact Details</SectionTitle>
+                  <div className="row g-4">
+                      <div className="col-md-4">
+                          <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Owner Name</label>
+                          <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Nimal Perera" />
+                      </div>
+                      <div className="col-md-4">
+                          <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Contact Number</label>
+                          <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="0771234567" />
+                      </div>
+                      <div className="col-md-4">
+                          <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Email Address</label>
+                          <input type="email" name="email" value={formData.email} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="nimal@example.com" />
+                      </div>
+                  </div>
+
+                  {/* Images */}
+                  <SectionTitle icon="bi-images">Property Images</SectionTitle>
+                  <div className="bg-light border border-2 border-primary border-dashed rounded-4 p-5 text-center position-relative" style={{ borderStyle: 'dashed !important', transition: 'all 0.3s' }}>
+                    <i className="bi bi-cloud-arrow-up display-4 text-primary opacity-50 mb-3"></i>
+                    <h5 className="fw-bold text-dark">Upload property images</h5>
+                    <p className="text-secondary small mb-4">PNG, JPG, WEBP up to 5MB each</p>
+                    
+                    <div>
+                      <label className="btn btn-outline-primary btn-lg px-5 rounded-pill shadow-sm" style={{ cursor: 'pointer' }}>
+                        <i className="bi bi-folder2-open me-2"></i> Browse Files
+                        <input type="file" multiple accept="image/*" onChange={handleImageChange} required={images.length === 0} className="d-none" />
+                      </label>
+                    </div>
+                    
+                    {images.length > 0 && (
+                       <div className="mt-4 d-inline-block bg-white text-primary px-4 py-2 rounded-pill shadow-sm fw-bold border border-primary-subtle">
+                         <i className="bi bi-check-circle-fill me-2"></i>
+                         {images.length} image{images.length !== 1 && 's'} selected
+                       </div>
+                    )}
+                  </div>
+
+                  {/* Submit */}
+                  <div className="mt-5 pt-4 border-top">
+                    <button 
+                      type="submit" 
+                      disabled={loading} 
+                      className={`btn btn-primary btn-lg w-100 py-3 rounded-4 shadow-sm fw-bold fs-5 ${loading ? 'opacity-75' : ''}`}
+                      style={{ transition: 'all 0.3s' }}
+                    >
+                      {loading ? (
+                        <div className="d-flex align-items-center justify-content-center gap-3">
+                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          Publishing Property...
+                        </div>
+                      ) : (
+                        <div className="d-flex align-items-center justify-content-center gap-2">
+                          <i className="bi bi-send-fill"></i> Publish Boarding Place
+                        </div>
+                      )}
+                    </button>
+                  </div>
+
+                </form>
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">PNG, JPG, WEBP up to 5MB each</p>
-            {images.length > 0 && (
-               <div className="mt-4 inline-block bg-blue-50 text-blue-700 border border-blue-200 px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
-                 {images.length} image{images.length !== 1 && 's'} selected
-               </div>
-            )}
-          </div>
 
-          {/* Submit */}
-          <div className="pt-6 mt-8 border-t border-gray-100">
-            <button 
-              type="submit" 
-              disabled={loading} 
-              className={`w-full py-3.5 px-4 rounded-xl flex items-center justify-center text-lg font-semibold text-white shadow-sm transition-all duration-200
-                ${loading 
-                  ? 'bg-blue-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 active:transform active:scale-[0.99]'}
-              `}
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Publishing...
-                </>
-              ) : (
-                'Publish Boarding Place'
-              )}
-            </button>
           </div>
-
-        </form>
+        </div>
       </div>
     </div>
   );
