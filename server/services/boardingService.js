@@ -20,7 +20,37 @@ const getAllBoardings = async () => {
   }
 };
 
+const getBoardingById = async (id) => {
+  try {
+    const boarding = await Boarding.findById(id);
+    return boarding;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateBoarding = async (id, updateData) => {
+  try {
+    const updatedBoarding = await Boarding.findByIdAndUpdate(id, updateData, { new: true });
+    return updatedBoarding;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteBoarding = async (id) => {
+  try {
+    const deletedBoarding = await Boarding.findByIdAndDelete(id);
+    return deletedBoarding;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   createBoarding,
   getAllBoardings,
+  getBoardingById,
+  updateBoarding,
+  deleteBoarding
 };

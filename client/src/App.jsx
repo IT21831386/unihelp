@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminAddBoarding from './pages/AdminAddBoarding';
 import BoardingsList from './pages/BoardingsList';
+import AdminAllBoardings from './pages/AdminAllBoardings';
+import AdminEditBoarding from './pages/AdminEditBoarding';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin/addboarding" element={<AdminAddBoarding />} />
+        <Route path="/admin/allboardings" element={<AdminAllBoardings />} />
+        <Route path="/admin/editboarding/:id" element={<AdminEditBoarding />} />
       </Routes>
     </Router>
   );
