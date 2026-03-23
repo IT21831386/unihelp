@@ -23,6 +23,28 @@ const addBoardingPlace = async (req, res) => {
   }
 };
 
+// @desc    Get all boardings
+// @route   GET /api/boardings
+// @access  Public
+const getBoardings = async (req, res) => {
+  try {
+    const boardings = await boardingService.getAllBoardings();
+    
+    res.status(200).json({
+      success: true,
+      count: boardings.length,
+      data: boardings,
+    });
+  } catch (error) {
+    console.error('Error in getBoardings:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server Error while fetching boardings',
+    });
+  }
+};
+
 module.exports = {
   addBoardingPlace,
+  getBoardings,
 };

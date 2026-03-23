@@ -10,8 +10,17 @@ const createBoarding = async (boardingData) => {
   }
 };
 
-// You can add more service functions (get, update, delete) here later.
+// Get all boardings
+const getAllBoardings = async () => {
+  try {
+    const boardings = await Boarding.find().sort({ createdAt: -1 });
+    return boardings;
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   createBoarding,
+  getAllBoardings,
 };

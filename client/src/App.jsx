@@ -5,6 +5,7 @@ import Careers from './pages/Careers';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminAddBoarding from './pages/AdminAddBoarding';
+import BoardingsList from './pages/BoardingsList';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/bookings" element={<Bookings />} />
+        <Route path="/boarding" element={<BoardingsList />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
