@@ -4,6 +4,7 @@ import Bookings from './pages/Bookings';
 import Careers from './pages/Careers';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import AdminAddBoarding from './pages/AdminAddBoarding';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/careers" element={<Careers />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/admin/addboarding" element={<AdminAddBoarding />} />
       </Routes>
     </Router>
   );
