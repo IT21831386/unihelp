@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate, Link } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
 
 // Setup Supabase Client
@@ -39,6 +40,7 @@ function MediaUpload(file) {
 }
 
 const AdminAddBoarding = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '', description: '', price: '', currency: 'LKR', address: '', city: '', district: '', propertyType: 'Room', totalRooms: '', availableRooms: '', maxOccupantsPerRoom: '', attachedBathroom: false, furnished: false, wifi: false, parking: false, kitchen: false, laundry: false, waterIncluded: false, electricityIncluded: false, genderPreference: 'Any', smokingAllowed: false, petsAllowed: false, availabilityStatus: 'Available', ownerName: '', contactNumber: '', email: ''
   });
@@ -58,8 +60,54 @@ const AdminAddBoarding = () => {
     setImages(Array.from(e.target.files));
   };
 
+  const validateForm = () => {
+    if (formData.title.trim().length < 5) {
+      toast.error("Property Title must be at least 5 characters long");
+      return false;
+    }
+    if (formData.description.trim().length < 20) {
+      toast.error("Description must be at least 20 characters long");
+      return false;
+    }
+    if (Number(formData.price) <= 0) {
+      toast.error("Price must be greater than 0");
+      return false;
+    }
+    if (formData.propertyType !== 'Room') {
+      if (Number(formData.totalRooms) <= 0) {
+        toast.error("Total Rooms must be greater than 0");
+        return false;
+      }
+      if (Number(formData.availableRooms) < 0 || Number(formData.availableRooms) > Number(formData.totalRooms)) {
+        toast.error("Available Rooms must be a valid number and cannot exceed Total Rooms");
+        return false;
+      }
+    }
+    if (Number(formData.maxOccupantsPerRoom) <= 0) {
+      toast.error("Max Occupants Per Room must be greater than 0");
+      return false;
+    }
+    const phoneRegex = /^(0|\+94)[0-9]{9}$/;
+    if (!phoneRegex.test(formData.contactNumber.trim())) {
+      toast.error("Please enter a valid 10-digit Sri Lankan mobile number (e.g., 0771234567)");
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+    if (images.length === 0) {
+      toast.error("Please select at least one property image to upload");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     setLoading(true);
 
     try {
@@ -74,20 +122,51 @@ const AdminAddBoarding = () => {
       const payload = {
         ...formData,
         price: Number(formData.price),
-        totalRooms: Number(formData.totalRooms),
-        availableRooms: Number(formData.availableRooms),
+        totalRooms: formData.propertyType === 'Room' ? 1 : Number(formData.totalRooms),
+        availableRooms: formData.propertyType === 'Room' ? 1 : Number(formData.availableRooms),
         maxOccupantsPerRoom: Number(formData.maxOccupantsPerRoom),
         imageUrls: uploadedImageUrls
       };
 
       const response = await axios.post('http://localhost:5000/api/boardings', payload);
       
-      if (response.data.success) {
-        toast.success("Boarding place added successfully!");
+      if (response.data && response.data.success) {
+        toast.success('Boarding place added successfully!');
+        
+        // Reset form
         setFormData({
-            title: '', description: '', price: '', currency: 'LKR', address: '', city: '', district: '', propertyType: 'Room', totalRooms: '', availableRooms: '', maxOccupantsPerRoom: '', attachedBathroom: false, furnished: false, wifi: false, parking: false, kitchen: false, laundry: false, waterIncluded: false, electricityIncluded: false, genderPreference: 'Any', smokingAllowed: false, petsAllowed: false, availabilityStatus: 'Available', ownerName: '', contactNumber: '', email: ''
+          title: '',
+          description: '',
+          price: '',
+          propertyType: 'Room',
+          totalRooms: '',
+          availableRooms: '',
+          maxOccupantsPerRoom: '',
+          address: '',
+          city: '',
+          district: '',
+          ownerName: '',
+          contactNumber: '',
+          email: '',
+          wifi: false,
+          attachedBathroom: false,
+          parking: false,
+          kitchen: false,
+          furnished: false,
+          laundry: false,
+          waterIncluded: false,
+          electricityIncluded: false,
+          smokingAllowed: false,
+          petsAllowed: false,
+          availabilityStatus: 'Available',
+          genderPreference: 'Any'
         });
         setImages([]);
+        
+        // Redirect to all boardings table after a short delay so the user sees the success toast
+        setTimeout(() => {
+          navigate('/admin/allboardings');
+        }, 1500);
       }
     } catch (error) {
       console.error(error);
@@ -183,15 +262,19 @@ const AdminAddBoarding = () => {
                         </select>
                       </div>
                       
-                      <div className="col-md-6">
-                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Total Rooms</label>
-                        <input type="number" name="totalRooms" value={formData.totalRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="4" />
-                      </div>
+                      {formData.propertyType !== 'Room' && (
+                        <>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Total Rooms</label>
+                            <input type="number" name="totalRooms" value={formData.totalRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="4" />
+                          </div>
 
-                      <div className="col-md-6">
-                        <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Available Rooms</label>
-                        <input type="number" name="availableRooms" value={formData.availableRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
-                      </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Available Rooms</label>
+                            <input type="number" name="availableRooms" value={formData.availableRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
+                          </div>
+                        </>
+                      )}
 
                       <div className="col-md-6">
                         <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Max Occupants Per Room</label>
@@ -251,11 +334,11 @@ const AdminAddBoarding = () => {
                   <div className="row g-4">
                       <div className="col-md-4">
                           <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Owner Name</label>
-                          <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Nimal Perera" />
+                          <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} required minLength={3} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Nimal Perera" />
                       </div>
                       <div className="col-md-4">
                           <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Contact Number</label>
-                          <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="0771234567" />
+                          <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required minLength={10} maxLength={12} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="0771234567" />
                       </div>
                       <div className="col-md-4">
                           <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Email Address</label>

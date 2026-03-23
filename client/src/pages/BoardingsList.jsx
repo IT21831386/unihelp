@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BoardingCard from '../components/BoardingCard';
+import Navbar from '../components/Navbar';
 
 const BoardingsList = () => {
   const [boardings, setBoardings] = useState([]);
@@ -75,10 +76,11 @@ const BoardingsList = () => {
   });
 
   return (
-    <div className="bg-light min-vh-100 font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="bg-light min-vh-100 font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
+      <Navbar />
       
       {/* Search Header */}
-      <div className="bg-white border-bottom sticky-top shadow-sm z-3">
+      <div className="bg-white border-bottom sticky-top shadow-sm z-3" style={{ top: '80px' }}>
         <div className="container py-4">
           <div className="row justify-content-center">
             <div className="col-12 col-xl-8">

@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const BoardingCard = ({ boarding }) => {
+  const navigate = useNavigate();
+
   // Determine the display image
   const displayImage = boarding.imageUrls && boarding.imageUrls.length > 0 
     ? boarding.imageUrls[0] 
@@ -10,7 +13,11 @@ const BoardingCard = ({ boarding }) => {
     <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style={{ transition: 'transform 0.3s, box-shadow 0.3s' }} onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.classList.add('shadow');}} onMouseLeave={(e) => {e.currentTarget.style.transform = 'none'; e.currentTarget.classList.remove('shadow');}}>
       
       {/* Image Container */}
-      <div className="position-relative bg-light" style={{ aspectRatio: '4/3', overflow: 'hidden' }}>
+      <div 
+        className="position-relative bg-light cursor-pointer" 
+        style={{ aspectRatio: '4/3', overflow: 'hidden', cursor: 'pointer' }}
+        onClick={() => navigate(`/boarding/${boarding._id || boarding.id}`)}
+      >
         <img 
           src={displayImage} 
           alt={boarding.title} 
@@ -81,7 +88,13 @@ const BoardingCard = ({ boarding }) => {
                 <span className="fs-4 fw-bolder">{boarding.price.toLocaleString()}</span>
               </div>
             </div>
-            <button className="btn btn-light text-primary bg-primary-subtle rounded-3 p-2" style={{ transition: 'all 0.2s' }} onMouseEnter={(e) => {e.currentTarget.classList.add('bg-primary', 'text-white')}} onMouseLeave={(e) => {e.currentTarget.classList.remove('bg-primary', 'text-white')}}>
+            <button 
+              onClick={() => navigate(`/boarding/${boarding._id || boarding.id}`)}
+              className="btn btn-light text-primary bg-primary-subtle rounded-3 p-2" 
+              style={{ transition: 'all 0.2s' }} 
+              onMouseEnter={(e) => {e.currentTarget.classList.add('bg-primary', 'text-white')}} 
+              onMouseLeave={(e) => {e.currentTarget.classList.remove('bg-primary', 'text-white')}}
+            >
               <i className="bi bi-arrow-right-short fs-4 lh-1"></i>
             </button>
           </div>

@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminAddBoarding from './pages/AdminAddBoarding';
 import BoardingsList from './pages/BoardingsList';
+import BoardingDetails from './pages/BoardingDetails';
 import AdminAllBoardings from './pages/AdminAllBoardings';
 import AdminEditBoarding from './pages/AdminEditBoarding';
 
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/boarding" element={<BoardingsList />} />
+        <Route path="/boarding/:id" element={<BoardingDetails />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

@@ -62,9 +62,14 @@ const AdminAllBoardings = () => {
                 </h2>
                 <p className="text-secondary mb-0 ms-5 ps-3">View, modify, or permanently remove existing boarding places.</p>
               </div>
-              <Link to="/admin/addboarding" className="btn btn-primary btn-lg rounded-pill shadow-sm fw-medium d-flex align-items-center gap-2">
-                <i className="bi bi-plus-lg"></i> Add New Boarding
-              </Link>
+              <div className="d-flex align-items-center gap-3">
+                <Link to="/" className="btn btn-light border shadow-sm fw-medium d-flex align-items-center gap-2 text-secondary" style={{ padding: '0.6rem 1.25rem', borderRadius: '50rem' }}>
+                  <i className="bi bi-house-door"></i> Back to Home
+                </Link>
+                <Link to="/admin/addboarding" className="btn btn-primary shadow-sm fw-medium d-flex align-items-center gap-2" style={{ padding: '0.6rem 1.25rem', borderRadius: '50rem' }}>
+                  <i className="bi bi-plus-lg"></i> Add New Boarding
+                </Link>
+              </div>
             </div>
 
             <div className="card border-0 shadow-lg rounded-4 overflow-hidden">

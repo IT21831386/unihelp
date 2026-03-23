@@ -13,5 +13,5 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
-
 //mongodb+srv://db_user:tharaka123@cluster0.xhawcbe.mongodb.net/?appName=Cluster0
+//mongodb://localhost:27017/unihelp
