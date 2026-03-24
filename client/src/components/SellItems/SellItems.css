@@ -1,0 +1,162 @@
+.sell-page {
+  background: #f5f5f0;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.sell-breadcrumb {
+  padding: 80px 40px 12px;;
+  font-size: 12px;
+  color: #888;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+
+.sell-breadcrumb span {
+  color: #e8821a;
+  cursor: pointer;
+}
+
+.sell-breadcrumb span:hover {
+  text-decoration: underline;
+}
+
+.sell-content {
+  max-width: 1000px;
+  margin: 36px auto;
+  padding: 0 40px;
+}
+
+.sell-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a2540;
+  margin-bottom: 28px;
+}
+
+.sell-top-buttons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.sell-big-btn {
+  flex: 1;
+  background: white;
+  border: 1.5px solid #e0e0d8;
+  border-radius: 12px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.sell-big-btn:hover {
+  border-color: #e8821a;
+  transform: translateY(-2px);
+}
+
+.sell-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orange-icon {
+  background: #fff0e0;
+}
+
+.orange-icon svg {
+  fill: #e8821a;
+}
+
+.navy-icon {
+  background: #e8ecf3;
+}
+
+.navy-icon svg {
+  fill: #1a2540;
+}
+
+.sell-btn-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a2540;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sell-btn-sub {
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+}
+
+.sell-badge {
+  background: #e8821a;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.sell-section-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a2540;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 18px;
+}
+
+.sell-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding-bottom: 60px;
+}
+
+.sell-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #aaa;
+}
+
+.sell-empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.sell-empty p {
+  font-size: 16px;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.sell-empty span {
+  font-size: 13px;
+  color: #bbb;
+}
+
+@media (max-width: 700px) {
+  .sell-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sell-top-buttons {
+    flex-direction: column;
+  }
+
+  .sell-content {
+    padding: 0 20px;
+  }
+}
