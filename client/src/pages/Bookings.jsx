@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Bookings.css';
@@ -49,7 +50,7 @@ function Bookings() {
 
           <div className="bookings-cards">
             {bookingCategories.map((category) => (
-              <div key={category.id} className="booking-card">
+              <Link to={`/bookings/${category.id}`} key={category.id} className="booking-card">
                 <div className="booking-card__image-wrapper">
                   <img
                     src={category.image}
@@ -58,7 +59,7 @@ function Bookings() {
                   />
                 </div>
                 <p className="booking-card__label">{category.label}</p>
-              </div>
+              </Link>
             ))}
           </div>
 
