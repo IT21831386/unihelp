@@ -12,6 +12,13 @@ import BoardingsList from './pages/BoardingsList';
 import BoardingDetails from './pages/BoardingDetails';
 import AdminAllBoardings from './pages/AdminAllBoardings';
 import AdminEditBoarding from './pages/AdminEditBoarding';
+import Marketplace from './components/MarketPlace/MarketPlace.jsx';
+import BuyItems from './components/BuyItems/BuyItems.jsx';
+import SellItems from './components/SellItems/SellItems.jsx';
+import AddItem from './components/AddItem/AddItem.jsx';
+import UpdateItem from './components/UpdateItem/UpdateItem.jsx';
+import ItemDetail from './components/ItemDetail/ItemDetail.jsx';
+import Chat from './components/Chat/Chat.jsx';
 
 function App() {
   return (
@@ -30,6 +37,13 @@ function App() {
         <Route path="/admin/addboarding" element={<AdminAddBoarding />} />
         <Route path="/admin/allboardings" element={<AdminAllBoardings />} />
         <Route path="/admin/editboarding/:id" element={<AdminEditBoarding />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/marketplace/buy" element={<BuyItems />} />
+        <Route path="/marketplace/sell" element={<SellItems />} />
+        <Route path="/marketplace/sell/add" element={<AddItem />} />
+        <Route path="/marketplace/sell/update/:id" element={<UpdateItem />} />
+        <Route path="/marketplace/item/:id" element={<ItemDetail />} />
+        <Route path="/marketplace/chats" element={<Chat />} />
       </Routes>
     </Router>
   );
