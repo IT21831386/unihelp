@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Careers.css';
@@ -8,11 +9,13 @@ const careerCategories = [
     id: 'post-job',
     label: 'Post a Job',
     image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=500&h=380&fit=crop',
+    to: '/careers/post-job',
   },
   {
     id: 'find-job',
     label: 'Find  a Job',
     image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&h=380&fit=crop',
+    to: '/careers/find-jobs',
   },
 ];
 
@@ -42,7 +45,7 @@ function Careers() {
         <div className="container">
           <div className="careers-cards">
             {careerCategories.map((category) => (
-              <div key={category.id} className="career-card">
+              <Link to={category.to} key={category.id} className="career-card">
                 <div className="career-card__image-wrapper">
                   <img
                     src={category.image}
@@ -51,7 +54,7 @@ function Careers() {
                   />
                 </div>
                 <p className="career-card__label">{category.label}</p>
-              </div>
+              </Link>
             ))}
           </div>
 

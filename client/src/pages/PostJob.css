@@ -1,0 +1,321 @@
+/* ===== Post Job Page ===== */
+
+/* Breadcrumb */
+.post-job-breadcrumb {
+  padding: calc(var(--navbar-height) + var(--spacing-xl)) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.post-job-breadcrumb a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.post-job-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.post-job-breadcrumb span {
+  margin: 0 var(--spacing-sm);
+  color: var(--color-text-muted);
+}
+
+/* Page Header */
+.post-job-header {
+  margin: var(--spacing-xl) 0 var(--spacing-2xl);
+}
+
+.post-job-header h1 {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+  font-style: italic;
+  margin-bottom: var(--spacing-xs);
+}
+
+.post-job-header p {
+  color: var(--color-text-light);
+  font-size: var(--font-size-base);
+}
+
+/* Form Card */
+.post-job-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-3xl);
+  margin-bottom: var(--spacing-4xl);
+  box-shadow: var(--shadow-md);
+  max-width: 720px;
+  position: relative;
+  overflow: hidden;
+}
+
+.post-job-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+
+/* Form Layout */
+.post-job-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.post-job-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+/* Reuse form-group, form-label, form-input from Auth.css */
+.post-job-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.post-job-form .form-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.post-job-form .form-label .required {
+  color: #dc2626;
+  margin-left: 2px;
+}
+
+.post-job-form .form-input,
+.post-job-form .form-select,
+.post-job-form .form-textarea {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  transition: all var(--transition-fast);
+  background-color: var(--color-white);
+  width: 100%;
+}
+
+.post-job-form .form-input:focus,
+.post-job-form .form-select:focus,
+.post-job-form .form-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
+.post-job-form .form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+.post-job-form .form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+/* Input Error States */
+.post-job-form .form-input.input-error,
+.post-job-form .form-select.input-error,
+.post-job-form .form-textarea.input-error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.post-job-form .form-input.input-error:focus,
+.post-job-form .form-select.input-error:focus,
+.post-job-form .form-textarea.input-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
+}
+
+.post-job-form .field-error {
+  color: #dc2626;
+  font-size: var(--font-size-sm);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Server Error Banner */
+.post-job-error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Submit Button */
+.post-job-submit {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-white);
+  padding: var(--spacing-md) var(--spacing-2xl);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+  align-self: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+.post-job-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.post-job-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(27, 20, 100, 0.35);
+}
+
+.post-job-submit:hover::after {
+  opacity: 1;
+}
+
+.post-job-submit:disabled {
+  background: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Success Card */
+.post-job-success {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid #86efac;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  text-align: center;
+  max-width: 720px;
+  margin-bottom: var(--spacing-4xl);
+  animation: slideUp 0.4s ease-out;
+}
+
+.post-job-success__icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.post-job-success h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: var(--spacing-sm);
+}
+
+.post-job-success p {
+  color: #15803d;
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xl);
+}
+
+.post-job-success__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
+.post-job-success__btn {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.post-job-success__btn--primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+}
+
+.post-job-success__btn--primary:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-1px);
+}
+
+.post-job-success__btn--secondary {
+  background: var(--color-white);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.post-job-success__btn--secondary:hover {
+  background: var(--color-bg-light);
+  transform: translateY(-1px);
+}
+
+/* Character / Helper Count */
+.field-helper {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  text-align: right;
+}
+
+/* Animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .post-job-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .post-job-card {
+    padding: var(--spacing-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .post-job-header h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .post-job-success__actions {
+    flex-direction: column;
+  }
+}
