@@ -1,0 +1,504 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,700&display=swap');
+
+/* ══ Variables ══ */
+:root {
+  --color-primary:      #1B1464;
+  --color-primary-light:#2a1f8a;
+  --color-accent:       #FF6B35;
+  --color-accent-hover: #e55a28;
+  --color-white:        #ffffff;
+  --color-bg:           #f8f9fc;
+  --color-text:         #333333;
+  --color-text-light:   #666666;
+  --color-text-muted:   #999999;
+  --color-border:       #e8e8e8;
+}
+
+/* ══ Page ══ */
+.bi-page {
+  background: var(--color-bg);
+  min-height: 100vh;
+  font-family: 'Sora', 'Segoe UI', sans-serif;
+}
+
+/* ════════════════════════════════
+   LOADING
+════════════════════════════════ */
+.bi-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 16px;
+}
+
+.bi-loading p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.bi-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(27, 20, 100, 0.1);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: biSpin 0.8s linear infinite;
+}
+
+@keyframes biSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ════════════════════════════════
+   HERO BANNER (breadcrumb + title)
+════════════════════════════════ */
+.bi-hero-banner {
+  background: var(--color-primary);
+  padding: 75px 44px 26px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dot grid texture */
+.bi-hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle, rgba(255,255,255,0.055) 1px, transparent 1px
+  );
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Orange glow orb */
+.bi-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: -70px;
+  right: -50px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.2);
+  filter: blur(55px);
+  z-index: 0;
+}
+
+/* Bottom accent line */
+.bi-hero-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-accent) 30%,
+    rgba(255, 107, 53, 0.35) 65%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* ── Breadcrumb ── */
+.bi-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 12px;
+}
+
+.bi-breadcrumb-home {
+  font-size: 12px;
+  color: rgba(255, 107, 53, 0.88);
+  cursor: pointer;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: color 0.2s ease;
+}
+
+.bi-breadcrumb-home:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.bi-breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.28);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.bi-breadcrumb-current {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 400;
+}
+
+/* ── Hero title ── */
+.bi-hero-title-row {
+  position: relative;
+  z-index: 2;
+}
+
+.bi-hero-main-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  color: var(--color-white);
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.bi-hero-main-title span {
+  color: var(--color-accent);
+}
+
+.bi-hero-sub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+/* ════════════════════════════════
+   CONTENT AREA
+════════════════════════════════ */
+.bi-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 44px 64px;
+}
+
+/* ════════════════════════════════
+   EMPTY STATE
+════════════════════════════════ */
+.bi-empty {
+  text-align: center;
+  padding: 90px 20px;
+}
+
+.bi-empty-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.07);
+  border: 2px dashed rgba(255, 107, 53, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 30px;
+}
+
+.bi-empty p {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 7px;
+}
+
+.bi-empty span {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* ════════════════════════════════
+   CATEGORY SECTION
+════════════════════════════════ */
+.bi-category-section {
+  margin-bottom: 48px;
+}
+
+/* Category header row */
+.bi-category-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+
+.bi-category-tag {
+  font-size: 9.5px;
+  letter-spacing: 3px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bi-category-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.bi-category-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-border) 0%, transparent 100%);
+}
+
+/* ════════════════════════════════
+   CARDS GRID
+════════════════════════════════ */
+.bi-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* ════════════════════════════════
+   CARD
+════════════════════════════════ */
+.bi-card {
+  background: var(--color-white);
+  border-radius: 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 4px 20px rgba(27, 20, 100, 0.07),
+    0 1px 4px rgba(27, 20, 100, 0.04);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1),
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.bi-card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(255, 107, 53, 0.5);
+  box-shadow:
+    0 20px 52px rgba(27, 20, 100, 0.14),
+    0 0 0 1.5px rgba(255, 107, 53, 0.35);
+}
+
+/* ── Card Image ── */
+.bi-card-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-primary);
+  position: relative;
+}
+
+.bi-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+  display: block;
+}
+
+.bi-card:hover .bi-card-img img {
+  transform: scale(1.07);
+}
+
+/* Gradient overlay on image */
+.bi-card-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(27, 20, 100, 0.08) 0%,
+    rgba(27, 20, 100, 0.0) 40%,
+    rgba(27, 20, 100, 0.45) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Condition pill badge on image */
+.bi-card-cond-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(27, 20, 100, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--color-white);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-weight: 600;
+  z-index: 2;
+}
+
+/* No image fallback */
+.bi-card-no-img {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  color: rgba(255, 255, 255, 0.22);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.bi-card-no-img svg {
+  opacity: 0.18;
+}
+
+/* ── Card Body ── */
+.bi-card-body {
+  padding: 14px 16px 16px;
+  position: relative;
+}
+
+/* Subtle top separator shimmer */
+.bi-card-body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(27, 20, 100, 0.09),
+    transparent
+  );
+}
+
+.bi-card-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bi-card-price {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 5px;
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+.bi-card-price span {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-left: 3px;
+}
+
+.bi-card-meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 13px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* Negotiable badge */
+.bi-neg-badge {
+  background: rgba(13, 122, 74, 0.1);
+  color: #0d7a4a;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Card footer row */
+.bi-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid rgba(27, 20, 100, 0.06);
+}
+
+/* View Details text button */
+.bi-view-btn {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'Sora', sans-serif;
+  letter-spacing: 0.3px;
+  transition: color 0.2s ease;
+}
+
+.bi-view-btn:hover {
+  color: var(--color-accent-hover);
+}
+
+/* Arrow button */
+.bi-card-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(255, 107, 53, 0.36);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  flex-shrink: 0;
+}
+
+.bi-card:hover .bi-card-arrow {
+  transform: scale(1.12) translateX(2px);
+  box-shadow: 0 5px 18px rgba(255, 107, 53, 0.52);
+}
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media (max-width: 900px) {
+  .bi-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .bi-hero-banner {
+    padding: 18px 24px 22px;
+  }
+
+  .bi-hero-main-title {
+    font-size: 22px;
+  }
+
+  .bi-content {
+    padding: 28px 20px 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bi-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bi-hero-main-title {
+    font-size: 20px;
+  }
+}
