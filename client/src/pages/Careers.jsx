@@ -1,8 +1,17 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Careers.css';
+
+function getLoggedInUser() {
+  try {
+    const stored = localStorage.getItem('user');
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
 
 const careerCategories = [
   {
@@ -21,6 +30,23 @@ const careerCategories = [
 
 function Careers() {
   const [activeDot] = useState(1);
+  const navigate = useNavigate();
+  const user = getLoggedInUser();
+
+  // Students go directly to Find Jobs
+  if (user && user.role === 'user') {
+    return <Navigate to="/careers/find-jobs" replace />;
+  }
+
+  const isLoggedIn = !!user;
+
+  const handleCardClick = (e, category) => {
+    // If not logged in and clicking "Post a Job", redirect to login with return URL
+    if (!isLoggedIn && category.id === 'post-job') {
+      e.preventDefault();
+      navigate('/login?redirect=/careers/post-job');
+    }
+  };
 
   return (
     <>
@@ -45,7 +71,12 @@ function Careers() {
         <div className="container">
           <div className="careers-cards">
             {careerCategories.map((category) => (
-              <Link to={category.to} key={category.id} className="career-card">
+              <Link
+                to={category.to}
+                key={category.id}
+                className="career-card"
+                onClick={(e) => handleCardClick(e, category)}
+              >
                 <div className="career-card__image-wrapper">
                   <img
                     src={category.image}

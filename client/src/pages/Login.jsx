@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import './Auth.css';
 
@@ -26,6 +26,8 @@ function Login() {
   const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectUrl = new URLSearchParams(location.search).get('redirect');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,7 +66,13 @@ function Login() {
           JSON.stringify({ name: data.name, role: data.role, email: data.email })
         );
         window.dispatchEvent(new Event('auth-change'));
-        navigate('/');
+
+        // Students should never land on post-job, redirect them to find-jobs instead
+        let destination = redirectUrl || '/';
+        if (data.role === 'user' && redirectUrl === '/careers/post-job') {
+          destination = '/careers/find-jobs';
+        }
+        navigate(destination);
       } else if (data.errors) {
         // Map express-validator field-level errors
         const mapped = {};
