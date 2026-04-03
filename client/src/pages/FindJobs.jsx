@@ -1,58 +1,124 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './FindJobs.css';
 
-const sampleJobs = [
-  {
-    id: 1,
-    title: 'UI/UX Engineer',
-    company: 'ABC Technologies',
-    tags: ['Full-time', 'Entry Level', 'Remote'],
-    description:
-      'ABC is hiring a UI/UX Engineer to support in upcoming projects and if you\'re interested in this opportunity please apply through our website.',
-  },
-  {
-    id: 2,
-    title: 'UI/UX Engineer',
-    company: 'ABC Technologies',
-    tags: ['Full-time', 'Entry Level', 'Remote'],
-    description:
-      'ABC is hiring a UI/UX Engineer to support in upcoming projects and if you\'re interested in this opportunity please apply through our website.',
-  },
-  {
-    id: 3,
-    title: 'UI/UX Engineer',
-    company: 'ABC Technologies',
-    tags: ['Full-time', 'Entry Level', 'Remote'],
-    description:
-      'ABC is hiring a UI/UX Engineer to support in upcoming projects and if you\'re interested in this opportunity please apply through our website.',
-  },
-  {
-    id: 4,
-    title: 'UI/UX Engineer',
-    company: 'ABC Technologies',
-    tags: ['Full-time', 'Entry Level', 'Remote'],
-    description:
-      'ABC is hiring a UI/UX Engineer to support in upcoming projects and if you\'re interested in this opportunity please apply through our website.',
-  },
-];
+const PAGE_SIZE = 10;
+
+const LEVEL_LABELS = {
+  internship: 'Internship',
+  entry: 'Entry Level',
+  'mid-senior': 'Mid-Senior',
+  senior: 'Senior',
+};
+
+const MODALITY_LABELS = {
+  remote: 'Remote',
+  'on-site': 'On-Site',
+  hybrid: 'Hybrid',
+};
+
+const LOCATION_LABELS = {
+  colombo: 'Colombo',
+  kandy: 'Kandy',
+  galle: 'Galle',
+  remote: 'Remote',
+};
 
 function FindJobs() {
+  const [allJobs, setAllJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Search
   const [keyword, setKeyword] = useState('');
-  const [location, setLocation] = useState('');
-  const [salary, setSalary] = useState(90);
+  const [locationSearch, setLocationSearch] = useState('');
+
+  // Filters
   const [filters, setFilters] = useState({
     location: '',
-    internship: true,
+    internship: false,
     entryLevel: false,
     midSenior: false,
     senior: false,
-    remote: true,
+    remote: false,
     onSite: false,
     hybrid: false,
   });
+  const [salary, setSalary] = useState(600);
+
+  // Fetch jobs from API
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/jobs');
+        const data = await res.json();
+        if (res.ok) {
+          // jobController returns the array directly via res.json(jobs)
+          setAllJobs(Array.isArray(data) ? data : (data.jobs || []));
+        } else {
+          setError(data.message || 'Failed to load jobs');
+        }
+      } catch {
+        setError('Failed to connect to the server');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
+
+  // Filter + search logic
+  const filteredJobs = allJobs.filter((job) => {
+    // Keyword search
+    if (keyword.trim()) {
+      const kw = keyword.toLowerCase();
+      const matchesKeyword =
+        job.title.toLowerCase().includes(kw) ||
+        job.company.toLowerCase().includes(kw) ||
+        job.description.toLowerCase().includes(kw);
+      if (!matchesKeyword) return false;
+    }
+
+    // Location search bar
+    if (locationSearch.trim()) {
+      const loc = locationSearch.toLowerCase();
+      if (!LOCATION_LABELS[job.location]?.toLowerCase().includes(loc)) return false;
+    }
+
+    // Location dropdown filter
+    if (filters.location && job.location !== filters.location) return false;
+
+    // Level filters (if any checked, only show matching)
+    const levelFilters = [];
+    if (filters.internship) levelFilters.push('internship');
+    if (filters.entryLevel) levelFilters.push('entry');
+    if (filters.midSenior) levelFilters.push('mid-senior');
+    if (filters.senior) levelFilters.push('senior');
+    if (levelFilters.length > 0 && !levelFilters.includes(job.level)) return false;
+
+    // Modality filters
+    const modalityFilters = [];
+    if (filters.remote) modalityFilters.push('remote');
+    if (filters.onSite) modalityFilters.push('on-site');
+    if (filters.hybrid) modalityFilters.push('hybrid');
+    if (modalityFilters.length > 0 && !modalityFilters.includes(job.modality)) return false;
+
+    // Salary filter (salary slider is in K, job.salary is in LKR)
+    if (job.salary > salary * 1000) return false;
+
+    return true;
+  });
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [keyword, locationSearch, filters, salary]);
+
+  const visibleJobs = filteredJobs.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredJobs.length;
 
   const handleCheckbox = (key) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -69,7 +135,17 @@ function FindJobs() {
       onSite: false,
       hybrid: false,
     });
-    setSalary(90);
+    setSalary(600);
+    setKeyword('');
+    setLocationSearch('');
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  };
+
+  const formatSalary = (val) => {
+    return Number(val).toLocaleString() + ' LKR';
   };
 
   return (
@@ -166,15 +242,15 @@ function FindJobs() {
                 type="range"
                 className="filter-salary__slider"
                 min={30}
-                max={200}
+                max={600}
                 value={salary}
                 onChange={(e) => setSalary(Number(e.target.value))}
               />
               <div className="filter-salary__labels">
                 <span>30K</span>
-                <span>60K</span>
-                <span>100K</span>
-                <span>200K</span>
+                <span>150K</span>
+                <span>300K</span>
+                <span>600K</span>
               </div>
             </div>
           </aside>
@@ -197,28 +273,67 @@ function FindJobs() {
                 type="text"
                 className="find-jobs-search__input"
                 placeholder="Colombo, Sri Lanka"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                value={locationSearch}
+                onChange={(e) => setLocationSearch(e.target.value)}
               />
-              <button className="find-jobs-search__btn">Search</button>
+              <button className="find-jobs-search__btn" onClick={() => setVisibleCount(PAGE_SIZE)}>
+                Search
+              </button>
             </div>
+
+            {/* Results count */}
+            <div className="find-jobs-results-info">
+              Showing {visibleJobs.length} of {filteredJobs.length} jobs
+            </div>
+
+            {/* Loading state */}
+            {loading && (
+              <div className="find-jobs-loading">
+                <div className="find-jobs-spinner" />
+                <p>Loading jobs...</p>
+              </div>
+            )}
+
+            {/* Error state */}
+            {error && <div className="find-jobs-error">⚠️ {error}</div>}
+
+            {/* Empty state */}
+            {!loading && !error && filteredJobs.length === 0 && (
+              <div className="find-jobs-empty">
+                <div className="find-jobs-empty__icon">🔍</div>
+                <p>No jobs match your filters</p>
+                <span>Try adjusting your search criteria or clearing filters</span>
+              </div>
+            )}
 
             {/* Job Cards Grid */}
             <div className="find-jobs-grid">
-              {sampleJobs.map((job) => (
-                <div key={job.id} className="job-card">
+              {visibleJobs.map((job) => (
+                <div key={job._id} className="job-card">
                   <h3 className="job-card__title">{job.title}</h3>
                   <p className="job-card__company">{job.company}</p>
                   <div className="job-card__tags">
-                    {job.tags.map((tag, i) => (
-                      <span key={i} className="job-card__tag">{tag}</span>
-                    ))}
+                    <span className="job-card__tag">{LEVEL_LABELS[job.level] || job.level}</span>
+                    <span className="job-card__tag">{MODALITY_LABELS[job.modality] || job.modality}</span>
+                    <span className="job-card__tag">{LOCATION_LABELS[job.location] || job.location}</span>
                   </div>
+                  <div className="job-card__salary">{formatSalary(job.salary)}</div>
                   <p className="job-card__description">{job.description}</p>
-                  <button className="job-card__apply">Apply</button>
+                  <a href={`mailto:${job.contactEmail}`} className="job-card__apply">
+                    Apply
+                  </a>
                 </div>
               ))}
             </div>
+
+            {/* Load More */}
+            {hasMore && !loading && (
+              <div className="find-jobs-load-more">
+                <button className="find-jobs-load-more__btn" onClick={handleLoadMore}>
+                  Load More ({filteredJobs.length - visibleCount} remaining)
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
