@@ -319,9 +319,9 @@ function FindJobs() {
                   </div>
                   <div className="job-card__salary">{formatSalary(job.salary)}</div>
                   <p className="job-card__description">{job.description}</p>
-                  <a href={`mailto:${job.contactEmail}`} className="job-card__apply">
-                    Apply
-                  </a>
+                  <Link to={`/careers/job/${job._id}`} className="job-card__apply">
+                    View Details
+                  </Link>
                 </div>
               ))}
             </div>

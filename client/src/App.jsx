@@ -5,6 +5,7 @@ import BookingSeats from './pages/BookingSeats';
 import Careers from './pages/Careers';
 import FindJobs from './pages/FindJobs';
 import PostJob from './pages/PostJob';
+import ViewJob from './pages/ViewJob';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminAddBoarding from './pages/AdminAddBoarding';
@@ -32,6 +33,7 @@ function App() {
         <Route path="/careers" element={<Careers />} />
         <Route path="/careers/find-jobs" element={<FindJobs />} />
         <Route path="/careers/post-job" element={<PostJob />} />
+        <Route path="/careers/job/:id" element={<ViewJob />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin/addboarding" element={<AdminAddBoarding />} />
