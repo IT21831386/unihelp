@@ -1,0 +1,156 @@
+/* BoardingDetails.css */
+.boarding-details-bg {
+  background: linear-gradient(135deg, #fbfbfe 0%, #f1f3f7 100%);
+  min-height: 100vh;
+}
+
+.details-header-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+  margin-bottom: 2rem;
+}
+
+.spec-card-modern {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 1.5rem;
+  text-align: center;
+  height: 100%;
+}
+
+.spec-card-modern:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(89, 56, 182, 0.08);
+}
+
+.amenity-chip-large {
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 500;
+  padding: 12px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.amenity-chip-large.is-on {
+  background: rgba(89, 56, 182, 0.05) !important;
+  border-color: rgba(89, 56, 182, 0.1) !important;
+  color: #212529 !important;
+}
+
+.amenity-chip-large.is-off {
+  opacity: 0.6;
+  background: #f1f3f5;
+  text-decoration: line-through;
+}
+
+.amenity-chip-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.03);
+}
+
+.contact-card-modern {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.contact-hero-modern {
+  background: linear-gradient(135deg, #5938B6 0%, #3f2a8c 100%);
+  color: white;
+  padding: 2.5rem 1.5rem 4rem 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.contact-avatar-wrapper {
+  margin-top: -35px;
+  position: relative;
+  z-index: 2;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.contact-action-btn {
+  border-radius: 16px;
+  padding: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.contact-action-btn.btn-call {
+  background: rgba(89, 56, 182, 0.1);
+  color: #5938B6;
+}
+
+.contact-action-btn.btn-call:hover {
+  background: rgba(89, 56, 182, 0.15);
+  transform: scale(1.02);
+  color: #5938B6;
+}
+
+.contact-action-btn.btn-email {
+  background: linear-gradient(135deg, #5938B6 0%, #3f2a8c 100%);
+  color: white;
+  box-shadow: 0 8px 20px rgba(89, 56, 182, 0.25);
+  border: none;
+}
+
+.contact-action-btn.btn-email:hover {
+  box-shadow: 0 12px 25px rgba(89, 56, 182, 0.35);
+  transform: scale(1.02);
+  color: white;
+}
+
+.gallery-card-modern {
+  background: white;
+  border-radius: 24px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.gallery-hero-img-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.gallery-hero-img-wrapper img {
+  border-radius: 16px;
+  transition: transform 0.5s ease;
+}
+
+.gallery-hero-img-wrapper:hover img {
+  transform: scale(1.03);
+}
+
+.details-section-card {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+  padding: 2.5rem;
+}

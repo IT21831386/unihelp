@@ -35,7 +35,7 @@ function Login() {
       if (response.ok) {
         // Save token to localStorage
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify({ name: data.name, role: data.role, email: data.email }));
+        localStorage.setItem('user', JSON.stringify({ id: data._id, name: data.name, role: data.role, email: data.email }));
         // Dispatch custom event to update navbar state immediately
         window.dispatchEvent(new Event('auth-change'));
         navigate('/');

@@ -1,0 +1,118 @@
+/* BoardingsList.css */
+.boarding-page-bg {
+  background: radial-gradient(circle at top left, #f3f0fb 0%, #ffffff 40%),
+              radial-gradient(circle at bottom right, #f0eafb 0%, #ffffff 50%);
+  min-height: 100vh;
+}
+
+.boarding-search-bar {
+  border-radius: 50px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.boarding-search-bar:focus-within {
+  box-shadow: 0 15px 40px rgba(89, 56, 182, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.boarding-search-input:focus {
+  outline: none;
+  box-shadow: none !important;
+}
+
+.glass-filter-card {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 15px 40px rgba(89, 56, 182, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  border-radius: 20px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-filter-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #5938B6, #ff7eb3, #5938B6);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+.filter-heading {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: #5938B6 !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.filter-radio, .filter-checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  margin: 0;
+}
+
+.filter-radio {
+  border-radius: 50%;
+}
+
+.filter-radio:checked, .filter-checkbox:checked {
+  background: #5938B6;
+  border-color: #5938B6;
+  box-shadow: 0 4px 10px rgba(89, 56, 182, 0.3);
+}
+
+.filter-radio:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+.filter-checkbox:checked::after {
+  content: "✔";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.clear-filter-btn {
+  background: linear-gradient(135deg, #f1f3f5 0%, #e9ecef 100%);
+  transition: all 0.2s ease;
+  border-radius: 30px !important;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.clear-filter-btn:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  transform: translateY(-1px);
+}
+
+.no-results-card {
+  background: linear-gradient(to bottom right, #ffffff, #fdfdfe);
+  border: 2px dashed #cbd5e1 !important;
+  border-radius: 24px !important;
+}

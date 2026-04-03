@@ -102,6 +102,17 @@ const AdminEditBoarding = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    if (name === 'contactNumber') {
+      const onlyNums = value.replace(/[^0-9]/g, '');
+      if (onlyNums.length > 10) return;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: onlyNums
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -139,9 +150,9 @@ const AdminEditBoarding = () => {
       toast.error("Max Occupants Per Room must be greater than 0");
       return false;
     }
-    const phoneRegex = /^(0|\+94)[0-9]{9}$/;
+    const phoneRegex = /^0[0-9]{9}$/;
     if (!phoneRegex.test(formData.contactNumber.trim())) {
-      toast.error("Please enter a valid 10-digit Sri Lankan mobile number (e.g., 0771234567)");
+      toast.error("Contact number must be exactly 10 digits and start with 0");
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -266,12 +277,14 @@ const AdminEditBoarding = () => {
                       <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Price / Month</label>
                       <div className="input-group input-group-lg shadow-sm">
                         <span className="input-group-text bg-white text-secondary border-0 border-end" style={{ borderTopLeftRadius: '0.5rem', borderBottomLeftRadius: '0.5rem' }}>₨</span>
-                        <input type="number" name="price" value={formData.price} onChange={handleChange} required className="form-control bg-light border-0" placeholder="18000" />
+                        <input type="number" name="price" value={formData.price} onChange={handleChange} required min="0" onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }} className="form-control bg-light border-0" placeholder="18000" />
                       </div>
                     </div>
                     <div className="col-md-4">
                       <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Currency</label>
-                      <input type="text" name="currency" value={formData.currency} onChange={handleChange} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="LKR" />
+                      <select name="currency" value={formData.currency} onChange={handleChange} className="form-select form-select-lg bg-light border-0 shadow-sm">
+                        <option value="LKR">LKR</option>
+                      </select>
                     </div>
                   </div>
 
@@ -289,7 +302,34 @@ const AdminEditBoarding = () => {
                     </div>
                     <div className="col-md-6">
                       <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">District</label>
-                      <input type="text" name="district" value={formData.district} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Colombo" />
+                      <select name="district" value={formData.district} onChange={handleChange} required className="form-select form-select-lg bg-light border-0 shadow-sm">
+                        <option value="" disabled>Select a District</option>
+                        <option value="Ampara">Ampara</option>
+                        <option value="Anuradhapura">Anuradhapura</option>
+                        <option value="Badulla">Badulla</option>
+                        <option value="Batticaloa">Batticaloa</option>
+                        <option value="Colombo">Colombo</option>
+                        <option value="Galle">Galle</option>
+                        <option value="Gampaha">Gampaha</option>
+                        <option value="Hambantota">Hambantota</option>
+                        <option value="Jaffna">Jaffna</option>
+                        <option value="Kalutara">Kalutara</option>
+                        <option value="Kandy">Kandy</option>
+                        <option value="Kegalle">Kegalle</option>
+                        <option value="Kilinochchi">Kilinochchi</option>
+                        <option value="Kurunegala">Kurunegala</option>
+                        <option value="Mannar">Mannar</option>
+                        <option value="Matale">Matale</option>
+                        <option value="Matara">Matara</option>
+                        <option value="Monaragala">Monaragala</option>
+                        <option value="Mullaitivu">Mullaitivu</option>
+                        <option value="Nuwara Eliya">Nuwara Eliya</option>
+                        <option value="Polonnaruwa">Polonnaruwa</option>
+                        <option value="Puttalam">Puttalam</option>
+                        <option value="Ratnapura">Ratnapura</option>
+                        <option value="Trincomalee">Trincomalee</option>
+                        <option value="Vavuniya">Vavuniya</option>
+                      </select>
                     </div>
                   </div>
 
@@ -309,19 +349,19 @@ const AdminEditBoarding = () => {
                         <>
                           <div className="col-md-6">
                             <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Total Rooms</label>
-                            <input type="number" name="totalRooms" value={formData.totalRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="4" />
+                            <input type="number" name="totalRooms" value={formData.totalRooms} onChange={handleChange} required min="0" onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="4" />
                           </div>
 
                           <div className="col-md-6">
                             <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Available Rooms</label>
-                            <input type="number" name="availableRooms" value={formData.availableRooms} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
+                            <input type="number" name="availableRooms" value={formData.availableRooms} onChange={handleChange} required min="0" onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
                           </div>
                         </>
                       )}
 
                       <div className="col-md-6">
                         <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Max Occupants Per Room</label>
-                        <input type="number" name="maxOccupantsPerRoom" value={formData.maxOccupantsPerRoom} onChange={handleChange} required className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
+                        <input type="number" name="maxOccupantsPerRoom" value={formData.maxOccupantsPerRoom} onChange={handleChange} required min="0" onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="2" />
                       </div>
                   </div>
 
@@ -381,7 +421,7 @@ const AdminEditBoarding = () => {
                       </div>
                       <div className="col-md-4">
                           <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Contact Number</label>
-                          <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required minLength={10} maxLength={12} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="0771234567" />
+                          <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required minLength={10} maxLength={10} className="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="0771234567" />
                       </div>
                       <div className="col-md-4">
                           <label className="form-label fw-semibold text-secondary small text-uppercase tracking-wider">Email Address</label>

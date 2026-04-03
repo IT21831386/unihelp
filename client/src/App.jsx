@@ -9,6 +9,7 @@ import BoardingsList from './pages/BoardingsList';
 import BoardingDetails from './pages/BoardingDetails';
 import AdminAllBoardings from './pages/AdminAllBoardings';
 import AdminEditBoarding from './pages/AdminEditBoarding';
+import OwnerReviews from './pages/OwnerReviews';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin/addboarding" element={<AdminAddBoarding />} />
         <Route path="/admin/allboardings" element={<AdminAllBoardings />} />
+        <Route path="/owner/reviews" element={<OwnerReviews />} />
         <Route path="/admin/editboarding/:id" element={<AdminEditBoarding />} />
       </Routes>
     </Router>

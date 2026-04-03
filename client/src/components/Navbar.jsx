@@ -89,6 +89,11 @@ function Navbar() {
                       <span>{user.email}</span>
                       <span className="navbar__role-badge">{user.role}</span>
                     </div>
+                    {(user.role === 'employer' || user.role === 'admin') && (
+                      <Link to="/owner/reviews" className="navbar__dropdown-item" onClick={() => setIsProfileOpen(false)}>
+                        My Reviews
+                      </Link>
+                    )}
                     <button onClick={handleLogout} className="navbar__dropdown-item logout">
                       Log Out
                     </button>
