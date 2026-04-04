@@ -104,9 +104,9 @@ const BoardingDetails = () => {
           </div>
         </div>
 
-        <div className="row g-5 boarding-details__layout">
+        <div className="row justify-content-center g-5 boarding-details__layout">
           {/* Main Content (Images & Details) */}
-          <div className="col-12 col-lg-8">
+          <div className="col-12 col-lg-10">
             
             {/* Image Gallery */}
             <div className="gallery-card-modern mb-5 boarding-details__gallery">
@@ -137,16 +137,16 @@ const BoardingDetails = () => {
             </div>
 
             {/* Description */}
-            <div className="details-section-card mb-5 boarding-details__section-card">
+            <div className="details-section-card mb-5 boarding-details__section-card text-center">
               <h4 className="fw-bold text-dark mb-4 border-bottom pb-3"><i className="bi bi-body-text text-primary me-2"></i> About this place</h4>
               <p className="text-secondary lh-lg fs-5 mb-0" style={{ whiteSpace: 'pre-line' }}>{boarding.description}</p>
             </div>
 
             {/* Property Details Grid */}
             <div className="details-section-card mb-5 boarding-details__section-card">
-              <h4 className="fw-bold text-dark mb-4 border-bottom pb-3"><i className="bi bi-house-door text-primary me-2"></i> Property Specifications</h4>
+              <h4 className="fw-bold text-center text-dark mb-4 border-bottom pb-3"><i className="bi bi-house-door text-primary me-2"></i> Property Specifications</h4>
                 
-                <div className="row g-4 mb-5">
+                <div className="row justify-content-center text-center g-4 mb-5">
                   <div className="col-6 col-md-3">
                     <div className="spec-card-modern boarding-details__stat">
                       <i className="bi bi-door-open fs-2 text-primary mb-2 d-block"></i>
@@ -177,8 +177,8 @@ const BoardingDetails = () => {
                   </div>
                 </div>
 
-                <h5 className="fw-bold text-dark mb-4">Amenities & Features</h5>
-                <div className="row g-3">
+                <h5 className="fw-bold text-dark text-center mb-4">Amenities & Features</h5>
+                <div className="row justify-content-center g-3">
                   {[
                     { key: 'attachedBathroom', label: 'Attached Bathroom', icon: 'bi-droplet-half' },
                     { key: 'furnished', label: 'Fully Furnished', icon: 'bi-lamp' },
@@ -207,11 +207,12 @@ const BoardingDetails = () => {
           </div>
 
           {/* Sidebar (Contact Info & Map Placeholder) */}
-          <div className="col-12 col-lg-4">
-            <div className="position-sticky boarding-details__side" style={{ top: '100px' }}>
+          <div className="col-12 col-lg-10">
+            <div className="boarding-details__side row g-4 mt-2">
               
               {/* Contact Card */}
-              <div className="contact-card-modern mb-4 boarding-details__contact-card">
+              <div className="col-12 col-md-6">
+                <div className="contact-card-modern h-100 mb-4 boarding-details__contact-card">
                 <div className="contact-hero-modern bg-primary text-white position-relative boarding-details__contact-hero">
                   <div className="position-absolute w-100 h-100 top-0 start-0 opacity-10 bg-white" style={{ background: 'radial-gradient(circle, transparent 20%, #fff 20%, #fff 80%, transparent 80%, transparent) 0% 0% / 20px 20px' }}></div>
                   <div className="position-relative z-1">
@@ -249,13 +250,17 @@ const BoardingDetails = () => {
                 </div>
               </div>
 
+              </div>
+
               {/* Map Placeholder */}
-              <div className="details-section-card p-4">
+              <div className="col-12 col-md-6">
+                <div className="details-section-card h-100 p-4">
                  <h6 className="fw-bold text-dark mb-3"><i className="bi bi-map text-primary me-2"></i> Location View</h6>
                  <div className="bg-light rounded-3 d-flex flex-column align-items-center justify-content-center text-secondary border" style={{ height: '200px' }}>
                     <i className="bi bi-geo text-secondary opacity-50 display-3 mb-2"></i>
                     <span className="fw-medium">{boarding.city}, {boarding.district}</span>
                  </div>
+              </div>
               </div>
 
             </div>

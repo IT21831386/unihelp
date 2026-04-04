@@ -766,9 +766,11 @@ button {
 
 /* ===== Modern UI polish (BoardingsList) ===== */
 .boardings-sidebar .card {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(27, 20, 100, 0.08) !important;
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 15px 35px rgba(27, 20, 100, 0.05);
 }
 
 .boardings-sidebar .border-top {
@@ -878,8 +880,9 @@ button {
 }
 
 .boardings-results .card {
-  border: 1px solid rgba(27, 20, 100, 0.08) !important;
-  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(20px) saturate(180%);
 }
 
 .boardings-results .card:hover {
@@ -887,14 +890,24 @@ button {
 }
 
 /* ===== Modern Boarding Cards (BoardingCard component) ===== */
+.glass-pill {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 99px;
+  box-shadow: 0 8px 32px rgba(27, 20, 100, 0.05);
+  display: inline-block;
+}
+
 .boardings-results .boarding-place-card {
-  border: 1px solid rgba(27, 20, 100, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
   background:
-    radial-gradient(1200px 240px at 10% -10%, rgba(255, 107, 53, 0.25), transparent 55%),
-    radial-gradient(900px 220px at 90% 0%, rgba(27, 20, 100, 0.22), transparent 50%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.86) 100%) !important;
-  backdrop-filter: blur(10px);
-  border-radius: 18px !important;
+    radial-gradient(1200px 240px at 10% -10%, rgba(255, 107, 53, 0.15), transparent 55%),
+    radial-gradient(900px 220px at 90% 0%, rgba(27, 20, 100, 0.12), transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px !important;
   box-shadow:
     0 16px 45px rgba(27, 20, 100, 0.10),
     0 10px 30px rgba(255, 107, 53, 0.06);

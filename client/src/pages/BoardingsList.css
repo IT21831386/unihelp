@@ -1,25 +1,92 @@
 /* BoardingsList.css */
 .boarding-page-bg {
-  background: radial-gradient(circle at top left, #f3f0fb 0%, #ffffff 40%),
-              radial-gradient(circle at bottom right, #f0eafb 0%, #ffffff 50%);
+  background: 
+    linear-gradient(135deg, rgba(243, 240, 251, 0.55) 0%, rgba(255, 255, 255, 0.65) 100%),
+    url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop') center/cover fixed;
   min-height: 100vh;
 }
 
-.boarding-search-bar {
-  border-radius: 50px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+.search-header-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(89, 56, 182, 0.04);
   transition: all 0.3s ease;
-  border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.boarding-search-bar {
+  border-radius: 99px;
+  background: linear-gradient(145deg, #ffffff, #fdfbfb);
+  box-shadow: 
+    0 10px 25px rgba(89, 56, 182, 0.08),
+    inset 0 0 0 1px rgba(89, 56, 182, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+}
+
+.boarding-search-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 99px;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(89, 56, 182, 0.8), rgba(255, 126, 179, 0.8));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
 }
 
 .boarding-search-bar:focus-within {
-  box-shadow: 0 15px 40px rgba(89, 56, 182, 0.1) !important;
-  transform: translateY(-2px);
+  box-shadow: 0 20px 45px rgba(89, 56, 182, 0.15) !important;
+  transform: translateY(-4px) scale(1.01);
+}
+
+.boarding-search-bar:focus-within::before {
+  opacity: 1;
+}
+
+.boarding-search-input {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.boarding-search-input::placeholder {
+  color: #9cb0c9;
+  font-weight: 400;
 }
 
 .boarding-search-input:focus {
   outline: none;
   box-shadow: none !important;
+}
+
+.boarding-search-bar .input-group-text i {
+  color: #5938B6;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.boarding-search-bar:focus-within .input-group-text i {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.boarding-search-bar .btn-light {
+  background: rgba(89, 56, 182, 0.05);
+  color: #5938B6;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.boarding-search-bar .btn-light:hover {
+  background: rgba(89, 56, 182, 0.1);
+  color: #3f2a8c;
 }
 
 .glass-filter-card {
@@ -115,4 +182,22 @@
   background: linear-gradient(to bottom right, #ffffff, #fdfdfe);
   border: 2px dashed #cbd5e1 !important;
   border-radius: 24px !important;
+}
+
+.boardings-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 22px;
+}
+
+@media (min-width: 768px) {
+  .boardings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .boardings-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }

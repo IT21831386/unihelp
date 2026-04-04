@@ -81,7 +81,7 @@ const BoardingsList = () => {
       <Navbar />
       
       {/* Search Header */}
-      <div className="bg-white border-bottom sticky-top shadow-sm z-3" style={{ top: '80px' }}>
+      <div className="search-header-container sticky-top z-3" style={{ top: '80px' }}>
         <div className="container py-4">
           <div className="row justify-content-center">
             <div className="col-12 col-xl-8">
@@ -209,10 +209,12 @@ const BoardingsList = () => {
 
           {/* Results Grid */}
           <main className="boardings-results">
-            <div className="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
-              <h3 className="fw-bolder text-dark mb-0">
-                {filteredBoardings.length} {filteredBoardings.length === 1 ? 'place' : 'places'} found
-              </h3>
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <div className="glass-pill px-4 py-2">
+                <h3 className="fw-bold text-dark mb-0 fs-5">
+                  {filteredBoardings.length} {filteredBoardings.length === 1 ? 'place' : 'places'} found
+                </h3>
+              </div>
             </div>
             
             {loading ? (
@@ -223,9 +225,9 @@ const BoardingsList = () => {
                   <p className="text-secondary fw-medium mt-4">Loading amazing places...</p>
                </div>
             ) : filteredBoardings.length > 0 ? (
-            <div className="row g-4">
+            <div className="boardings-grid">
                 {filteredBoardings.map(boarding => (
-                  <div key={boarding._id || boarding.id || Math.random()} className="col-12 col-md-6 col-xl-4">
+                  <div key={boarding._id || boarding.id || Math.random()} className="boarding-grid-item">
                       <BoardingCard boarding={boarding} />
                   </div>
                 ))}

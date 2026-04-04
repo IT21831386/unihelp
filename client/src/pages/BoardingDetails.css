@@ -1,6 +1,8 @@
 /* BoardingDetails.css */
 .boarding-details-bg {
-  background: linear-gradient(135deg, #fbfbfe 0%, #f1f3f7 100%);
+  background: 
+    linear-gradient(135deg, rgba(243, 240, 251, 0.55) 0%, rgba(255, 255, 255, 0.65) 100%),
+    url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop') center/cover fixed;
   min-height: 100vh;
 }
 
@@ -16,7 +18,8 @@
 }
 
 .spec-card-modern {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
   border-radius: 20px;
   border: 1px solid rgba(0,0,0,0.03);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
@@ -62,7 +65,8 @@
 }
 
 .contact-card-modern {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
   border-radius: 24px;
   border: 1px solid rgba(0,0,0,0.04);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
@@ -126,7 +130,8 @@
 }
 
 .gallery-card-modern {
-  background: white;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
   border-radius: 24px;
   padding: 1rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.03);
@@ -148,7 +153,8 @@
 }
 
 .details-section-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
   border-radius: 24px;
   border: 1px solid rgba(0,0,0,0.03);
   box-shadow: 0 10px 30px rgba(0,0,0,0.02);
