@@ -1,25 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './BookingSeats.css';
 
-// Seat layout config for each table group
-const tableGroups = {
-  left: [
-    { id: 'TA', label: 'TA', rows: [['TA1', 'TA2', 'TA3'], ['TA4', 'TA5', 'TA6']] },
-    { id: 'TB', label: 'TB', rows: [['TB1', 'TB2', 'TB3'], ['TB4', 'TB5', 'TB6']] },
-    { id: 'TC', label: 'TC', rows: [['TC1', 'TC2', 'TC3'], ['TC4', 'TC5', 'TC6']] },
-  ],
-  right: [
-    { id: 'TD', label: 'TD', rows: [['TD1', 'TD2', 'TD3', 'TD4'], ['TD5', 'TD6', 'TD7', 'TD8']] },
-    { id: 'TE', label: 'TE', rows: [['TE1', 'TE2', 'TE3'], ['TE4', 'TE5', 'TE6']] },
-    { id: 'TF', label: 'TF', rows: [['TF1', 'TF2', 'TF3'], ['TF4', 'TF5', 'TF6']] },
-  ],
-};
+
 
 // Some seats marked as unavailable for demo
-const unavailableSeats = ['TA3', 'TB2', 'TD4', 'TE3', 'TF1'];
+const unavailableSeats = ['TA3', 'TB2', 'TD4', 'TE3', 'TF1', 'C1-3', 'C4-2', 'L1-1', 'L6-5'];
 
 const categoryLabels = {
   canteen: 'Canteen',
@@ -31,14 +19,69 @@ function BookingSeats() {
   const { categoryId } = useParams();
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [area, setArea] = useState('Study Area 1');
-  const [date, setDate] = useState('2026-03-02');
-  const [time, setTime] = useState('09:00');
+  
+  // Get current date (YYYY-MM-DD) and time (HH:MM) for initial state
+  const now = new Date();
+  const defaultDate = now.toISOString().split('T')[0];
+  const defaultTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
+  const [date, setDate] = useState(defaultDate);
+  const [time, setTime] = useState(defaultTime);
   const [numSeats, setNumSeats] = useState(4);
+  const [bookedSeatsFromDB, setBookedSeatsFromDB] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const categoryLabel = categoryLabels[categoryId] || 'Study area';
+  const [currentLayout, setCurrentLayout] = useState(null);
+
+  useEffect(() => {
+    const fetchLayoutConfig = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/areas');
+        if (res.ok) {
+          const areas = await res.json();
+          const targetArea = areas.find(a => a.categoryId === (categoryId || 'study-area'));
+          if (targetArea) setCurrentLayout(targetArea.layoutConfig);
+        }
+      } catch (err) {
+        console.error('Failed to load layout configs:', err);
+      }
+    };
+    fetchLayoutConfig();
+  }, [categoryId]);
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const query = new URLSearchParams({
+          category: categoryId || 'study-area',
+          area,
+          date,
+          time
+        }).toString();
+        const res = await fetch(`http://localhost:5000/api/bookings?${query}`);
+        if (!res.ok) throw new Error('Failed to fetch bookings');
+        const data = await res.json();
+        const seats = data.flatMap(b => b.seats);
+        setBookedSeatsFromDB(seats);
+        
+        // Remove currently selected seats if they just became unavailable
+        setSelectedSeats(prev => prev.filter(s => !seats.includes(s)));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchBookings();
+  }, [categoryId, area, date, time]);
+
+  const isSeatUnavailable = (seatId) => {
+    return unavailableSeats.includes(seatId) || bookedSeatsFromDB.includes(seatId);
+  };
 
   const toggleSeat = (seatId) => {
-    if (unavailableSeats.includes(seatId)) return;
+    if (isSeatUnavailable(seatId)) return;
 
     setSelectedSeats((prev) => {
       if (prev.includes(seatId)) {
@@ -50,9 +93,41 @@ function BookingSeats() {
   };
 
   const getSeatClass = (seatId) => {
-    if (unavailableSeats.includes(seatId)) return 'seat unavailable';
+    if (isSeatUnavailable(seatId)) return 'seat unavailable';
     if (selectedSeats.includes(seatId)) return 'seat selected';
     return 'seat';
+  };
+
+  const handleBookSpot = async () => {
+    setLoading(true);
+    setError('');
+    setSuccessMsg('');
+    try {
+      const res = await fetch('http://localhost:5000/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: categoryId || 'study-area',
+          area,
+          date,
+          time,
+          seats: selectedSeats
+        })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to book seats');
+      }
+      
+      setSuccessMsg('Successfully booked your spot!');
+      setSelectedSeats([]);
+      setBookedSeatsFromDB(prev => [...prev, ...selectedSeats]);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderTableGroup = (group) => (
@@ -64,7 +139,7 @@ function BookingSeats() {
               key={seatId}
               className={getSeatClass(seatId)}
               onClick={() => toggleSeat(seatId)}
-              title={unavailableSeats.includes(seatId) ? 'Unavailable' : seatId}
+              title={isSeatUnavailable(seatId) ? 'Unavailable' : seatId}
             >
               {seatId}
             </button>
@@ -154,11 +229,11 @@ function BookingSeats() {
               <div className="seat-map__grid">
                 {/* Left column */}
                 <div className="seat-map__column">
-                  {tableGroups.left.map(renderTableGroup)}
+                  {currentLayout ? currentLayout.left.map(renderTableGroup) : <div>Loading layout...</div>}
                 </div>
                 {/* Right column */}
                 <div className="seat-map__column">
-                  {tableGroups.right.map(renderTableGroup)}
+                  {currentLayout ? currentLayout.right.map(renderTableGroup) : <div>Loading layout...</div>}
                   <p className="seat-map__entrance">Entrance here</p>
                 </div>
               </div>
@@ -168,11 +243,14 @@ function BookingSeats() {
 
         {/* CTA */}
         <div className="booking-seats-cta">
+          {error && <p className="booking-seats-error" style={{color: 'red', marginBottom: '10px'}}>{error}</p>}
+          {successMsg && <p className="booking-seats-success" style={{color: 'green', marginBottom: '10px'}}>{successMsg}</p>}
           <button
             className="booking-seats-cta__btn"
-            disabled={selectedSeats.length === 0}
+            disabled={selectedSeats.length === 0 || loading}
+            onClick={handleBookSpot}
           >
-            Book your spot
+            {loading ? 'Booking...' : 'Book your spot'}
           </button>
         </div>
       </div>
