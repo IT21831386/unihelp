@@ -46,18 +46,21 @@ const BoardingCard = ({ boarding }) => {
           className="w-100 h-100 object-fit-cover boarding-place-card__img"
           style={{ transition: 'transform 0.5s ease-in-out' }}
         />
-        {/* Status Badge */}
-        <div className={`position-absolute top-0 end-0 m-3 badge rounded-pill px-3 py-2 ${
-          boarding.availabilityStatus === 'Available' ? 'bg-success text-white' : 
-          boarding.availabilityStatus === 'Full' ? 'bg-danger text-white' : 
-          'bg-warning text-dark'
-        } boarding-status-glass`}>
-          {boarding.availabilityStatus}
-        </div>
-        
-        {/* Type Badge */}
-        <div className="position-absolute top-0 start-0 m-3 badge rounded-pill px-3 py-2 boarding-badge-glass">
-          {boarding.propertyType}
+        {/* Badges Stack */}
+        <div className="position-absolute top-0 start-0 p-3 d-flex flex-column gap-2 align-items-start" style={{ pointerEvents: 'none' }}>
+          {/* Type Badge */}
+          <div className="badge rounded-pill px-3 py-2 boarding-badge-glass">
+            {boarding.propertyType}
+          </div>
+
+          {/* Status Badge */}
+          <div className={`badge rounded-pill px-3 py-2 ${
+            boarding.availabilityStatus === 'Available' ? 'bg-success text-white' : 
+            boarding.availabilityStatus === 'Full' ? 'bg-danger text-white' : 
+            'bg-warning text-dark'
+          } boarding-status-glass`}>
+            {boarding.availabilityStatus}
+          </div>
         </div>
       </div>
 
