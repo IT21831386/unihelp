@@ -46,6 +46,10 @@ const jobSchema = new mongoose.Schema(
       lowercase: true,
       match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Enter a valid email address'],
     },
+    link: {
+      type: String,
+      trim: true,
+    },
   },
   { timestamps: true }
 );

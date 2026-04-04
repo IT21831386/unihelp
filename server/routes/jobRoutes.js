@@ -31,6 +31,9 @@ const jobValidation = [
     .notEmpty().withMessage('Contact email is required')
     .isEmail().withMessage('Enter a valid email address')
     .normalizeEmail(),
+  body('link')
+    .optional({ checkFalsy: true })
+    .isURL().withMessage('Please enter a valid URL'),
 ];
 
 router.post('/', jobValidation, createJob);

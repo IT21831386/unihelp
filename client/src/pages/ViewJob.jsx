@@ -119,7 +119,12 @@ function ViewJob() {
           </div>
           <div className="view-job-header__actions">
             <div className="view-job-salary">{formatSalary(job.salary)}/Month</div>
-            <a href={`mailto:${job.contactEmail}`} className="view-job-apply-btn">
+            <a
+              href={job.link || `mailto:${job.contactEmail}`}
+              target={job.link ? '_blank' : undefined}
+              rel={job.link ? 'noopener noreferrer' : undefined}
+              className="view-job-apply-btn"
+            >
               Apply Now 🚀
             </a>
           </div>
@@ -138,9 +143,15 @@ function ViewJob() {
             <div className="view-job-contact">
               <h3>Interested in this role?</h3>
               <p>
-                Send your resume and a cover letter to{' '}
+                Send your resume to{' '}
                 <a href={`mailto:${job.contactEmail}`}>{job.contactEmail}</a>
               </p>
+              {job.link && (
+                <p>
+                  Or apply directly:{' '}
+                  <a href={job.link} target="_blank" rel="noopener noreferrer">{job.link}</a>
+                </p>
+              )}
             </div>
           </div>
 

@@ -51,6 +51,14 @@ function validate(data) {
     errors.contactEmail = 'Enter a valid email address';
   }
 
+  if (data.link && data.link.trim()) {
+    try {
+      new URL(data.link);
+    } catch {
+      errors.link = 'Please enter a valid URL';
+    }
+  }
+
   return errors;
 }
 
@@ -63,6 +71,7 @@ const initialFormData = {
   salary: '',
   description: '',
   contactEmail: '',
+  link: '',
 };
 
 function PostJob() {
@@ -342,6 +351,25 @@ function PostJob() {
                 />
                 {fieldErrors.contactEmail && (
                   <span className="field-error">{fieldErrors.contactEmail}</span>
+                )}
+              </div>
+
+              {/* Application Link */}
+              <div className="form-group">
+                <label className="form-label" htmlFor="link">
+                  Application Link <span className="optional">(optional)</span>
+                </label>
+                <input
+                  type="url"
+                  id="link"
+                  name="link"
+                  className={`form-input${fieldErrors.link ? ' input-error' : ''}`}
+                  value={formData.link}
+                  onChange={handleChange}
+                  placeholder="https://careers.company.com/apply"
+                />
+                {fieldErrors.link && (
+                  <span className="field-error">{fieldErrors.link}</span>
                 )}
               </div>
 
