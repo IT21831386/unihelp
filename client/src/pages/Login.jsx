@@ -1,90 +1,49 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import './Auth.css';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validate({ email, password }) {
-  const errors = {};
-  if (!email.trim()) {
-    errors.email = 'Email is required';
-  } else if (!EMAIL_REGEX.test(email)) {
-    errors.email = 'Enter a valid email address';
-  }
-  if (!password) {
-    errors.password = 'Password is required';
-  } else if (password.length < 6) {
-    errors.password = 'Password must be at least 6 characters';
-  }
-  return errors;
-}
-
 function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [serverError, setServerError] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const redirectUrl = new URLSearchParams(location.search).get('redirect');
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear the field error as the user types
-    if (fieldErrors[name]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setServerError('');
-
-    // Client-side validation first
-    const errors = validate(formData);
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      return;
-    }
-
+    setError('');
     setLoading(true);
+
     try {
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        // Save token to localStorage
         localStorage.setItem('token', data.token);
-        localStorage.setItem(
-          'user',
-          JSON.stringify({ name: data.name, role: data.role, email: data.email })
-        );
+        localStorage.setItem('user', JSON.stringify({ id: data._id, name: data.name, role: data.role, email: data.email }));
+        // Dispatch custom event to update navbar state immediately
         window.dispatchEvent(new Event('auth-change'));
-
-        // Students should never land on post-job, redirect them to find-jobs instead
-        let destination = redirectUrl || '/';
-        if (data.role === 'user' && redirectUrl === '/careers/post-job') {
-          destination = '/careers/find-jobs';
-        }
-        navigate(destination);
-      } else if (data.errors) {
-        // Map express-validator field-level errors
-        const mapped = {};
-        data.errors.forEach((err) => {
-          mapped[err.path] = err.msg;
-        });
-        setFieldErrors(mapped);
+        navigate('/');
       } else {
-        setServerError(data.message || 'Login failed');
+        setError(data.message || 'Login failed');
       }
-    } catch {
-      setServerError('Failed to connect to the server');
+    } catch (err) {
+      setError('Failed to connect to the server');
     } finally {
       setLoading(false);
     }
@@ -100,45 +59,35 @@ function Login() {
             <p className="auth-subtitle">Log in to your UniHelp account</p>
           </div>
 
-          {serverError && <div className="auth-error">{serverError}</div>}
+          {error && <div className="auth-error">{error}</div>}
 
-          <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label" htmlFor="email">
-                Email Address
-              </label>
+              <label className="form-label" htmlFor="email">Email Address</label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                className={`form-input${fieldErrors.email ? ' input-error' : ''}`}
+                className="form-input"
                 value={formData.email}
                 onChange={handleChange}
+                required
                 placeholder="name@example.com"
-                autoComplete="email"
               />
-              {fieldErrors.email && (
-                <span className="field-error">{fieldErrors.email}</span>
-              )}
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="password">
-                Password
-              </label>
+              <label className="form-label" htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
                 name="password"
-                className={`form-input${fieldErrors.password ? ' input-error' : ''}`}
+                className="form-input"
                 value={formData.password}
                 onChange={handleChange}
+                required
                 placeholder="Enter your password"
-                autoComplete="current-password"
               />
-              {fieldErrors.password && (
-                <span className="field-error">{fieldErrors.password}</span>
-              )}
             </div>
 
             <button type="submit" className="auth-button" disabled={loading}>
@@ -147,10 +96,7 @@ function Login() {
           </form>
 
           <div className="auth-footer">
-            Don't have an account?{' '}
-            <Link to="/signup" className="auth-link">
-              Sign Up
-            </Link>
+            Don't have an account? <Link to="/signup" className="auth-link">Sign Up</Link>
           </div>
         </div>
       </div>

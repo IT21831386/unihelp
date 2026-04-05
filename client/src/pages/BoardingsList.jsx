@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BoardingCard from '../components/BoardingCard';
 import Navbar from '../components/Navbar';
+import './BoardingsList.css';
 
 const BoardingsList = () => {
   const [boardings, setBoardings] = useState([]);
@@ -76,16 +77,16 @@ const BoardingsList = () => {
   });
 
   return (
-    <div className="bg-light min-vh-100 font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
+    <div className="boarding-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
       <Navbar />
       
       {/* Search Header */}
-      <div className="bg-white border-bottom sticky-top shadow-sm z-3" style={{ top: '80px' }}>
+      <div className="search-header-container sticky-top z-3" style={{ top: '80px' }}>
         <div className="container py-4">
           <div className="row justify-content-center">
             <div className="col-12 col-xl-8">
-              <div className="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
-                <span className="input-group-text bg-white border-0 text-secondary ps-4">
+              <div className="input-group input-group-lg boarding-search-bar bg-white overflow-hidden">
+                <span className="input-group-text bg-transparent border-0 text-secondary ps-4">
                   <i className="bi bi-search"></i>
                 </span>
                 <input 
@@ -93,7 +94,7 @@ const BoardingsList = () => {
                   placeholder="Search by city, district, or address..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="form-control border-0 bg-white py-3 px-3 shadow-none"
+                  className="form-control border-0 bg-transparent py-3 px-3 shadow-none boarding-search-input"
                 />
                 <button 
                   onClick={() => setIsMobileFiltersOpen(true)}
@@ -109,13 +110,14 @@ const BoardingsList = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="container py-5 flex-grow-1">
-        <div className="row g-5">
-          
-          {/* Sidebar Filters (Desktop) */}
-          <aside className={`col-lg-3 ${isMobileFiltersOpen ? 'd-block position-fixed top-0 start-0 h-100 bg-white z-3 shadow-lg overflow-auto' : 'd-none d-lg-block'}`} style={isMobileFiltersOpen ? { width: '320px', zIndex: 1050 } : {}}>
+        <div className="container py-5 flex-grow-1">
+        <div className="boardings-layout">
+          {/* Sidebar Filters */}
+          <aside
+            className={`boardings-sidebar ${isMobileFiltersOpen ? 'open' : ''}`}
+          >
             
-            <div className="card border-0 rounded-4 shadow-sm h-100 bg-white d-flex flex-column" style={isMobileFiltersOpen ? { borderRadius: '0 !important', padding: '2rem 1.5rem', boxShadow: 'none' } : { padding: '2rem 1.5rem' }}>
+            <div className="card h-100 glass-filter-card d-flex flex-column" style={isMobileFiltersOpen ? { borderRadius: '0 !important', padding: '2rem 1.5rem' } : { padding: '2rem 1.5rem' }}>
               
               <div className="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
                 <div className="d-flex align-items-center gap-2 text-dark fs-5 fw-bold">
@@ -132,7 +134,7 @@ const BoardingsList = () => {
               <div className="d-flex flex-column gap-5">
                 {/* Property Type */}
                 <div>
-                  <h6 className="text-secondary small fw-bold text-uppercase tracking-wider mb-3">Property Type</h6>
+                  <h6 className="filter-heading">Property Type</h6>
                   <div className="d-flex flex-column gap-2">
                     {['All', 'Room', 'House', 'Apartment'].map(type => (
                       <div key={type} className="form-check">
@@ -143,7 +145,7 @@ const BoardingsList = () => {
                           value={type}
                           checked={propertyType === type}
                           onChange={(e) => setPropertyType(e.target.value)}
-                          className="form-check-input border-secondary-subtle focus-ring focus-ring-primary"
+                          className="form-check-input filter-radio"
                         />
                         <label className="form-check-label text-dark fw-medium" htmlFor={`type-${type}`}>
                           {type}
@@ -155,7 +157,7 @@ const BoardingsList = () => {
 
                 {/* Price Range */}
                 <div className="border-top pt-4">
-                  <h6 className="text-secondary small fw-bold text-uppercase tracking-wider mb-3">Max Price (LKR)</h6>
+                  <h6 className="filter-heading">Max Price (LKR)</h6>
                    <div className="input-group">
                     <span className="input-group-text bg-light text-secondary border-end-0">₨</span>
                     <input 
@@ -170,22 +172,22 @@ const BoardingsList = () => {
 
                 {/* Amenities */}
                 <div className="border-top pt-4">
-                  <h6 className="text-secondary small fw-bold text-uppercase tracking-wider mb-3">Must Include</h6>
+                  <h6 className="filter-heading">Must Include</h6>
                   <div className="d-flex flex-column gap-2">
-                    <div className="form-check">
-                      <input type="checkbox" id="wifi" name="wifi" checked={amenities.wifi} onChange={handleAmenityChange} className="form-check-input border-secondary-subtle" />
+                    <div className="form-check d-flex align-items-center gap-2">
+                      <input type="checkbox" id="wifi" name="wifi" checked={amenities.wifi} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
                       <label className="form-check-label text-dark fw-medium" htmlFor="wifi">WiFi access</label>
                     </div>
-                    <div className="form-check">
-                      <input type="checkbox" id="bath" name="attachedBathroom" checked={amenities.attachedBathroom} onChange={handleAmenityChange} className="form-check-input border-secondary-subtle" />
+                    <div className="form-check d-flex align-items-center gap-2">
+                      <input type="checkbox" id="bath" name="attachedBathroom" checked={amenities.attachedBathroom} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
                       <label className="form-check-label text-dark fw-medium" htmlFor="bath">Attached Bathroom</label>
                     </div>
-                    <div className="form-check">
-                      <input type="checkbox" id="park" name="parking" checked={amenities.parking} onChange={handleAmenityChange} className="form-check-input border-secondary-subtle" />
+                    <div className="form-check d-flex align-items-center gap-2">
+                      <input type="checkbox" id="park" name="parking" checked={amenities.parking} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
                       <label className="form-check-label text-dark fw-medium" htmlFor="park">Parking Space</label>
                     </div>
-                    <div className="form-check">
-                      <input type="checkbox" id="furnish" name="furnished" checked={amenities.furnished} onChange={handleAmenityChange} className="form-check-input border-secondary-subtle" />
+                    <div className="form-check d-flex align-items-center gap-2">
+                      <input type="checkbox" id="furnish" name="furnished" checked={amenities.furnished} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
                       <label className="form-check-label text-dark fw-medium" htmlFor="furnish">Fully Furnished</label>
                     </div>
                   </div>
@@ -195,7 +197,7 @@ const BoardingsList = () => {
                 <div className="border-top pt-4 mt-auto">
                    <button 
                     onClick={clearFilters}
-                    className="btn btn-light w-100 py-2 text-secondary fw-semibold border"
+                    className="btn w-100 py-2 text-secondary fw-semibold clear-filter-btn"
                   >
                     Clear all filters
                   </button>
@@ -205,21 +207,14 @@ const BoardingsList = () => {
             </div>
           </aside>
 
-          {/* Mobile filter backdrop */}
-          {isMobileFiltersOpen && (
-            <div 
-              className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 z-2"
-              style={{ backdropFilter: 'blur(3px)' }}
-              onClick={() => setIsMobileFiltersOpen(false)}
-            ></div>
-          )}
-
           {/* Results Grid */}
-          <main className="col-12 col-lg-9">
-            <div className="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
-              <h3 className="fw-bolder text-dark mb-0">
-                {filteredBoardings.length} {filteredBoardings.length === 1 ? 'place' : 'places'} found
-              </h3>
+          <main className="boardings-results">
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <div className="glass-pill px-4 py-2">
+                <h3 className="fw-bold text-dark mb-0 fs-5">
+                  {filteredBoardings.length} {filteredBoardings.length === 1 ? 'place' : 'places'} found
+                </h3>
+              </div>
             </div>
             
             {loading ? (
@@ -230,17 +225,17 @@ const BoardingsList = () => {
                   <p className="text-secondary fw-medium mt-4">Loading amazing places...</p>
                </div>
             ) : filteredBoardings.length > 0 ? (
-              <div className="row g-4">
+            <div className="boardings-grid">
                 {filteredBoardings.map(boarding => (
-                  <div key={boarding._id || boarding.id || Math.random()} className="col-12 col-md-6 col-xl-4">
+                  <div key={boarding._id || boarding.id || Math.random()} className="boarding-grid-item">
                       <BoardingCard boarding={boarding} />
                   </div>
                 ))}
               </div>
             ) : (
-               <div className="card border-0 rounded-4 p-5 text-center bg-white shadow-sm w-100" style={{ borderStyle: 'dashed !important', borderWidth: '2px !important', borderColor: '#dee2e6 !important' }}>
+               <div className="card no-results-card p-5 text-center w-100">
                   <div className="card-body py-5">
-                    <i className="bi bi-geo-alt display-2 text-light mb-4 shadow-sm rounded-circle d-inline-block p-4 bg-primary text-white"></i>
+                    <i className="bi bi-geo-alt display-2 text-light mb-4 shadow-sm rounded-circle d-inline-block p-4 bg-primary text-white" style={{ background: 'linear-gradient(135deg, var(--bs-primary), #3f2a8c)' }}></i>
                     <h3 className="fw-bold text-dark mb-3">No places found</h3>
                     <p className="text-secondary mb-4 mx-auto" style={{ maxWidth: '400px' }}>We couldn't find any boarding places matching your exact search and filters.</p>
                     <button 

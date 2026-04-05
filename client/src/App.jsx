@@ -21,6 +21,7 @@ import AddItem from './components/AddItem/AddItem.jsx';
 import UpdateItem from './components/UpdateItem/UpdateItem.jsx';
 import ItemDetail from './components/ItemDetail/ItemDetail.jsx';
 import Chat from './components/Chat/Chat.jsx';
+import OwnerReviews from './pages/OwnerReviews';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
         <Route path="/marketplace/sell/update/:id" element={<UpdateItem />} />
         <Route path="/marketplace/item/:id" element={<ItemDetail />} />
         <Route path="/marketplace/chats" element={<Chat />} />
+        <Route path="/owner/reviews" element={<OwnerReviews />} />
       </Routes>
     </Router>
   );

@@ -3,26 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import './Auth.css';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validate({ name, email, password }) {
-  const errors = {};
-  if (!name.trim()) {
-    errors.name = 'Name is required';
-  }
-  if (!email.trim()) {
-    errors.email = 'Email is required';
-  } else if (!EMAIL_REGEX.test(email)) {
-    errors.email = 'Enter a valid email address';
-  }
-  if (!password) {
-    errors.password = 'Password is required';
-  } else if (password.length < 6) {
-    errors.password = 'Password must be at least 6 characters';
-  }
-  return errors;
-}
-
 function Signup() {
   const [formData, setFormData] = useState({
     name: '',
@@ -30,61 +10,42 @@ function Signup() {
     password: '',
     role: 'user',
   });
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [serverError, setServerError] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+n
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear the field error as the user types
-    if (fieldErrors[name]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setServerError('');
-
-    // Client-side validation first
-    const errors = validate(formData);
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      return;
-    }
-
+    setError('');
     setLoading(true);
+
     try {
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        // Save token to localStorage
         localStorage.setItem('token', data.token);
-        localStorage.setItem(
-          'user',
-          JSON.stringify({ name: data.name, role: data.role, email: data.email })
-        );
+        localStorage.setItem('user', JSON.stringify({ id: data._id, name: data.name, role: data.role, email: data.email }));
+        // Dispatch custom event to update navbar state immediately
         window.dispatchEvent(new Event('auth-change'));
         navigate('/');
-      } else if (data.errors) {
-        // Map express-validator field-level errors
-        const mapped = {};
-        data.errors.forEach((err) => {
-          mapped[err.path] = err.msg;
-        });
-        setFieldErrors(mapped);
       } else {
-        setServerError(data.message || 'Registration failed');
+        setError(data.message || 'Registration failed');
       }
-    } catch {
-      setServerError('Failed to connect to the server');
+    } catch (err) {
+      setError('Failed to connect to the server');
     } finally {
       setLoading(false);
     }
@@ -100,70 +61,54 @@ function Signup() {
             <p className="auth-subtitle">Create an account to get started</p>
           </div>
 
-          {serverError && <div className="auth-error">{serverError}</div>}
+          {error && <div className="auth-error">{error}</div>}
 
-          <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label" htmlFor="name">
-                Full Name / Company Name
-              </label>
+              <label className="form-label" htmlFor="name">Full Name / Company Name</label>
               <input
                 type="text"
                 id="name"
                 name="name"
-                className={`form-input${fieldErrors.name ? ' input-error' : ''}`}
+                className="form-input"
                 value={formData.name}
                 onChange={handleChange}
+                required
                 placeholder="Enter your name"
-                autoComplete="name"
               />
-              {fieldErrors.name && (
-                <span className="field-error">{fieldErrors.name}</span>
-              )}
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="email">
-                Email Address
-              </label>
+              <label className="form-label" htmlFor="email">Email Address</label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                className={`form-input${fieldErrors.email ? ' input-error' : ''}`}
+                className="form-input"
                 value={formData.email}
                 onChange={handleChange}
+                required
                 placeholder="name@example.com"
-                autoComplete="email"
               />
-              {fieldErrors.email && (
-                <span className="field-error">{fieldErrors.email}</span>
-              )}
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="password">
-                Password
-              </label>
+              <label className="form-label" htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
                 name="password"
-                className={`form-input${fieldErrors.password ? ' input-error' : ''}`}
+                className="form-input"
                 value={formData.password}
                 onChange={handleChange}
+                required
                 placeholder="Min. 6 characters"
-                autoComplete="new-password"
+                minLength="6"
               />
-              {fieldErrors.password && (
-                <span className="field-error">{fieldErrors.password}</span>
-              )}
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="role">
-                I am a...
-              </label>
+              <label className="form-label" htmlFor="role">I am a...</label>
               <select
                 id="role"
                 name="role"
@@ -183,10 +128,7 @@ function Signup() {
           </form>
 
           <div className="auth-footer">
-            Already have an account?{' '}
-            <Link to="/login" className="auth-link">
-              Log In
-            </Link>
+            Already have an account? <Link to="/login" className="auth-link">Log In</Link>
           </div>
         </div>
       </div>
