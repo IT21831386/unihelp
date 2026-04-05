@@ -6,11 +6,6 @@ import './Bookings.css';
 
 const bookingCategories = [
   {
-    id: 'canteen',
-    label: 'Canteen',
-    image: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=400&h=400&fit=crop',
-  },
-  {
     id: 'study-area',
     label: 'Study Area',
     image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop',
