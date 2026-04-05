@@ -1,0 +1,80 @@
+/* BoardingCard.css */
+.boarding-card-modern {
+  border-radius: 20px !important;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+}
+
+.boarding-card-modern:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(89, 56, 182, 0.12) !important;
+}
+
+.boarding-card-img-wrapper {
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  position: relative;
+}
+
+.boarding-card-img {
+  transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.boarding-card-modern:hover .boarding-card-img {
+  transform: scale(1.08);
+}
+
+.boarding-badge-glass {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #333 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.boarding-status-glass {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  letter-spacing: 0.5px;
+}
+
+.boarding-cta-btn {
+  background: #f1f3f5;
+  color: #5938B6;
+  border-radius: 12px;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.boarding-card-modern:hover .boarding-cta-btn {
+  background: linear-gradient(135deg, #5938B6 0%, #3f2a8c 100%);
+  color: white;
+  box-shadow: 0 8px 20px rgba(89, 56, 182, 0.3);
+  transform: translateX(4px);
+}
+
+.amenity-chip {
+  background: #f8f9fa;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.boarding-card-modern:hover .amenity-chip {
+  background: #f1f3f5;
+  color: #495057;
+}

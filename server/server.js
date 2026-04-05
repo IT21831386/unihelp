@@ -14,6 +14,7 @@ const boardingRoutes = require('./routes/boardingRouter');
 const jobRoutes = require('./routes/jobRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const areaRoutes = require('./routes/areaRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 // Middleware
 app.use(cors());
@@ -25,6 +26,7 @@ app.use('/api/boardings', boardingRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/areas', areaRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to UniHelp API' });
