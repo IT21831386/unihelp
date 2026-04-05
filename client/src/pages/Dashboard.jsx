@@ -16,6 +16,7 @@ function Dashboard() {
   const [isAddingArea, setIsAddingArea] = useState(false);
   const [newAreaLabel, setNewAreaLabel] = useState('');
   const [newAreaId, setNewAreaId] = useState('');
+  const [myBookings, setMyBookings] = useState([]);
   
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -31,12 +32,10 @@ function Dashboard() {
     const parsedUser = JSON.parse(userStr);
     setCurrentUser(parsedUser);
 
-    // Kick out regular students entirely from dashboard access
     if (parsedUser.role === 'user') {
-      navigate('/');
+      setActiveTab('bookings');
     }
 
-    // Default tab for employers is jobs
     if (parsedUser.role === 'employer') {
       setActiveTab('jobs');
     }
@@ -65,16 +64,25 @@ function Dashboard() {
           }
         }
 
-        // Fetch jobs for both admin and employer
-        const jobsRes = await fetch('http://localhost:5000/api/jobs');
-        if (jobsRes.ok) {
-          const jobsData = await jobsRes.json();
-          let allJobs = Array.isArray(jobsData) ? jobsData : [];
-          // If employer, filter jobs to only showcase their own
-          if (currentUser.role === 'employer') {
-             allJobs = allJobs.filter(job => job.contactEmail === currentUser.email);
+        if (currentUser.role === 'user') {
+          const bookingsRes = await fetch(`http://localhost:5000/api/bookings?user=${currentUser._id}`);
+          if (bookingsRes.ok) {
+             const bookingsData = await bookingsRes.json();
+             setMyBookings(Array.isArray(bookingsData) ? bookingsData : []);
           }
-          setJobs(allJobs);
+        }
+
+        // Fetch jobs for both admin and employer
+        if (currentUser.role === 'admin' || currentUser.role === 'employer') {
+          const jobsRes = await fetch('http://localhost:5000/api/jobs');
+          if (jobsRes.ok) {
+            const jobsData = await jobsRes.json();
+            let allJobs = Array.isArray(jobsData) ? jobsData : [];
+            if (currentUser.role === 'employer') {
+               allJobs = allJobs.filter(job => job.contactEmail === currentUser.email);
+            }
+            setJobs(allJobs);
+          }
         }
       } catch (err) {
         setError('Failed to load dashboard data. Check your connection to the server.');
@@ -409,6 +417,45 @@ function Dashboard() {
           </div>
         );
 
+      case 'bookings':
+        if (currentUser.role !== 'user') return null;
+        return (
+          <div className="dashboard-card">
+            <div className="dashboard-card__header">
+              <h2>My Booked Seats</h2>
+              <span className="dashboard-badge">{myBookings.length} Total</span>
+            </div>
+            <div className="table-responsive">
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Area ID</th>
+                    <th>Seats</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myBookings.length === 0 ? (
+                    <tr><td colSpan="5" className="empty-row">No bookings found</td></tr>
+                  ) : (
+                    myBookings.map(booking => (
+                      <tr key={booking._id}>
+                        <td><strong>{formatDate(booking.date)}</strong></td>
+                        <td>{booking.time}</td>
+                        <td><span className="level-tag" style={{textTransform: 'capitalize'}}>{booking.area}</span></td>
+                        <td>{booking.seats.join(', ')}</td>
+                        <td><span className="role-tag" style={{ background: '#d4edda', color: '#155724' }}>Active</span></td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -425,6 +472,15 @@ function Dashboard() {
             <h3>Dashboard</h3>
           </div>
           <nav className="dashboard-nav">
+            {currentUser.role === 'user' && (
+              <button 
+                className={`dashboard-nav__btn ${activeTab === 'bookings' ? 'active' : ''}`}
+                onClick={() => setActiveTab('bookings')}
+              >
+                <span className="nav-icon">📅</span> My Bookings
+              </button>
+            )}
+
             {currentUser.role === 'admin' && (
               <button 
                 className={`dashboard-nav__btn ${activeTab === 'students' ? 'active' : ''}`}
@@ -434,12 +490,14 @@ function Dashboard() {
               </button>
             )}
             
-            <button 
-              className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
-              onClick={() => setActiveTab('jobs')}
-            >
-              <span className="nav-icon">💼</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
-            </button>
+            {currentUser.role !== 'user' && (
+              <button 
+                className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
+                onClick={() => setActiveTab('jobs')}
+              >
+                <span className="nav-icon">💼</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
+              </button>
+            )}
             
             {currentUser.role === 'admin' && (
               <>

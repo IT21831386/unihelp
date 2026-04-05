@@ -6,6 +6,7 @@ const bookingSchema = new mongoose.Schema({
   area: { type: String, required: true },
   date: { type: String, required: true },
   time: { type: String, required: true },
+  endTime: { type: String, required: true },
   seats: [{ type: String, required: true }],
   status: { type: String, default: 'active' },
 }, { timestamps: true });

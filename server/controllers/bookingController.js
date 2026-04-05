@@ -4,11 +4,15 @@ const Booking = require('../models/Booking');
 // @route   POST /api/bookings
 const createBooking = async (req, res) => {
   try {
-    const { category, area, date, time, seats } = req.body;
+    const { category, area, date, time, endTime, seats, user } = req.body;
     
-    // Check if seats are already booked for that date/time/area
-    const existingBookings = await Booking.find({ category, area, date, time, status: 'active' });
-    const bookedSeats = existingBookings.flatMap(b => b.seats);
+    // Check if seats are already booked for that date/area and mathematically intersect the block
+    const existingBookings = await Booking.find({ category, area, date, status: 'active' });
+    const overlappingBookings = existingBookings.filter(b => {
+      return (time < b.endTime && endTime > b.time);
+    });
+    
+    const bookedSeats = overlappingBookings.flatMap(b => b.seats);
     
     const overlap = seats.some(seat => bookedSeats.includes(seat));
     if (overlap) {
@@ -16,7 +20,7 @@ const createBooking = async (req, res) => {
     }
 
     const booking = new Booking({
-      category, area, date, time, seats
+      user, category, area, date, time, endTime, seats
     });
 
     const savedBooking = await booking.save();
@@ -30,13 +34,13 @@ const createBooking = async (req, res) => {
 // @route   GET /api/bookings
 const getBookings = async (req, res) => {
   try {
-    const { category, area, date, time } = req.query;
+    const { category, area, date, user } = req.query;
     
     const filter = { status: 'active' };
     if (category) filter.category = category;
     if (area) filter.area = area;
     if (date) filter.date = date;
-    if (time) filter.time = time;
+    if (user) filter.user = user;
     
     const bookings = await Booking.find(filter);
     res.json(bookings);
