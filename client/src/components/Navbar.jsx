@@ -89,6 +89,9 @@ function Navbar() {
                       <span>{user.email}</span>
                       <span className="navbar__role-badge">{user.role}</span>
                     </div>
+                    <Link to="/dashboard" className="navbar__dropdown-item" onClick={() => setIsProfileOpen(false)}>
+                      Dashboard
+                    </Link>
                     {(user.role === 'employer' || user.role === 'admin') && (
                       <Link to="/owner/reviews" className="navbar__dropdown-item" onClick={() => setIsProfileOpen(false)}>
                         My Reviews

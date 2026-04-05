@@ -9,6 +9,7 @@ import ViewJob from './pages/ViewJob';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import ApplyJob from './pages/ApplyJob';
 import AdminAddBoarding from './pages/AdminAddBoarding';
 import BoardingsList from './pages/BoardingsList';
 import BoardingDetails from './pages/BoardingDetails';
@@ -36,6 +37,7 @@ function App() {
         <Route path="/careers/find-jobs" element={<FindJobs />} />
         <Route path="/careers/post-job" element={<PostJob />} />
         <Route path="/careers/job/:id" element={<ViewJob />} />
+        <Route path="/careers/job/:id/apply" element={<ApplyJob />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
