@@ -15,6 +15,8 @@ const jobRoutes = require('./routes/jobRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const areaRoutes = require('./routes/areaRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const jobApplicationRoutes = require('./routes/jobApplicationRoutes');
+const path = require('path');
 
 // Middleware
 app.use(cors());
@@ -27,6 +29,10 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/areas', areaRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/job-applications', jobApplicationRoutes);
+
+// Expose uploads directory to frontend
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to UniHelp API' });

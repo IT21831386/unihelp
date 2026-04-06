@@ -9,6 +9,7 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState('students');
   const [users, setUsers] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [areas, setAreas] = useState([]);
@@ -83,6 +84,20 @@ function Dashboard() {
             }
             setJobs(allJobs);
           }
+        }
+
+        // Fetch Job Applications
+        let applicationsUrl = 'http://localhost:5000/api/job-applications';
+        if (currentUser.role === 'employer') {
+          applicationsUrl += `?employerEmail=${currentUser.email}`;
+        } else if (currentUser.role === 'user') {
+          applicationsUrl += `?applicantId=${currentUser.id || currentUser._id}`;
+        }
+        
+        const appsRes = await fetch(applicationsUrl);
+        if (appsRes.ok) {
+          const appsData = await appsRes.json();
+          setApplications(Array.isArray(appsData) ? appsData : []);
         }
       } catch (err) {
         setError('Failed to load dashboard data. Check your connection to the server.');
@@ -245,6 +260,57 @@ function Dashboard() {
                         <td>{formatDate(job.createdAt)}</td>
                         <td>
                           <Link to={`/careers/job/${job._id}`} className="dashboard-link">View</Link>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+
+      case 'applications':
+        return (
+          <div className="dashboard-card">
+            <div className="dashboard-card__header">
+              <h2>{currentUser.role === 'user' ? 'My Sent Applications' : 'Job Applications'}</h2>
+              <span className="dashboard-badge">{applications.length} Total</span>
+            </div>
+            <div className="table-responsive">
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Applicant Name</th>
+                    <th>Job Title</th>
+                    <th>Contact</th>
+                    <th>Applied On</th>
+                    <th>CV / Resume</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {applications.length === 0 ? (
+                    <tr><td colSpan="5" className="empty-row">No applications received yet.</td></tr>
+                  ) : (
+                    applications.map(app => (
+                      <tr key={app._id}>
+                        <td><strong>{app.fullName}</strong></td>
+                        <td>{app.jobId ? app.jobId.title : 'Deleted Job'}</td>
+                        <td>
+                          <a href={`mailto:${app.email}`} className="dashboard-link">{app.email}</a><br/>
+                          <small>{app.phone}</small>
+                        </td>
+                        <td>{formatDate(app.createdAt)}</td>
+                        <td>
+                          <a 
+                            href={`http://localhost:5000/${app.cvFilePath.replace(/\\/g, '/')}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="btn-primary"
+                            style={{ padding: '6px 12px', fontSize: '12px', display: 'inline-block', borderRadius: '4px', textDecoration: 'none' }}
+                          >
+                            View CV
+                          </a>
                         </td>
                       </tr>
                     ))
@@ -486,17 +552,26 @@ function Dashboard() {
                 className={`dashboard-nav__btn ${activeTab === 'students' ? 'active' : ''}`}
                 onClick={() => setActiveTab('students')}
               >
-                <span className="nav-icon">🎓</span> Students
+                  <span className="nav-icon">🎓</span> Students
               </button>
             )}
+
+            <button 
+              className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+              onClick={() => setActiveTab('applications')}
+            >
+              <span className="nav-icon">&#128221;</span> {currentUser.role === 'user' ? 'My Applications' : 'Applications'}
+            </button>
             
             {currentUser.role !== 'user' && (
-              <button 
-                className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
-                onClick={() => setActiveTab('jobs')}
-              >
-                <span className="nav-icon">💼</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
-              </button>
+              <>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('jobs')}
+                >
+                  <span className="nav-icon">�</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
+                </button>
+              </>
             )}
             
             {currentUser.role === 'admin' && (

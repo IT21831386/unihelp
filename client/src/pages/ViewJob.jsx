@@ -119,14 +119,12 @@ function ViewJob() {
           </div>
           <div className="view-job-header__actions">
             <div className="view-job-salary">{formatSalary(job.salary)}/Month</div>
-            <a
-              href={job.link || `mailto:${job.contactEmail}`}
-              target={job.link ? '_blank' : undefined}
-              rel={job.link ? 'noopener noreferrer' : undefined}
+            <Link
+              to={`/careers/job/${id}/apply`}
               className="view-job-apply-btn"
             >
               Apply Now 🚀
-            </a>
+            </Link>
           </div>
         </div>
 
