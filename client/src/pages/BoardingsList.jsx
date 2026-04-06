@@ -95,38 +95,55 @@ const BoardingsList = () => {
             Explore thousands of verified boarding places, apartments, and rooms near your university.
           </p>
 
-          {/* Stat pills */}
-          <div className="hero-stats">
-            <span className="hero-stat-pill"><i className="bi bi-houses-fill" /> Verified Listings</span>
-            <span className="hero-stat-pill"><i className="bi bi-shield-check-fill" /> Safe &amp; Trusted</span>
-            <span className="hero-stat-pill"><i className="bi bi-lightning-charge-fill" /> Instant Search</span>
-          </div>
+          <div className="row justify-content-center w-100 mt-5 mx-0">
+            <div className="col-12 col-xl-8">
+              
+              {/* Category Icons (Airbnb Style) */}
+              <div className="bl-hero-categories mb-4">
+                {[
+                  { label: 'All', icon: 'bi-grid-1x2-fill' },
+                  { label: 'Room', icon: 'bi-door-open-fill' },
+                  { label: 'House', icon: 'bi-house-heart-fill' },
+                  { label: 'Apartment', icon: 'bi-building-fill' }
+                ].map(cat => (
+                  <div 
+                    key={cat.label} 
+                    className={`bl-hero-cat-item ${propertyType === cat.label ? 'active' : ''}`}
+                    onClick={() => setPropertyType(cat.label)}
+                  >
+                    <i className={`bi ${cat.icon} bl-hero-cat-icon`}></i>
+                    <span className="bl-hero-cat-label">{cat.label}</span>
+                  </div>
+                ))}
+              </div>
 
-           {/* Search Bar inside Hero */}
-           <div className="row justify-content-center w-100 mt-5 mx-0">
-             <div className="col-12 col-xl-8">
-               <div className="input-group input-group-lg boarding-search-bar bg-white overflow-hidden shadow-lg">
-                 <span className="input-group-text bg-transparent border-0 text-secondary ps-4">
+              {/* Modern Search Bar */}
+              <div className="bl-hero-search">
+                <div className="bl-hero-search-icon">
                    <i className="bi bi-search"></i>
-                 </span>
-                 <input 
-                   type="text" 
-                   placeholder="Search by city, district, or address..." 
-                   value={searchQuery}
-                   onChange={(e) => setSearchQuery(e.target.value)}
-                   className="form-control border-0 bg-transparent py-4 px-3 shadow-none boarding-search-input"
-                   style={{ fontSize: '1.15rem' }}
-                 />
-                 <button 
-                   onClick={() => setIsMobileFiltersOpen(true)}
-                   className="btn btn-light d-lg-none border-start border-0 px-4"
-                   aria-label="Open Filters"
-                 >
-                   <i className="bi bi-sliders fs-5"></i>
-                 </button>
-               </div>
-             </div>
-           </div>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Search by city, district, or address..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bl-hero-search-input"
+                />
+                <button className="bl-hero-search-btn">
+                   Search
+                </button>
+                
+                {/* Mobile Toggle */}
+                <button 
+                  onClick={() => setIsMobileFiltersOpen(true)}
+                  className="bl-hero-mobile-toggle d-md-none"
+                >
+                  <i className="bi bi-sliders"></i>
+                </button>
+              </div>
+
+            </div>
+          </div>
         </div>
       </section>
 
