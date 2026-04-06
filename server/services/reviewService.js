@@ -33,8 +33,45 @@ const getReviewsByOwnerEmail = async (email) => {
   }
 };
 
+const addOwnerReply = async (reviewId, reply) => {
+  try {
+    const review = await Review.findByIdAndUpdate(
+      reviewId,
+      { ownerReply: reply },
+      { new: true }
+    );
+    if (!review) throw new Error('Review not found');
+    return review;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateReview = async (reviewId, updateData) => {
+  try {
+    const review = await Review.findByIdAndUpdate(reviewId, updateData, { new: true });
+    if (!review) throw new Error('Review not found');
+    return review;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteReview = async (reviewId) => {
+  try {
+    const review = await Review.findByIdAndDelete(reviewId);
+    if (!review) throw new Error('Review not found');
+    return review;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   addReview,
+  addOwnerReply,
+  updateReview,
+  deleteReview,
   getReviewsByBoardingId,
   getReviewsByOwnerEmail,
 };

@@ -88,12 +88,19 @@ const BoardingsList = () => {
         <div className="hero-shape hero-shape-3"></div>
         
         <div className="container text-center position-relative" style={{ zIndex: 1 }}>
-           <h1 className="hero-title-modern">
-             Discover Your <span className="highlight-text">Perfect Student Home</span>
-           </h1>
-           <p className="hero-subtitle-modern mb-5 mt-4">
-              Explore thousands of verified boarding places, apartments, and rooms near your university.
-           </p>
+          <h1 className="hero-title-modern">
+            Discover Your <span className="highlight-text">Perfect Student Home</span>
+          </h1>
+          <p className="hero-subtitle-modern mt-3 mb-3">
+            Explore thousands of verified boarding places, apartments, and rooms near your university.
+          </p>
+
+          {/* Stat pills */}
+          <div className="hero-stats">
+            <span className="hero-stat-pill"><i className="bi bi-houses-fill" /> Verified Listings</span>
+            <span className="hero-stat-pill"><i className="bi bi-shield-check-fill" /> Safe &amp; Trusted</span>
+            <span className="hero-stat-pill"><i className="bi bi-lightning-charge-fill" /> Instant Search</span>
+          </div>
 
            {/* Search Bar inside Hero */}
            <div className="row justify-content-center w-100 mt-5 mx-0">
@@ -133,13 +140,11 @@ const BoardingsList = () => {
             
             <div className="card h-100 glass-filter-card d-flex flex-column" style={isMobileFiltersOpen ? { borderRadius: '0 !important', padding: '2rem 1.5rem' } : { padding: '2rem 1.5rem' }}>
               
-              <div className="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-                <div className="d-flex align-items-center gap-2 text-dark fs-5 fw-bold">
-                  <i className="bi bi-funnel-fill text-primary"></i>
-                  Filters
-                </div>
+              <div className="bl-filter-header">
+                <div className="bl-filter-header__icon"><i className="bi bi-funnel-fill" /></div>
+                <h5 className="bl-filter-header__title">Filters</h5>
                 {isMobileFiltersOpen && (
-                  <button onClick={() => setIsMobileFiltersOpen(false)} className="btn btn-sm btn-link text-secondary p-0">
+                  <button onClick={() => setIsMobileFiltersOpen(false)} className="btn btn-sm btn-link text-secondary p-0 ms-auto">
                     <i className="bi bi-x-lg fs-5"></i>
                   </button>
                 )}
@@ -151,19 +156,17 @@ const BoardingsList = () => {
                   <h6 className="filter-heading">Property Type</h6>
                   <div className="d-flex flex-column gap-2">
                     {['All', 'Room', 'House', 'Apartment'].map(type => (
-                      <div key={type} className="form-check">
-                        <input 
-                          type="radio" 
-                          name="propertyType" 
+                      <div key={type} className="form-check d-flex align-items-center gap-2">
+                        <input
+                          type="radio"
+                          name="propertyType"
                           id={`type-${type}`}
                           value={type}
                           checked={propertyType === type}
                           onChange={(e) => setPropertyType(e.target.value)}
                           className="form-check-input filter-radio"
                         />
-                        <label className="form-check-label text-dark fw-medium" htmlFor={`type-${type}`}>
-                          {type}
-                        </label>
+                        <label className="filter-label" htmlFor={`type-${type}`}>{type}</label>
                       </div>
                     ))}
                   </div>
@@ -172,14 +175,13 @@ const BoardingsList = () => {
                 {/* Price Range */}
                 <div className="border-top pt-4">
                   <h6 className="filter-heading">Max Price (LKR)</h6>
-                   <div className="input-group">
-                    <span className="input-group-text bg-light text-secondary border-end-0">₨</span>
-                    <input 
-                      type="number" 
-                      placeholder="Any price" 
+                  <div className="bl-price-input-group">
+                    <span className="bl-price-input-group__prefix">Rs</span>
+                    <input
+                      type="number"
+                      placeholder="Any price"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
-                      className="form-control bg-light border-start-0 ps-0 shadow-none"
                     />
                   </div>
                 </div>
@@ -190,19 +192,19 @@ const BoardingsList = () => {
                   <div className="d-flex flex-column gap-2">
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="wifi" name="wifi" checked={amenities.wifi} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="wifi">WiFi access</label>
+                      <label className="filter-label" htmlFor="wifi">WiFi access</label>
                     </div>
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="bath" name="attachedBathroom" checked={amenities.attachedBathroom} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="bath">Attached Bathroom</label>
+                      <label className="filter-label" htmlFor="bath">Attached Bathroom</label>
                     </div>
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="park" name="parking" checked={amenities.parking} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="park">Parking Space</label>
+                      <label className="filter-label" htmlFor="park">Parking Space</label>
                     </div>
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="furnish" name="furnished" checked={amenities.furnished} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="furnish">Fully Furnished</label>
+                      <label className="filter-label" htmlFor="furnish">Fully Furnished</label>
                     </div>
                   </div>
                 </div>
@@ -223,11 +225,11 @@ const BoardingsList = () => {
 
           {/* Results Grid */}
           <main className="boardings-results">
-            <div className="d-flex align-items-center justify-content-between mb-4">
-              <div className="glass-pill px-4 py-2">
-                <h3 className="fw-bold text-dark mb-0 fs-5">
-                  {filteredBoardings.length} {filteredBoardings.length === 1 ? 'place' : 'places'} found
-                </h3>
+            <div className="bl-results-header">
+              <div className="bl-count-pill">
+                <i className="bi bi-grid-3x3-gap-fill" />
+                <span className="bl-count-pill__num">{filteredBoardings.length}</span>
+                {filteredBoardings.length === 1 ? 'place' : 'places'} found
               </div>
             </div>
             
