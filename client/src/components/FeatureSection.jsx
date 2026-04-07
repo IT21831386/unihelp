@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './FeatureSection.css';
 
 function FeatureSection({ id, title, tags, description, image, imageAlt, linkText, reverse }) {
@@ -22,12 +23,12 @@ function FeatureSection({ id, title, tags, description, image, imageAlt, linkTex
               </div>
             )}
             <p className="feature-section__description">{description}</p>
-            <a href={`#${id}`} className="feature-section__link">
+            <Link to={`/${id}`} className="feature-section__link">
               {linkText || 'View All'}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
