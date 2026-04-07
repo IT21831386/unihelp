@@ -267,15 +267,6 @@ function FindJobs() {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
               />
-              <div className="find-jobs-search__divider" />
-              <span className="find-jobs-search__icon">📍</span>
-              <input
-                type="text"
-                className="find-jobs-search__input"
-                placeholder="Colombo, Sri Lanka"
-                value={locationSearch}
-                onChange={(e) => setLocationSearch(e.target.value)}
-              />
               <button className="find-jobs-search__btn" onClick={() => setVisibleCount(PAGE_SIZE)}>
                 Search
               </button>

@@ -49,3 +49,33 @@ exports.getJobById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// @desc    Update a job by ID
+// @route   PUT /api/jobs/:id
+// @access  Public (in this prototype)
+exports.updateJob = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  try {
+    const job = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    res.json(job);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Delete a job by ID
+// @route   DELETE /api/jobs/:id
+// @access  Public
+exports.deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndDelete(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    res.json({ message: 'Job deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

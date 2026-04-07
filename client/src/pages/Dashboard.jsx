@@ -17,9 +17,9 @@ function Dashboard() {
   const [selectedAreaId, setSelectedAreaId] = useState(null);
   const [isAddingArea, setIsAddingArea] = useState(false);
   const [newAreaLabel, setNewAreaLabel] = useState('');
-  const [newAreaId, setNewAreaId] = useState('');
   const [myBookings, setMyBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [editingJob, setEditingJob] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   
   const [currentUser, setCurrentUser] = useState(null);
@@ -139,6 +139,34 @@ function Dashboard() {
   const companies = Object.values(companiesMap).sort((a, b) => b.jobCount - a.jobCount);
 
   if (!currentUser) return null;
+
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm('Are you sure you want to delete this job posting? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/jobs/${jobId}`, { method: 'DELETE' });
+      if (res.ok) setJobs(prev => prev.filter(j => j._id !== jobId));
+      else alert('Failed to delete job');
+    } catch (e) { alert('Network error'); }
+  };
+
+  const handleUpdateJob = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`http://localhost:5000/api/jobs/${editingJob._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...editingJob, salary: Number(editingJob.salary) })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setJobs(prev => prev.map(j => j._id === updated._id ? updated : j));
+        setEditingJob(null);
+      } else {
+        const errData = await res.json();
+        alert(errData.message || 'Failed to update job');
+      }
+    } catch (e) { alert('Network error'); }
+  };
 
   const renderContent = () => {
     if (loading) {
@@ -300,7 +328,15 @@ function Dashboard() {
                         <td><span className="level-tag">{job.level}</span></td>
                         <td>{formatDate(job.createdAt)}</td>
                         <td>
-                          <Link to={`/careers/job/${job._id}`} className="dashboard-link">View</Link>
+                          <div style={{ display: 'flex', gap: '10px' }}>
+                            <Link to={`/careers/job/${job._id}`} className="dashboard-link">View</Link>
+                            {currentUser.role === 'employer' && (
+                              <>
+                                <button onClick={() => setEditingJob({...job})} style={{ background: 'none', border: 'none', color: '#0366d6', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Edit</button>
+                                <button onClick={() => handleDeleteJob(job._id)} style={{ background: 'none', border: 'none', color: '#cb2431', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Delete</button>
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -308,6 +344,62 @@ function Dashboard() {
                 </tbody>
               </table>
             </div>
+
+            {editingJob && (
+              <div onClick={() => setEditingJob(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '12px', padding: '30px', maxWidth: '500px', width: '90%', maxHeight: '90vh', overflowY: 'auto', textAlign: 'left', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                  <h3 style={{ marginBottom: '20px', color: '#24292e' }}>Edit Job Posting</h3>
+                  <form onSubmit={handleUpdateJob} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Job Title</label>
+                      <input type="text" value={editingJob.title} onChange={e => setEditingJob({...editingJob, title: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required minLength={3} maxLength={100} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Company</label>
+                      <input type="text" value={editingJob.company} onChange={e => setEditingJob({...editingJob, company: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required minLength={2} maxLength={100} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '15px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Location</label>
+                        <select value={editingJob.location} onChange={e => setEditingJob({...editingJob, location: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required>
+                          <option value="colombo">Colombo</option><option value="kandy">Kandy</option><option value="galle">Galle</option><option value="remote">Remote</option>
+                        </select>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Level</label>
+                        <select value={editingJob.level} onChange={e => setEditingJob({...editingJob, level: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required>
+                          <option value="internship">Internship</option><option value="entry">Entry Level</option><option value="mid-senior">Mid - Senior</option><option value="senior">Senior</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '15px' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Modality</label>
+                        <select value={editingJob.modality} onChange={e => setEditingJob({...editingJob, modality: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required>
+                          <option value="remote">Remote</option><option value="on-site">On - Site</option><option value="hybrid">Hybrid</option>
+                        </select>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Salary (LKR)</label>
+                        <input type="number" value={editingJob.salary} onChange={e => setEditingJob({...editingJob, salary: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required min={1} max={10000000} />
+                      </div>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Description</label>
+                      <textarea value={editingJob.description} onChange={e => setEditingJob({...editingJob, description: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} rows={4} required minLength={20} maxLength={5000} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Application Link (Optional)</label>
+                      <input type="url" value={editingJob.link || ''} onChange={e => setEditingJob({...editingJob, link: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                      <button type="button" onClick={() => setEditingJob(null)} style={{ padding: '8px 15px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
+                      <button type="submit" style={{ padding: '8px 15px', background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Save Changes</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -342,16 +434,24 @@ function Dashboard() {
                           <small>{app.phone}</small>
                         </td>
                         <td>{formatDate(app.createdAt)}</td>
-                        <td>
-                          <a 
-                            href={`http://localhost:5000/${app.cvFilePath.replace(/\\/g, '/')}`} 
-                            target="_blank" 
+                        <td style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                          <a
+                            href={`http://localhost:5000/${app.cvFilePath.replace(/\\/g, '/')}`}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="btn-primary"
                             style={{ padding: '6px 12px', fontSize: '12px', display: 'inline-block', borderRadius: '4px', textDecoration: 'none' }}
                           >
-                            View CV
+                            View
                           </a>
+                          {/* <a
+                            href={`http://localhost:5000/${app.cvFilePath.replace(/\\/g, '/')}`}
+                            download
+                            className="btn-primary"
+                            style={{ padding: '6px 12px', fontSize: '12px', display: 'inline-block', borderRadius: '4px', textDecoration: 'none', background: '#2ea44f' }}
+                          >
+                            ⬇ Download
+                          </a> */}
                         </td>
                       </tr>
                     ))

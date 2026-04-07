@@ -13,12 +13,16 @@ function validate(data) {
     errors.title = 'Job title is required';
   } else if (data.title.trim().length < 3) {
     errors.title = 'Job title must be at least 3 characters';
+  } else if (data.title.trim().length > 100) {
+    errors.title = 'Job title cannot exceed 100 characters';
   }
 
   if (!data.company.trim()) {
     errors.company = 'Company name is required';
   } else if (data.company.trim().length < 2) {
     errors.company = 'Company name must be at least 2 characters';
+  } else if (data.company.trim().length > 100) {
+    errors.company = 'Company name cannot exceed 100 characters';
   }
 
   if (!data.location) {
@@ -37,12 +41,16 @@ function validate(data) {
     errors.salary = 'Salary is required';
   } else if (Number(data.salary) <= 0) {
     errors.salary = 'Salary must be greater than 0';
+  } else if (Number(data.salary) > 10000000) {
+    errors.salary = 'Salary cannot exceed 10,000,000';
   }
 
   if (!data.description.trim()) {
     errors.description = 'Description is required';
   } else if (data.description.trim().length < 20) {
     errors.description = `Description must be at least 20 characters (${data.description.trim().length}/20)`;
+  } else if (data.description.trim().length > 5000) {
+    errors.description = `Description cannot exceed 5000 characters (${data.description.trim().length}/5000)`;
   }
 
   if (!data.contactEmail.trim()) {
@@ -197,6 +205,7 @@ function PostJob() {
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="e.g. UI/UX Engineer"
+                    maxLength={100}
                   />
                   {fieldErrors.title && (
                     <span className="field-error">{fieldErrors.title}</span>
@@ -215,6 +224,7 @@ function PostJob() {
                     value={formData.company}
                     onChange={handleChange}
                     placeholder="e.g. ABC Technologies"
+                    maxLength={100}
                   />
                   {fieldErrors.company && (
                     <span className="field-error">{fieldErrors.company}</span>
@@ -305,6 +315,7 @@ function PostJob() {
                     onChange={handleChange}
                     placeholder="e.g. 90000"
                     min="1"
+                    max="10000000"
                   />
                   {fieldErrors.salary && (
                     <span className="field-error">{fieldErrors.salary}</span>
@@ -323,11 +334,13 @@ function PostJob() {
                   className={`form-textarea${fieldErrors.description ? ' input-error' : ''}`}
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Describe the role, responsibilities, and requirements (min. 20 characters)"
+                  placeholder="Describe the role, responsibilities, and requirements (max 5000 characters)"
                   rows={5}
+                  maxLength={5000}
                 />
-                <span className="field-helper">
-                  {formData.description.length} / 20 min characters
+                <span className="field-helper" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Min: 20</span>
+                  <span>{formData.description.length} / 5000</span>
                 </span>
                 {fieldErrors.description && (
                   <span className="field-error">{fieldErrors.description}</span>

@@ -16,12 +16,43 @@ function ApplyJob() {
     phone: '',
   });
   const [cvFile, setCvFile] = useState(null);
-  
+
   // UI state
   const [loading, setLoading] = useState(false);
   const [fetchingJob, setFetchingJob] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const PHONE_REGEX = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{3,5}[-\s\.]?[0-9]{4,6}$/;
+  const ALLOWED_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  const ALLOWED_EXTS = ['.pdf', '.doc', '.docx'];
+
+  const validate = () => {
+    const errors = {};
+    if (!formData.fullName.trim()) {
+      errors.fullName = 'Full name is required.';
+    } else if (formData.fullName.trim().length < 3) {
+      errors.fullName = 'Full name must be at least 3 characters.';
+    } else if (formData.fullName.trim().length > 100) {
+      errors.fullName = 'Full name cannot exceed 100 characters.';
+    }
+    if (!formData.email.trim()) {
+      errors.email = 'Email address is required.';
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      errors.email = 'Please enter a valid email address.';
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = 'Phone number is required.';
+    } else if (!PHONE_REGEX.test(formData.phone.trim())) {
+      errors.phone = 'Enter a valid phone number (e.g. +94 77 123 4567).';
+    }
+    if (!cvFile) {
+      errors.cvFile = 'A CV / Resume file is required.';
+    }
+    return errors;
+  };
 
   // If user is logged in, prefill standard details
   useEffect(() => {
@@ -63,27 +94,36 @@ function ApplyJob() {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      // Very basic validation
       const file = e.target.files[0];
-      if (file.size > 5000000) {
-        setError('File size exceeds the 5MB limit.');
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      if (!ALLOWED_TYPES.includes(file.type) && !ALLOWED_EXTS.includes(ext)) {
+        setFieldErrors(prev => ({ ...prev, cvFile: 'Only PDF, DOC, or DOCX files are accepted.' }));
         setCvFile(null);
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5000000) {
+        setFieldErrors(prev => ({ ...prev, cvFile: 'File size exceeds the 5MB limit.' }));
+        setCvFile(null);
+        e.target.value = '';
         return;
       }
       setCvFile(file);
+      setFieldErrors(prev => ({ ...prev, cvFile: '' }));
       setError('');
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!cvFile) {
-      setError('A CV attachment is absolutely required.');
+    setError('');
+
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
-
-    setLoading(true);
-    setError('');
+    setFieldErrors({});
 
     try {
       const userStr = localStorage.getItem('user');
@@ -161,38 +201,42 @@ function ApplyJob() {
 
               <div className="form-group">
                 <label>Full Name</label>
-                <input 
-                  type="text" 
-                  name="fullName" 
-                  value={formData.fullName} 
-                  onChange={handleInputChange} 
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
                   placeholder="e.g. Jane Doe"
-                  required 
+                  maxLength={100}
+                  required
                 />
+                {fieldErrors.fullName && <span style={{ color: '#cb2431', fontSize: '13px', marginTop: '4px', display: 'block' }}>{fieldErrors.fullName}</span>}
               </div>
 
               <div className="form-group">
                 <label>Email Address</label>
-                <input 
-                  type="email" 
-                  name="email" 
-                  value={formData.email} 
-                  onChange={handleInputChange} 
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   placeholder="jane@example.com"
-                  required 
+                  required
                 />
+                {fieldErrors.email && <span style={{ color: '#cb2431', fontSize: '13px', marginTop: '4px', display: 'block' }}>{fieldErrors.email}</span>}
               </div>
 
               <div className="form-group">
                 <label>Phone Number</label>
-                <input 
-                  type="tel" 
-                  name="phone" 
-                  value={formData.phone} 
-                  onChange={handleInputChange} 
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
                   placeholder="+94 77 123 4567"
-                  required 
+                  required
                 />
+                {fieldErrors.phone && <span style={{ color: '#cb2431', fontSize: '13px', marginTop: '4px', display: 'block' }}>{fieldErrors.phone}</span>}
               </div>
 
               <div className="form-group file-upload-group">
@@ -210,6 +254,7 @@ function ApplyJob() {
                     <small>Supported formats: PDF, DOCX (Max 5MB)</small>
                   </div>
                 </div>
+                {fieldErrors.cvFile && <span style={{ color: '#cb2431', fontSize: '13px', marginTop: '4px', display: 'block' }}>{fieldErrors.cvFile}</span>}
               </div>
 
               <button 

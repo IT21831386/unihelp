@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { createJob, getJobs, getJobById } = require('../controllers/jobController');
+const { createJob, getJobs, getJobById, updateJob, deleteJob } = require('../controllers/jobController');
 
 const jobValidation = [
   body('title')
@@ -39,5 +39,7 @@ const jobValidation = [
 router.post('/', jobValidation, createJob);
 router.get('/', getJobs);
 router.get('/:id', getJobById);
+router.put('/:id', jobValidation, updateJob);
+router.delete('/:id', deleteJob);
 
 module.exports = router;
