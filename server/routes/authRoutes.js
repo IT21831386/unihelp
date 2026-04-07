@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { registerUser, loginUser, getMe, getUsers } = require('../controllers/authController');
+const { registerUser, loginUser, getMe, getUsers, deleteUser } = require('../controllers/authController');
 
 const loginValidation = [
   body('email')
@@ -28,5 +28,6 @@ router.post('/register', registerValidation, registerUser);
 router.post('/login', loginValidation, loginUser);
 router.get('/me', getMe);
 router.get('/users', getUsers);
+router.delete('/users/:id', deleteUser);
 
 module.exports = router;

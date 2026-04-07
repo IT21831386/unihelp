@@ -6,8 +6,6 @@ import './BookingSeats.css';
 
 
 
-// Some seats marked as unavailable for demo
-const unavailableSeats = ['TA3', 'TB2', 'TD4', 'TE3', 'TF1', 'C1-3', 'C4-2', 'L1-1', 'L6-5'];
 
 const categoryLabels = {
   canteen: 'Canteen',
@@ -127,7 +125,7 @@ function BookingSeats() {
   }, [time, endTime, dailyBookings]);
 
   const isSeatUnavailable = (seatId) => {
-    return unavailableSeats.includes(seatId) || unavailableSeatsList.includes(seatId);
+    return unavailableSeatsList.includes(seatId);
   };
 
   const toggleSeat = (seatId) => {
@@ -350,13 +348,17 @@ function BookingSeats() {
              </p>
           ) : currentUser.role !== 'user' ? (
              <p style={{color: 'red', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px'}}>Only students can book seats. You are logged in as an {currentUser.role}.</p>
+          ) : numSeats <= 0 ? (
+             <p style={{color: 'red', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px'}}>Number of seats must be at least 1.</p>
+          ) : date < defaultDate ? (
+             <p style={{color: 'red', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px'}}>You cannot select a past date.</p>
           ) : !isTimeValid() ? (
              <p style={{color: 'red', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px'}}>Bookings must strictly fall between 08:00 AM and 10:00 PM, and your End Time must be after your Start Time. Please adjust!</p>
           ) : null}
 
           <button
             className="booking-seats-cta__btn"
-            disabled={selectedSeats.length < numSeats || loading || !currentUser || currentUser.role !== 'user' || !isTimeValid()}
+            disabled={selectedSeats.length < numSeats || numSeats <= 0 || date < defaultDate || loading || !currentUser || currentUser.role !== 'user' || !isTimeValid()}
             onClick={handleBookSpot}
           >
             {loading ? 'Booking...' : (!currentUser ? 'Login Required' : (selectedSeats.length < numSeats ? `Select ${numSeats - selectedSeats.length} more seat${numSeats - selectedSeats.length > 1 ? 's' : ''}` : 'Book your spot'))}

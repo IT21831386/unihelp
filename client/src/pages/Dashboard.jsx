@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AreaLayoutEditor from '../components/AreaLayoutEditor';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -20,6 +20,7 @@ function Dashboard() {
   const [newAreaId, setNewAreaId] = useState('');
   const [myBookings, setMyBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -175,11 +176,12 @@ function Dashboard() {
                     <th>Email Address</th>
                     <th>Role</th>
                     <th>Joined</th>
+                    <th style={{ minWidth: '200px' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {students.length === 0 ? (
-                    <tr><td colSpan="4" className="empty-row">No students found</td></tr>
+                    <tr><td colSpan="5" className="empty-row">No students found</td></tr>
                   ) : (
                     students.map(student => (
                       <tr key={student._id}>
@@ -187,12 +189,48 @@ function Dashboard() {
                         <td>{student.email}</td>
                         <td><span className="role-tag role-student">Student</span></td>
                         <td>{formatDate(student.createdAt)}</td>
+                        <td>
+                          <button onClick={() => setSelectedStudent(student)} style={{ padding: '5px 12px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', marginRight: '5px', fontWeight: 'bold' }}>View</button>
+                          <button onClick={async () => {
+                            if (!window.confirm('Are you sure you want to delete this student?')) return;
+                            try {
+                              const res = await fetch(`http://localhost:5000/api/auth/users/${student._id}`, { method: 'DELETE' });
+                              if (res.ok) {
+                                setUsers(prev => prev.filter(u => u._id !== student._id));
+                              } else {
+                                alert('Failed to delete student');
+                              }
+                            } catch (e) {
+                              alert(e.message);
+                            }
+                          }} style={{ padding: '5px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Delete</button>
+                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
+
+            {selectedStudent && (
+              <div onClick={() => setSelectedStudent(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '12px', padding: '30px', maxWidth: '350px', width: '90%', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                  <div style={{ width: '60px', height: '60px', background: 'var(--color-primary)', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 'bold', margin: '0 auto 15px' }}>
+                    {selectedStudent.name.charAt(0).toUpperCase()}
+                  </div>
+                  <h3 style={{ marginBottom: '5px', color: '#24292e' }}>{selectedStudent.name}</h3>
+                  <p style={{ fontSize: '13px', color: '#586069', marginBottom: '20px' }}><span className="role-tag role-student">Student</span></p>
+                  
+                  <div style={{ textAlign: 'left', background: '#f6f8fa', padding: '15px', borderRadius: '8px', lineHeight: '1.8', fontSize: '14px' }}>
+                    <div><strong>Email:</strong> <a href={`mailto:${selectedStudent.email}`} style={{ color: 'var(--color-primary)' }}>{selectedStudent.email}</a></div>
+                    <div><strong>Joined:</strong> {formatDate(selectedStudent.createdAt)}</div>
+                    <div><strong>Account ID:</strong> <span style={{ fontFamily: 'monospace', fontSize: '12px', color: '#666' }}>{selectedStudent._id}</span></div>
+                  </div>
+                  
+                  <button onClick={() => setSelectedStudent(null)} style={{ marginTop: '20px', padding: '10px 30px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', width: '100%' }}>Close</button>
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -501,18 +539,20 @@ function Dashboard() {
                     <th style={{ width: '40px' }}>QR Code</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Area ID</th>
+                    <th style={{ minWidth: '160px' }}>Area ID</th>
                     <th>Seats</th>
                     <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {myBookings.length === 0 ? (
-                    <tr><td colSpan="5" className="empty-row">No bookings found</td></tr>
+                    <tr><td colSpan="7" className="empty-row">No bookings found</td></tr>
                   ) : (
                     myBookings.map(booking => {
                       const bookingEnd = new Date(`${booking.date}T${booking.endTime || '23:59'}`);
                       const isExpired = bookingEnd < new Date();
+                      const isCancelled = booking.status === 'cancelled';
                       const to12h = (t) => {
                         if (!t) return '';
                         const [h, m] = t.split(':');
@@ -520,9 +560,21 @@ function Dashboard() {
                         const ampm = hr >= 12 ? 'PM' : 'AM';
                         return `${hr % 12 || 12}:${m} ${ampm}`;
                       };
+                      
+                      const getStatusLabel = () => {
+                        if (isCancelled) return 'Cancelled';
+                        if (isExpired) return 'Completed';
+                        return 'Active';
+                      };
+                      const getStatusStyle = () => {
+                        if (isCancelled) return { background: '#f8d7da', color: '#721c24' };
+                        if (isExpired) return { background: '#e2e3e5', color: '#383d41' };
+                        return { background: '#d4edda', color: '#155724' };
+                      };
+
                       return (
-                        <tr key={booking._id}>
-                          <td style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setSelectedBooking({ ...booking, isExpired, to12h })} title="View QR">
+                        <tr key={booking._id} style={isCancelled ? { opacity: 0.65 } : {}}>
+                          <td style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setSelectedBooking({ ...booking, isExpired, isCancelled, to12h, getStatusLabel })} title="View QR">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <rect x="3" y="3" width="7" height="7" />
                               <rect x="14" y="3" width="7" height="7" />
@@ -537,12 +589,34 @@ function Dashboard() {
                           <td><span className="level-tag" style={{textTransform: 'capitalize'}}>{booking.area}</span></td>
                           <td>{booking.seats.join(', ')}</td>
                           <td>
-                            <span className="role-tag" style={{ 
-                              background: isExpired ? '#e2e3e5' : '#d4edda', 
-                              color: isExpired ? '#383d41' : '#155724' 
-                            }}>
-                              {isExpired ? 'Completed' : 'Active'}
+                            <span className="role-tag" style={getStatusStyle()}>
+                              {getStatusLabel()}
                             </span>
+                          </td>
+                          <td>
+                            {!isCancelled && !isExpired ? (
+                              <button
+                                onClick={async () => {
+                                  if (!window.confirm('Are you sure you want to cancel this booking?')) return;
+                                  try {
+                                    const res = await fetch(`http://localhost:5000/api/bookings/${booking._id}/cancel`, { method: 'PATCH' });
+                                    if (!res.ok) {
+                                      const data = await res.json();
+                                      alert(data.message || 'Failed to cancel booking');
+                                      return;
+                                    }
+                                    setMyBookings(prev => prev.map(b => b._id === booking._id ? { ...b, status: 'cancelled' } : b));
+                                  } catch (err) {
+                                    alert('Error cancelling booking: ' + err.message);
+                                  }
+                                }}
+                                style={{ padding: '5px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                              >
+                                Cancel
+                              </button>
+                            ) : (
+                              <span style={{ color: '#999', fontSize: '12px' }}>—</span>
+                            )}
                           </td>
                         </tr>
                       );
@@ -558,8 +632,9 @@ function Dashboard() {
                   <h3 style={{ marginBottom: '5px', color: '#24292e' }}>Booking QR Code</h3>
                   <p style={{ fontSize: '13px', color: '#586069', marginBottom: '20px' }}>Scan with your phone camera</p>
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-                    <QRCodeSVG
-                      value={`UniHelp Booking\nStudent: ${currentUser?.name || 'N/A'}\nArea: ${selectedBooking.area}\nDate: ${selectedBooking.date}\nTime: ${selectedBooking.to12h(selectedBooking.time)} - ${selectedBooking.to12h(selectedBooking.endTime)}\nSeats: ${selectedBooking.seats.join(', ')}\nStatus: ${selectedBooking.isExpired ? 'Completed' : 'Active'}`}
+                    <QRCodeCanvas
+                      id="qr-code-canvas"
+                      value={`UniHelp Booking\nStudent: ${currentUser?.name || 'N/A'}\nArea: ${selectedBooking.area}\nDate: ${selectedBooking.date}\nTime: ${selectedBooking.to12h(selectedBooking.time)} - ${selectedBooking.to12h(selectedBooking.endTime)}\nSeats: ${selectedBooking.seats.join(', ')}\nStatus: ${selectedBooking.getStatusLabel()}`}
                       size={200}
                       level="M"
                     />
@@ -570,9 +645,22 @@ function Dashboard() {
                     <div><strong>Date:</strong> {formatDate(selectedBooking.date)}</div>
                     <div><strong>Time:</strong> {selectedBooking.to12h(selectedBooking.time)} - {selectedBooking.to12h(selectedBooking.endTime)}</div>
                     <div><strong>Seats:</strong> {selectedBooking.seats.join(', ')}</div>
-                    <div><strong>Status:</strong> {selectedBooking.isExpired ? 'Completed' : 'Active'}</div>
+                    <div><strong>Status:</strong> {selectedBooking.getStatusLabel()}</div>
                   </div>
-                  <button onClick={() => setSelectedBooking(null)} style={{ marginTop: '20px', padding: '10px 30px', background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>Close</button>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
+                    <button onClick={() => {
+                        const canvas = document.getElementById("qr-code-canvas");
+                        if (!canvas) return;
+                        const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                        const a = document.createElement("a");
+                        a.href = pngUrl;
+                        a.download = "unihelp-booking-qr.png";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }} style={{ padding: '10px 20px', background: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>Download QR</button>
+                    <button onClick={() => setSelectedBooking(null)} style={{ padding: '10px 30px', background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>Close</button>
+                  </div>
                 </div>
               </div>
             )}

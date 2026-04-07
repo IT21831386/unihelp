@@ -38,11 +38,17 @@ const getBookings = async (req, res) => {
   try {
     const { category, area, date, user } = req.query;
     
-    const filter = { status: 'active' };
+    const filter = {};
     if (category) filter.category = category;
     if (area) filter.area = area;
     if (date) filter.date = date;
-    if (user) filter.user = new mongoose.Types.ObjectId(user);
+    if (user) {
+      // When fetching a specific user's bookings (dashboard), return all statuses
+      filter.user = new mongoose.Types.ObjectId(user);
+    } else {
+      // When checking seat availability, only return active bookings
+      filter.status = 'active';
+    }
     
     const bookings = await Booking.find(filter);
     res.json(bookings);
@@ -51,7 +57,29 @@ const getBookings = async (req, res) => {
   }
 };
 
+// @desc    Cancel a booking
+// @route   PATCH /api/bookings/:id/cancel
+const cancelBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+    
+    if (booking.status === 'cancelled') {
+      return res.status(400).json({ message: 'Booking is already cancelled' });
+    }
+    
+    booking.status = 'cancelled';
+    await booking.save();
+    res.json(booking);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Server error' });
+  }
+};
+
 module.exports = {
   createBooking,
-  getBookings
+  getBookings,
+  cancelBooking
 };
