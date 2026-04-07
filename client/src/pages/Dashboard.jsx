@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AreaLayoutEditor from '../components/AreaLayoutEditor';
+import { QRCodeSVG } from 'qrcode.react';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -18,6 +19,7 @@ function Dashboard() {
   const [newAreaLabel, setNewAreaLabel] = useState('');
   const [newAreaId, setNewAreaId] = useState('');
   const [myBookings, setMyBookings] = useState([]);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -496,6 +498,7 @@ function Dashboard() {
               <table className="dashboard-table">
                 <thead>
                   <tr>
+                    <th style={{ width: '40px' }}>QR Code</th>
                     <th>Date</th>
                     <th>Time</th>
                     <th>Area ID</th>
@@ -519,6 +522,16 @@ function Dashboard() {
                       };
                       return (
                         <tr key={booking._id}>
+                          <td style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setSelectedBooking({ ...booking, isExpired, to12h })} title="View QR">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="3" y="3" width="7" height="7" />
+                              <rect x="14" y="3" width="7" height="7" />
+                              <rect x="3" y="14" width="7" height="7" />
+                              <rect x="14" y="14" width="3" height="3" />
+                              <line x1="21" y1="14" x2="21" y2="21" />
+                              <line x1="14" y1="21" x2="21" y2="21" />
+                            </svg>
+                          </td>
                           <td><strong>{formatDate(booking.date)}</strong></td>
                           <td>{to12h(booking.time)}{booking.endTime ? ` - ${to12h(booking.endTime)}` : ''}</td>
                           <td><span className="level-tag" style={{textTransform: 'capitalize'}}>{booking.area}</span></td>
@@ -538,6 +551,31 @@ function Dashboard() {
                 </tbody>
               </table>
             </div>
+
+            {selectedBooking && (
+              <div onClick={() => setSelectedBooking(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '12px', padding: '30px', maxWidth: '350px', width: '90%', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                  <h3 style={{ marginBottom: '5px', color: '#24292e' }}>Booking QR Code</h3>
+                  <p style={{ fontSize: '13px', color: '#586069', marginBottom: '20px' }}>Scan with your phone camera</p>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+                    <QRCodeSVG
+                      value={`UniHelp Booking\nStudent: ${currentUser?.name || 'N/A'}\nArea: ${selectedBooking.area}\nDate: ${selectedBooking.date}\nTime: ${selectedBooking.to12h(selectedBooking.time)} - ${selectedBooking.to12h(selectedBooking.endTime)}\nSeats: ${selectedBooking.seats.join(', ')}\nStatus: ${selectedBooking.isExpired ? 'Completed' : 'Active'}`}
+                      size={200}
+                      level="M"
+                    />
+                  </div>
+                  <div style={{ marginTop: '20px', fontSize: '14px', textAlign: 'left', background: '#f6f8fa', padding: '12px', borderRadius: '8px', lineHeight: '1.8' }}>
+                    <div><strong>Student:</strong> {currentUser?.name}</div>
+                    <div><strong>Area:</strong> <span style={{ textTransform: 'capitalize' }}>{selectedBooking.area}</span></div>
+                    <div><strong>Date:</strong> {formatDate(selectedBooking.date)}</div>
+                    <div><strong>Time:</strong> {selectedBooking.to12h(selectedBooking.time)} - {selectedBooking.to12h(selectedBooking.endTime)}</div>
+                    <div><strong>Seats:</strong> {selectedBooking.seats.join(', ')}</div>
+                    <div><strong>Status:</strong> {selectedBooking.isExpired ? 'Completed' : 'Active'}</div>
+                  </div>
+                  <button onClick={() => setSelectedBooking(null)} style={{ marginTop: '20px', padding: '10px 30px', background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>Close</button>
+                </div>
+              </div>
+            )}
           </div>
         );
 

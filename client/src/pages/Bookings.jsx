@@ -46,7 +46,11 @@ function Bookings() {
       {/* Booking Categories */}
       <section className="bookings-section">
         <div className="container">
-          <h2 className="bookings-section__heading">Your booking confirmations</h2>
+          <h2 className="bookings-section__heading">
+            <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit' }}>
+              Your booking confirmations &rarr;
+            </Link>
+          </h2>
 
           <div className="bookings-cards">
             {bookingCategories.map((category) => (
