@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 
 // @desc    Create a new booking
@@ -20,7 +21,8 @@ const createBooking = async (req, res) => {
     }
 
     const booking = new Booking({
-      user, category, area, date, time, endTime, seats
+      user: user ? new mongoose.Types.ObjectId(user) : null,
+      category, area, date, time, endTime, seats
     });
 
     const savedBooking = await booking.save();
@@ -40,7 +42,7 @@ const getBookings = async (req, res) => {
     if (category) filter.category = category;
     if (area) filter.area = area;
     if (date) filter.date = date;
-    if (user) filter.user = user;
+    if (user) filter.user = new mongoose.Types.ObjectId(user);
     
     const bookings = await Booking.find(filter);
     res.json(bookings);

@@ -160,7 +160,7 @@ function BookingSeats() {
           time,
           endTime,
           seats: selectedSeats,
-          user: currentUser ? currentUser._id : null
+          user: currentUser ? currentUser.id : null
         })
       });
       

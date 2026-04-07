@@ -66,7 +66,7 @@ function Dashboard() {
         }
 
         if (currentUser.role === 'user') {
-          const bookingsRes = await fetch(`http://localhost:5000/api/bookings?user=${currentUser._id}`);
+          const bookingsRes = await fetch(`http://localhost:5000/api/bookings?user=${currentUser.id}`);
           if (bookingsRes.ok) {
              const bookingsData = await bookingsRes.json();
              setMyBookings(Array.isArray(bookingsData) ? bookingsData : []);
@@ -88,10 +88,11 @@ function Dashboard() {
 
         // Fetch Job Applications
         let applicationsUrl = 'http://localhost:5000/api/job-applications';
-        if (currentUser.role === 'employer') {
+        if (currentUser.role !== 'user') {
+          // Both Employers and Admins now only see applications for jobs they specifically posted
           applicationsUrl += `?employerEmail=${currentUser.email}`;
         } else if (currentUser.role === 'user') {
-          applicationsUrl += `?applicantId=${currentUser.id || currentUser._id}`;
+          applicationsUrl += `?applicantId=${currentUser.id || currentUser._id}&applicantEmail=${currentUser.email}`;
         }
         
         const appsRes = await fetch(applicationsUrl);
@@ -506,15 +507,33 @@ function Dashboard() {
                   {myBookings.length === 0 ? (
                     <tr><td colSpan="5" className="empty-row">No bookings found</td></tr>
                   ) : (
-                    myBookings.map(booking => (
-                      <tr key={booking._id}>
-                        <td><strong>{formatDate(booking.date)}</strong></td>
-                        <td>{booking.time}</td>
-                        <td><span className="level-tag" style={{textTransform: 'capitalize'}}>{booking.area}</span></td>
-                        <td>{booking.seats.join(', ')}</td>
-                        <td><span className="role-tag" style={{ background: '#d4edda', color: '#155724' }}>Active</span></td>
-                      </tr>
-                    ))
+                    myBookings.map(booking => {
+                      const bookingEnd = new Date(`${booking.date}T${booking.endTime || '23:59'}`);
+                      const isExpired = bookingEnd < new Date();
+                      const to12h = (t) => {
+                        if (!t) return '';
+                        const [h, m] = t.split(':');
+                        const hr = parseInt(h, 10);
+                        const ampm = hr >= 12 ? 'PM' : 'AM';
+                        return `${hr % 12 || 12}:${m} ${ampm}`;
+                      };
+                      return (
+                        <tr key={booking._id}>
+                          <td><strong>{formatDate(booking.date)}</strong></td>
+                          <td>{to12h(booking.time)}{booking.endTime ? ` - ${to12h(booking.endTime)}` : ''}</td>
+                          <td><span className="level-tag" style={{textTransform: 'capitalize'}}>{booking.area}</span></td>
+                          <td>{booking.seats.join(', ')}</td>
+                          <td>
+                            <span className="role-tag" style={{ 
+                              background: isExpired ? '#e2e3e5' : '#d4edda', 
+                              color: isExpired ? '#383d41' : '#155724' 
+                            }}>
+                              {isExpired ? 'Completed' : 'Active'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -569,7 +588,7 @@ function Dashboard() {
                   className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
                   onClick={() => setActiveTab('jobs')}
                 >
-                  <span className="nav-icon">�</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
+                  <span className="nav-icon">&#128188;</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
                 </button>
               </>
             )}

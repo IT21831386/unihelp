@@ -91,8 +91,8 @@ function ApplyJob() {
       
       const payload = new FormData();
       payload.append('jobId', id);
-      if (user && user.id) {
-        payload.append('applicantId', user.id);
+      if (user && (user._id || user.id)) {
+        payload.append('applicantId', user._id || user.id);
       }
       payload.append('fullName', formData.fullName);
       payload.append('email', formData.email);

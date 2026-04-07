@@ -37,7 +37,7 @@ exports.applyForJob = async (req, res) => {
 // @access  Public
 exports.getApplications = async (req, res) => {
   try {
-    const { employerEmail, applicantId } = req.query;
+    const { employerEmail, applicantId, applicantEmail } = req.query;
 
     // First fetch all applications and populate the Job details
     let applications = await JobApplication.find()
@@ -51,11 +51,13 @@ exports.getApplications = async (req, res) => {
       );
     }
 
-    // If an applicant ID is provided, filter for the student's own applications
-    if (applicantId) {
-      applications = applications.filter(app => 
-        app.applicantId && app.applicantId.toString() === applicantId
-      );
+    // If an applicant ID or email is provided, filter for the student's own applications
+    if (applicantId || applicantEmail) {
+      applications = applications.filter(app => {
+        if (applicantId && app.applicantId && app.applicantId.toString() === applicantId) return true;
+        if (applicantEmail && app.email === applicantEmail) return true;
+        return false;
+      });
     }
 
     res.json(applications);
