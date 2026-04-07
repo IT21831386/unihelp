@@ -151,25 +151,49 @@
 }
 
 .filter-group__checkboxes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
-.filter-checkbox {
+.jobs-filter-check {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: var(--font-size-xs);
+  gap: 8px;
+  font-size: var(--font-size-sm);
   color: var(--color-text);
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.filter-checkbox input[type="checkbox"] {
-  accent-color: var(--color-primary);
-  width: 14px;
-  height: 14px;
+.jobs-filter-check input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-white);
   cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.jobs-filter-check input[type="checkbox"]:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.jobs-filter-check input[type="checkbox"]:checked::after {
+  content: "✔";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
 }
 
 /* Salary Slider */

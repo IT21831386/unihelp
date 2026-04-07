@@ -194,19 +194,19 @@ function FindJobs() {
             <div className="filter-group">
               <label className="filter-group__label">Job Level</label>
               <div className="filter-group__checkboxes">
-                <label className="filter-checkbox">
+                <label className="jobs-filter-check">
                   <input type="checkbox" checked={filters.internship} onChange={() => handleCheckbox('internship')} />
                   Internship
                 </label>
-                <label className="filter-checkbox">
+                <label className="jobs-filter-check">
                   <input type="checkbox" checked={filters.entryLevel} onChange={() => handleCheckbox('entryLevel')} />
                   Entry Level
                 </label>
-                <label className="filter-checkbox">
+                <label className="jobs-filter-check">
                   <input type="checkbox" checked={filters.midSenior} onChange={() => handleCheckbox('midSenior')} />
                   Mid - Senior
                 </label>
-                <label className="filter-checkbox">
+                <label className="jobs-filter-check">
                   <input type="checkbox" checked={filters.senior} onChange={() => handleCheckbox('senior')} />
                   Senior
                 </label>
@@ -217,15 +217,15 @@ function FindJobs() {
             <div className="filter-group">
               <label className="filter-group__label">Modality</label>
               <div className="filter-group__checkboxes">
-                <label className="filter-checkbox">
+                <label className="jobs-filter-check">
                   <input type="checkbox" checked={filters.remote} onChange={() => handleCheckbox('remote')} />
                   Remote
                 </label>
-                <label className="filter-checkbox">
+                <label className="jobs-filter-check">
                   <input type="checkbox" checked={filters.onSite} onChange={() => handleCheckbox('onSite')} />
                   On - Site
                 </label>
-                <label className="filter-checkbox">
+                <label className="jobs-filter-check">
                   <input type="checkbox" checked={filters.hybrid} onChange={() => handleCheckbox('hybrid')} />
                   Hybrid
                 </label>
