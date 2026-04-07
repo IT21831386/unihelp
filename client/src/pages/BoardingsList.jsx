@@ -79,35 +79,49 @@ const BoardingsList = () => {
   return (
     <div className="boarding-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
       <Navbar />
-      
-      {/* Search Header */}
-      <div className="search-header-container sticky-top z-3" style={{ top: '80px' }}>
-        <div className="container py-4">
-          <div className="row justify-content-center">
-            <div className="col-12 col-xl-8">
-              <div className="input-group input-group-lg boarding-search-bar bg-white overflow-hidden">
-                <span className="input-group-text bg-transparent border-0 text-secondary ps-4">
-                  <i className="bi bi-search"></i>
-                </span>
-                <input 
-                  type="text" 
-                  placeholder="Search by city, district, or address..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="form-control border-0 bg-transparent py-3 px-3 shadow-none boarding-search-input"
-                />
-                <button 
-                  onClick={() => setIsMobileFiltersOpen(true)}
-                  className="btn btn-light d-lg-none border-start border-0 px-4"
-                  aria-label="Open Filters"
-                >
-                  <i className="bi bi-sliders"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+
+      {/* Modern Hero Section */}
+      <section className="boardings-hero-modern">
+        {/* Animated Background Elements */}
+        <div className="hero-shape hero-shape-1"></div>
+        <div className="hero-shape hero-shape-2"></div>
+        <div className="hero-shape hero-shape-3"></div>
+        
+        <div className="container text-center position-relative" style={{ zIndex: 1 }}>
+           <h1 className="hero-title-modern">
+             Discover Your <span className="highlight-text">Perfect Student Home</span>
+           </h1>
+           <p className="hero-subtitle-modern mb-5 mt-4">
+              Explore thousands of verified boarding places, apartments, and rooms near your university.
+           </p>
+
+           {/* Search Bar inside Hero */}
+           <div className="row justify-content-center w-100 mt-5 mx-0">
+             <div className="col-12 col-xl-8">
+               <div className="input-group input-group-lg boarding-search-bar bg-white overflow-hidden shadow-lg">
+                 <span className="input-group-text bg-transparent border-0 text-secondary ps-4">
+                   <i className="bi bi-search"></i>
+                 </span>
+                 <input 
+                   type="text" 
+                   placeholder="Search by city, district, or address..." 
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   className="form-control border-0 bg-transparent py-4 px-3 shadow-none boarding-search-input"
+                   style={{ fontSize: '1.15rem' }}
+                 />
+                 <button 
+                   onClick={() => setIsMobileFiltersOpen(true)}
+                   className="btn btn-light d-lg-none border-start border-0 px-4"
+                   aria-label="Open Filters"
+                 >
+                   <i className="bi bi-sliders fs-5"></i>
+                 </button>
+               </div>
+             </div>
+           </div>
         </div>
-      </div>
+      </section>
 
       {/* Main Content Area */}
         <div className="container py-5 flex-grow-1">
