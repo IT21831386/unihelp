@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 const navLinks = [
@@ -17,6 +17,7 @@ function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check initial auth state
@@ -46,6 +47,7 @@ function Navbar() {
     setUser(null);
     setIsProfileOpen(false);
     window.dispatchEvent(new Event('auth-change'));
+    navigate('/login');
   };
 
   return (
