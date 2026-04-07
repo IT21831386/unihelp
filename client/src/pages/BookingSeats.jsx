@@ -24,32 +24,35 @@ function BookingSeats() {
   const now = new Date();
   const defaultDate = now.toISOString().split('T')[0];
   let hNum = now.getHours();
-  if (hNum < 8) hNum = 8;
-  if (hNum > 21) hNum = 21; // Prevent defaulting past the closing boundary
-  const h = String(hNum).padStart(2, '0');
-  const m = now.getMinutes() >= 30 ? '30' : '00';
-  const defaultTime = `${h}:${m}`;
+  let defaultTime;
+  if (hNum < 8) {
+    defaultTime = '08:00';
+  } else if (hNum > 21) {
+    defaultTime = '21:00';
+  } else {
+    // Current exact time natively
+    defaultTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+  }
 
   const [date, setDate] = useState(defaultDate);
   const [time, setTime] = useState(defaultTime);
-  const [duration, setDuration] = useState(1);
-  const [numSeats, setNumSeats] = useState(4);
-  const [dailyBookings, setDailyBookings] = useState([]);
   
-  const getEndTime = (startStr, durHours) => {
-    if (!startStr) return '';
+  // Create a default end time 1 hour after start time
+  const getDefaultEndTime = (startStr) => {
+    if (!startStr) return '09:00';
     const parts = startStr.split(':');
-    if (parts.length < 2) return '';
-    const totalMins = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10) + durHours * 60;
-    const endH = Math.floor(totalMins / 60);
-    const endM = totalMins % 60;
-    if (endH >= 24) return '23:59';
-    return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+    let endH = parseInt(parts[0], 10) + 1;
+    if (endH > 22) endH = 22;
+    return `${String(endH).padStart(2, '0')}:${parts[1]}`;
   };
-  const endTime = getEndTime(time, duration);
+  const [endTime, setEndTime] = useState(getDefaultEndTime(defaultTime));
+  
+  const [numSeats, setNumSeats] = useState(1);
+  const [dailyBookings, setDailyBookings] = useState([]);
   
   const isTimeValid = () => {
     if (!time || !endTime) return false;
+    if (time >= endTime) return false; // End time must be strictly after start time
     if (time < '08:00') return false;
     if (endTime > '22:00') return false;
     return true;
@@ -169,7 +172,7 @@ function BookingSeats() {
         throw new Error(data.message || 'Failed to book seats');
       }
       
-      setSuccessMsg(`Successfully booked your spot for ${duration} hour(s)!`);
+      setSuccessMsg(`Successfully booked your spot for ${time} to ${endTime}!`);
       setSelectedSeats([]);
       setDailyBookings(prev => [...prev, data]);
     } catch (err) {
@@ -255,6 +258,7 @@ function BookingSeats() {
                 <div className="booking-seats-form__row">
                   <input
                     type="date"
+                    min={defaultDate}
                     className="booking-seats-form__input"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
@@ -263,23 +267,27 @@ function BookingSeats() {
                     type="time"
                     className="booking-seats-form__input"
                     value={time}
-                    onChange={(e) => setTime(e.target.value)}
+                    onChange={(e) => {
+                      const newStart = e.target.value;
+                      setTime(newStart);
+                      setEndTime(getDefaultEndTime(newStart));
+                    }}
                   />
                 </div>
               </div>
 
               <div className="booking-seats-form__group">
-                <label className="booking-seats-form__label">Duration</label>
-                <select
-                  className="booking-seats-form__select"
-                  value={duration}
-                  onChange={(e) => setDuration(Number(e.target.value))}
-                >
-                  {[...Array(11)].map((_, i) => {
-                    const val = 1 + (i * 0.5); // Starts at 1, goes to 6
-                    return <option key={val} value={val}>{val} Hour{val > 1 ? 's' : ''} (Ends {getEndTime(time, val)})</option>;
-                  })}
-                </select>
+                <label className="booking-seats-form__label">
+                  End Time
+                </label>
+                <div className="booking-seats-form__row">
+                  <input
+                    type="time"
+                    className="booking-seats-form__input"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div className="booking-seats-form__group">
@@ -343,15 +351,15 @@ function BookingSeats() {
           ) : currentUser.role !== 'user' ? (
              <p style={{color: 'red', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px'}}>Only students can book seats. You are logged in as an {currentUser.role}.</p>
           ) : !isTimeValid() ? (
-             <p style={{color: 'red', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px'}}>Bookings must strictly fall between 08:00 AM and 10:00 PM. Please adjust your start time or duration!</p>
+             <p style={{color: 'red', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px'}}>Bookings must strictly fall between 08:00 AM and 10:00 PM, and your End Time must be after your Start Time. Please adjust!</p>
           ) : null}
 
           <button
             className="booking-seats-cta__btn"
-            disabled={selectedSeats.length === 0 || loading || !currentUser || currentUser.role !== 'user' || !isTimeValid()}
+            disabled={selectedSeats.length < numSeats || loading || !currentUser || currentUser.role !== 'user' || !isTimeValid()}
             onClick={handleBookSpot}
           >
-            {loading ? 'Booking...' : (!currentUser ? 'Login Required' : 'Book your spot')}
+            {loading ? 'Booking...' : (!currentUser ? 'Login Required' : (selectedSeats.length < numSeats ? `Select ${numSeats - selectedSeats.length} more seat${numSeats - selectedSeats.length > 1 ? 's' : ''}` : 'Book your spot'))}
           </button>
         </div>
       </div>
