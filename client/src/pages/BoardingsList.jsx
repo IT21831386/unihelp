@@ -4,6 +4,24 @@ import BoardingCard from '../components/BoardingCard';
 import Navbar from '../components/Navbar';
 import './BoardingsList.css';
 
+const SkeletonCard = () => (
+  <div className="bc-card is-skeleton">
+    <div className="bc-img-wrap"></div>
+    <div className="bc-body">
+      <div className="bc-title mb-2"></div>
+      <div className="bc-location"></div>
+      <div className="bc-amenities mt-3">
+        <div className="bc-amenity"></div>
+        <div className="bc-amenity"></div>
+        <div className="bc-amenity"></div>
+      </div>
+      <div className="bc-footer mt-auto">
+        <div className="bc-price__amount"></div>
+      </div>
+    </div>
+  </div>
+);
+
 const BoardingsList = () => {
   const [boardings, setBoardings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -263,12 +281,9 @@ const BoardingsList = () => {
             </div>
             
             {loading ? (
-               <div className="d-flex flex-column align-items-center justify-content-center py-5" style={{ minHeight: '300px' }}>
-                  <div className="spinner-border text-primary border-4" style={{ width: '3rem', height: '3rem' }} role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="text-secondary fw-medium mt-4">Loading amazing places...</p>
-               </div>
+             <div className="boardings-grid">
+               {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+             </div>
             ) : filteredBoardings.length > 0 ? (
             <div className="boardings-grid">
                 {filteredBoardings.map(boarding => (

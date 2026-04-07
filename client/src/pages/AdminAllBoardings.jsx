@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import './AdminAllBoardings.css';
 
 const AdminAllBoardings = () => {
   const navigate = useNavigate();
@@ -34,8 +35,7 @@ const AdminAllBoardings = () => {
         const response = await axios.delete(`http://localhost:5000/api/boardings/${id}`);
         if (response.data.success) {
           toast.success('Boarding deleted successfully', { id: 'deleteToast' });
-          // Remove from local state
-          setBoardings(boardings.filter(b => b._id !== id));
+          setBoardings(boardings.filter(b => (b._id || b.id) !== id));
         }
       } catch (error) {
         console.error("Error deleting boarding:", error);
@@ -45,115 +45,147 @@ const AdminAllBoardings = () => {
   };
 
   return (
-    <div className="bg-light min-vh-100 py-5" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="admin-mgmt-page">
       <Toaster position="top-center" />
+      
+      {/* Aurora Backdrop */}
+      <div className="bg-aurora" aria-hidden="true">
+        <div className="aurora-blob aurora-blob-1" />
+        <div className="aurora-blob aurora-blob-2" />
+        <div className="aurora-blob aurora-blob-3" />
+      </div>
+      <div className="bg-grain" aria-hidden="true" />
       
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-xxl-11">
             
-            <div className="d-flex align-items-center justify-content-between mb-4">
-              <div>
-                <h2 className="fw-bolder text-dark mb-1 d-flex align-items-center gap-3">
-                  <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px' }}>
-                    <i className="bi bi-buildings fs-4"></i>
-                  </div>
-                  Manage Boarding Places
-                </h2>
-                <p className="text-secondary mb-0 ms-5 ps-3">View, modify, or permanently remove existing boarding places.</p>
-              </div>
+            {/* Action Header */}
+            <div className="admin-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
               <div className="d-flex align-items-center gap-3">
-                <Link to="/" className="btn btn-light border shadow-sm fw-medium d-flex align-items-center gap-2 text-secondary" style={{ padding: '0.6rem 1.25rem', borderRadius: '50rem' }}>
-                  <i className="bi bi-house-door"></i> Back to Home
+                <div className="admin-header__icon">
+                  <i className="bi bi-buildings"></i>
+                </div>
+                <div>
+                  <h2 className="admin-header__title mb-0">Manage Boarding Places</h2>
+                  <p className="text-secondary small mb-0 fw-medium">Admin Dashboard • Control your entire marketplace catalogue</p>
+                </div>
+              </div>
+              
+              <div className="d-flex align-items-center gap-3">
+                <Link to="/" className="btn btn-light px-4 py-2 border shadow-sm fw-bold text-secondary rounded-pill d-flex align-items-center gap-2">
+                  <i className="bi bi-house-star fs-5 text-primary"></i> <span className="d-none d-lg-inline">Back to Home</span>
                 </Link>
-                <Link to="/admin/addboarding" className="btn btn-primary shadow-sm fw-medium d-flex align-items-center gap-2" style={{ padding: '0.6rem 1.25rem', borderRadius: '50rem' }}>
-                  <i className="bi bi-plus-lg"></i> Add New Boarding
+                <Link to="/admin/addboarding" className="btn btn-premium-add">
+                  <i className="bi bi-plus-circle fs-5 me-1"></i> Add New Boarding
                 </Link>
               </div>
             </div>
 
-            <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
+            {/* Quick Stats */}
+            <div className="admin-stats-bar">
+              <div className="admin-stat-pill">
+                <span className="admin-stat-pill__val">{boardings.length}</span>
+                <span className="admin-stat-pill__label">Total Properties</span>
+              </div>
+              <div className="admin-stat-pill">
+                <span className="admin-stat-pill__val">
+                  {boardings.filter(b => b.availabilityStatus === 'Available').length}
+                </span>
+                <span className="admin-stat-pill__label">Available</span>
+              </div>
+            </div>
+
+            {/* Main Table Container */}
+            <div className="card admin-table-card border-0">
               <div className="card-body p-0">
                 {loading ? (
-                  <div className="d-flex flex-column align-items-center justify-content-center py-5" style={{ minHeight: '300px' }}>
-                    <div className="spinner-border text-primary border-4" style={{ width: '3rem', height: '3rem' }} role="status">
-                      <span className="visually-hidden">Loading...</span>
+                  <div className="unihelp-loader-container" style={{ minHeight: '400px' }}>
+                    <div className="unihelp-loader">
+                      <div className="loader-ring"></div>
+                      <div className="loader-ring"></div>
+                      <div className="loader-ring"></div>
+                      <div className="loader-logo">U</div>
                     </div>
+                    <p className="loader-text mt-4">Syncing Catalogue...</p>
                   </div>
                 ) : boardings.length === 0 ? (
-                  <div className="text-center py-5 text-secondary">
-                    <i className="bi bi-inbox display-1 text-light mb-3"></i>
-                    <h4>No boarding places found.</h4>
-                    <p>Start by adding a new boarding place.</p>
+                  <div className="text-center py-5" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4 mx-auto" style={{ width: '120px', height: '120px' }}>
+                       <i className="bi bi-box-seam display-2 text-secondary opacity-25"></i>
+                    </div>
+                    <h4 className="fw-bold text-dark">No boarding places found.</h4>
+                    <p className="text-secondary mb-4">You haven't listed any boarding places yet.</p>
+                    <Link to="/admin/addboarding" className="btn btn-primary px-4 py-2 rounded-pill fw-bold">
+                       <i className="bi bi-plus-lg me-2"></i>Create First Listing
+                    </Link>
                   </div>
                 ) : (
                   <div className="table-responsive">
-                    <table className="table table-hover align-middle mb-0">
-                      <thead className="table-light text-secondary small text-uppercase tracking-wider">
+                    <table className="table admin-table align-middle mb-0">
+                      <thead>
                         <tr>
-                          <th className="px-4 py-3 border-bottom-0 fw-semibold" style={{ width: '80px' }}>Image</th>
-                          <th className="px-4 py-3 border-bottom-0 fw-semibold">Property Details</th>
-                          <th className="px-4 py-3 border-bottom-0 fw-semibold">Location</th>
-                          <th className="px-4 py-3 border-bottom-0 fw-semibold">Price</th>
-                          <th className="px-4 py-3 border-bottom-0 fw-semibold">Status</th>
-                          <th className="px-4 py-3 border-bottom-0 fw-semibold text-end">Actions</th>
+                          <th>Image</th>
+                          <th>Property Details</th>
+                          <th>Location</th>
+                          <th>Price</th>
+                          <th>Status</th>
+                          <th className="text-end">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="border-top-0">
+                      <tbody>
                         {boardings.map((boarding) => {
+                          const id = boarding._id || boarding.id;
                           const displayImage = boarding.imageUrls && boarding.imageUrls.length > 0 
                             ? boarding.imageUrls[0] 
                             : 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop';
                           
                           return (
-                            <tr key={boarding._id} style={{ transition: 'all 0.2s' }}>
-                              <td className="px-4 py-3">
-                                <div className="rounded-3 overflow-hidden bg-light shadow-sm" style={{ width: '60px', height: '60px' }}>
+                            <tr key={id}>
+                              <td>
+                                <div className="table-img-wrap">
                                   <img src={displayImage} alt={boarding.title} className="w-100 h-100 object-fit-cover" />
                                 </div>
                               </td>
-                              <td className="px-4 py-3">
-                                <h6 className="mb-1 fw-bold text-dark text-truncate" style={{ maxWidth: '250px' }} title={boarding.title}>
-                                  {boarding.title}
-                                </h6>
-                                <span className="text-secondary small d-flex align-items-center gap-1">
-                                  <span className="badge bg-light text-dark border">{boarding.propertyType}</span>
+                              <td>
+                                <p className="table-prop-title mb-0">{boarding.title}</p>
+                                <span className="badge bg-light text-secondary small border-0 px-2" style={{ fontSize: '0.65rem' }}>{boarding.propertyType}</span>
+                              </td>
+                              <td className="text-secondary">
+                                <span className="d-flex align-items-center gap-2 small fw-semibold">
+                                  <i className="bi bi-geo-alt-fill text-danger opacity-75"></i> {boarding.city}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 text-secondary">
-                                <i className="bi bi-geo-alt-fill text-primary me-1"></i> {boarding.city}
-                              </td>
-                              <td className="px-4 py-3">
-                                <div className="fw-bolder text-primary">
+                              <td>
+                                <div className="table-price-val">
                                   {boarding.currency} {boarding.price.toLocaleString()}
                                 </div>
                               </td>
-                              <td className="px-4 py-3">
-                                <span className={`badge rounded-pill px-3 py-2 fw-medium ${
-                                  boarding.availabilityStatus === 'Available' ? 'bg-success bg-opacity-10 text-success border border-success-subtle' : 
-                                  boarding.availabilityStatus === 'Full' ? 'bg-danger bg-opacity-10 text-danger border border-danger-subtle' : 
-                                  'bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle'
+                              <td>
+                                <div className={`status-badge-dot ${
+                                  boarding.availabilityStatus === 'Available' ? 'badge-available' : 
+                                  boarding.availabilityStatus === 'Full' ? 'badge-full' : 
+                                  'badge-other'
                                 }`}>
+                                  <span className="dot-indicator" style={{ color: boarding.availabilityStatus === 'Available' ? '#10b981' : boarding.availabilityStatus === 'Full' ? '#ef4444' : '#f59e0b' }}></span>
                                   {boarding.availabilityStatus}
-                                </span>
+                                </div>
                               </td>
-                              <td className="px-4 py-3 text-end">
-                                <div className="d-flex gap-2 justify-content-end">
+                              <td className="text-end">
+                                <div className="d-flex gap-2 justify-content-end px-2">
                                   <button 
-                                    onClick={() => navigate(`/admin/editboarding/${boarding._id || boarding.id}`)}
-                                    className="btn btn-light btn-sm text-primary rounded-circle shadow-sm" 
-                                    style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }} 
-                                    title="Edit"
+                                    onClick={() => navigate(`/admin/editboarding/${id}`)}
+                                    className="admin-action-btn btn-edit" 
+                                    title="Edit Details"
                                   >
-                                    <i className="bi bi-pencil-square"></i>
+                                    <i className="bi bi-pencil-fill"></i>
                                   </button>
                                   <button 
-                                    onClick={() => handleDelete(boarding._id || boarding.id, boarding.title)}
-                                    className="btn btn-light btn-sm text-danger rounded-circle shadow-sm hover-danger" 
-                                    style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                    title="Delete"
+                                    onClick={() => handleDelete(id, boarding.title)}
+                                    className="admin-action-btn btn-delete" 
+                                    title="Permanently Delete"
                                   >
-                                    <i className="bi bi-trash3"></i>
+                                    <i className="bi bi-trash3-fill"></i>
                                   </button>
                                 </div>
                               </td>
@@ -170,7 +202,6 @@ const AdminAllBoardings = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

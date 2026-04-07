@@ -146,6 +146,50 @@
 }
 .bc-status--maintenance .bc-status__dot { background: #fff; }
 
+/* ── Verified Badge ── */
+.bc-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #d946ef);
+  color: white;
+  box-shadow: 
+    0 4px 15px rgba(139, 92, 246, 0.4),
+    0 0 0 1.5px rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  animation: bc-verified-shimmer 3s infinite linear;
+  background-size: 200% auto;
+}
+@keyframes bc-verified-shimmer {
+  to { background-position: 200% center; }
+}
+
+/* ── Hot Deal Badge ── */
+.bc-hotdeal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  color: white;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+}
+.bi-fire { color: #fff; animation: fire-pulse 1.2s infinite alternate ease-in-out; }
+@keyframes fire-pulse {
+  from { transform: scale(1) translateY(0); opacity: 1; }
+  to { transform: scale(1.2) translateY(-1px); opacity: 0.8; }
+}
+
 /* ── Rating pill (bottom of image) ── */
 .bc-rating-pill {
   position: absolute;
@@ -183,6 +227,7 @@
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+  line-clamp: 1;
   overflow: hidden;
   transition: color 0.2s;
 }
@@ -307,3 +352,34 @@
   box-shadow: 0 8px 20px rgba(89, 56, 182, 0.4);
   transform: translateX(3px);
 }
+/* ── Skeleton Loading Animation ── */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: inherit;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.bc-card.is-skeleton {
+  cursor: default; pointer-events: none; border-color: rgba(0,0,0,0.05);
+}
+.bc-card.is-skeleton .bc-img-wrap { background: #f1f5f9; position: relative; overflow: hidden; }
+.bc-card.is-skeleton .bc-img-wrap::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: skeleton-loading 1.5s infinite;
+}
+.bc-card.is-skeleton .bc-title,
+.bc-card.is-skeleton .bc-location,
+.bc-card.is-skeleton .bc-amenity,
+.bc-card.is-skeleton .bc-price__amount {
+  height: 20px; background: #f1f5f9; border-radius: 6px; position: relative; overflow: hidden;
+}
+.bc-card.is-skeleton .bc-title { width: 80%; height: 26px; }
+.bc-card.is-skeleton .bc-location { width: 50%; height: 16px; margin-top: 10px; }
+.bc-card.is-skeleton .bc-amenity { width: 60px; height: 24px; border-radius: 99px; }
+.bc-card.is-skeleton .bc-price__amount { width: 100px; height: 32px; }

@@ -32,11 +32,16 @@ const BoardingDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-vh-100 d-flex flex-column align-items-center justify-content-center bg-light">
-        <div className="spinner-border text-primary border-4" style={{ width: '4rem', height: '4rem' }} role="status">
-          <span className="visually-hidden">Loading...</span>
+      <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+        <div className="unihelp-loader-container">
+          <div className="unihelp-loader">
+            <div className="loader-ring"></div>
+            <div className="loader-ring"></div>
+            <div className="loader-ring"></div>
+            <div className="loader-logo">U</div>
+          </div>
+          <span className="loader-text">Fetching Property...</span>
         </div>
-        <h4 className="mt-4 text-secondary">Loading Property Details...</h4>
       </div>
     );
   }
@@ -79,6 +84,25 @@ const BoardingDetails = () => {
         <div className="bd-header-card">
           <div className="bd-header-card__left">
             <div className="bd-header-card__badges">
+              {/* Verified Badge */}
+              {(boarding.isVerified || boarding.userId) && (
+                <span className="bc-verified-badge">
+                  <i className="bi bi-patch-check-fill" /> Verified
+                </span>
+              )}
+              
+              {/* Hot Deal Badge */}
+              {(boarding.isHotDeal || 
+                (boarding.price > 0 && (
+                  (boarding.propertyType === 'Room' && boarding.price < 15000) ||
+                  ((boarding.propertyType === 'Apartment' || boarding.propertyType === 'House') && boarding.price < 40000)
+                ))
+              ) && (
+                <span className="bc-hotdeal-badge">
+                  <i className="bi bi-fire" /> Hot Deal
+                </span>
+              )}
+
               <span className={`bd-status-badge ${
                 boarding.availabilityStatus === 'Available' ? 'bd-status-badge--available' :
                 boarding.availabilityStatus === 'Full'      ? 'bd-status-badge--full' :

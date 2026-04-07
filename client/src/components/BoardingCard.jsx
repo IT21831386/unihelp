@@ -61,6 +61,25 @@ const BoardingCard = ({ boarding }) => {
 
         {/* Top badges */}
         <div className="bc-badges">
+          {/* Verified Badge (Simulated logic or from DB) */}
+          {(boarding.isVerified || boarding.userId) && (
+            <span className="bc-verified-badge">
+              <i className="bi bi-patch-check-fill" /> Verified
+            </span>
+          )}
+          
+          {/* Hot Deal Badge (Property-specific thresholds) */}
+          {(boarding.isHotDeal || 
+            (boarding.price > 0 && (
+              (boarding.propertyType === 'Room' && boarding.price < 15000) ||
+              ((boarding.propertyType === 'Apartment' || boarding.propertyType === 'House') && boarding.price < 40000)
+            ))
+          ) && (
+            <span className="bc-hotdeal-badge">
+              <i className="bi bi-fire" /> Hot Deal
+            </span>
+          )}
+
           <span className="bc-type-badge">
             <i className="bi bi-building" /> {boarding.propertyType}
           </span>
