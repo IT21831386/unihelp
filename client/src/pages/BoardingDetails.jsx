@@ -64,7 +64,7 @@ const BoardingDetails = () => {
     : ['https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop'];
 
   return (
-    <div className="boarding-details-bg pb-5 boarding-details" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
+    <div className="boarding-details-bg pb-5 boarding-details" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '120px' }}>
       <Navbar />
       <Toaster position="top-center" />
 

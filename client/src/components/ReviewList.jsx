@@ -165,16 +165,37 @@ const ReviewList = ({ boardingId, boardingEmail: boardingEmailProp }) => {
                     ))}
                   </div>
 
+                  {/* Edit Textarea with Counter */}
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <span className="review-edit-mode__label mb-0">Edit Your Review</span>
+                    <span className={`small fw-bold ${editContent.comment.length > 450 ? 'text-danger' : 'text-secondary'}`} style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                      {editContent.comment.length}/500
+                    </span>
+                  </div>
+
                   <textarea
-                    className="review-edit-textarea form-control mb-0"
+                    className={`review-edit-textarea form-control ${editContent.comment.length > 0 && editContent.comment.trim().length < 10 ? 'is-invalid border-danger' : 'mb-0'}`}
                     rows="3"
+                    maxLength={500}
                     value={editContent.comment}
                     onChange={(e) => setEditContent({ ...editContent, comment: e.target.value })}
-                    placeholder="Update your comment…"
+                    placeholder="Update your comment (min. 10 characters)…"
                   />
 
-                  <div className="review-edit-actions">
-                    <button className="btn-review-save" onClick={() => handleUpdate(review._id)}>
+                  {editContent.comment.length > 0 && editContent.comment.trim().length < 10 && (
+                    <div className="text-danger mt-1" style={{ fontSize: '0.65rem', fontWeight: 600 }}>
+                      <i className="bi bi-info-circle me-1" />
+                      Must be at least 10 characters.
+                    </div>
+                  )}
+
+                  <div className="review-edit-actions mt-3">
+                    <button 
+                      className="btn-review-save" 
+                      onClick={() => handleUpdate(review._id)}
+                      disabled={editContent.comment.trim().length < 10}
+                      style={{ opacity: editContent.comment.trim().length < 10 ? 0.6 : 1 }}
+                    >
                       <i className="bi bi-check-lg" /> Save Changes
                     </button>
                     <button className="btn-review-cancel" onClick={() => setEditingReviewId(null)}>

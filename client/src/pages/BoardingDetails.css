@@ -251,298 +251,230 @@
 .bd-open-maps-btn .bi-arrow-up-right-square { font-size: 0.9rem; opacity: 0.85; }
 
 /* ─────────────────────────────────────────────
-   Back Navigation Bar
+   Back Navigation Bar (Elite Modern Pill)
    ───────────────────────────────────────────── */
-
 .bd-back-nav {
   position: sticky;
-  top: 0;
+  top: 64px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(89, 56, 182, 0.08);
-  padding: 0.875rem 0;
-  box-shadow: 0 2px 16px rgba(89, 56, 182, 0.06);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 1rem 0;
+  margin-bottom: 2.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bd-back-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   text-decoration: none;
   color: #5938B6;
-  font-weight: 700;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  padding: 6px 14px 6px 6px;
-  border-radius: 12px;
-  background: rgba(89, 56, 182, 0.06);
-  border: 1px solid rgba(89, 56, 182, 0.12);
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 14px 32px 14px 14px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 4px 15px rgba(89, 56, 182, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .bd-back-link:hover {
-  background: rgba(89, 56, 182, 0.12);
+  background: #fff;
+  transform: translateX(-5px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(89, 56, 182, 0.15);
   color: #3f2a8c;
-  transform: translateX(-3px);
   text-decoration: none;
 }
 
 .bd-back-link__icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #5938B6, #7c5cbf);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5938B6, #ec4899);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 0.85rem;
+  font-size: 1rem;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.bd-back-link:hover .bd-back-link__icon {
-  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(89, 56, 182, 0.25);
 }
 
 /* ─────────────────────────────────────────────
-   Header Card
+   Premium Header Card (Glassmorphic Dashboard)
    ───────────────────────────────────────────── */
 .bd-header-card {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background: linear-gradient(145deg,
-    rgba(255,255,255,0.85) 0%,
-    rgba(248,246,255,0.9) 50%,
-    rgba(255,255,255,0.88) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.9);
-  border-radius: 28px;
-  padding: 2rem 2.25rem;
-  margin-bottom: 2rem;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(167, 139, 250, 0.18) 0%, transparent 35%),
+    radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.12) 0%, transparent 35%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 246, 255, 0.8) 100%);
+  backdrop-filter: blur(28px) saturate(120%);
+  -webkit-backdrop-filter: blur(28px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  padding: 1rem 2rem;
+  margin-bottom: 1.25rem;
   box-shadow:
-    0 16px 48px rgba(89,56,182,0.09),
-    0 4px 16px rgba(0,0,0,0.04),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+    0 25px 60px -15px rgba(89, 56, 182, 0.1),
+    0 10px 25px -10px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* To allow price card shadow to pop */
 }
 
-.bd-header-card::before {
-  content: '';
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 200px; height: 200px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(167,139,250,0.1), transparent 70%);
-  pointer-events: none;
-}
-
-.bd-header-card::after {
-  content: '';
-  position: absolute;
-  bottom: -40px; left: -40px;
-  width: 140px; height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245,158,11,0.07), transparent 70%);
-  pointer-events: none;
-}
-
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .bd-header-card {
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
   }
 }
 
-.bd-header-card__left {
-  flex: 1;
-}
+.bd-header-card__left { flex: 1; position: relative; z-index: 2; }
 
 /* ─────────────────────────────────────────────
-   Status + Type Badges
+   Enhanced Badges
    ───────────────────────────────────────────── */
 .bd-header-card__badges {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-/* Base status badge */
 .bd-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  padding: 8px 18px;
+  border-radius: 50px;
   font-weight: 800;
-  padding: 6px 14px;
-  border-radius: 20px;
-  letter-spacing: 0.4px;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  border: 1.5px solid;
+  letter-spacing: 0.8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1.5px solid rgba(255,255,255,0.8);
 }
 
-.bd-status-badge__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  animation: dot-pulse 2s ease-in-out infinite;
-}
+.bd-status-badge--available { color: #059669; border-color: rgba(16, 185, 129, 0.3); }
+.bd-status-badge--available .bd-status-badge__dot { background: #10b981; box-shadow: 0 0 10px #10b981; }
 
-@keyframes dot-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(0.7); }
-}
-
-/* Available */
-.bd-status-badge--available {
-  background: rgba(16,185,129,0.1);
-  color: #059669;
-  border-color: rgba(16,185,129,0.3);
-}
-.bd-status-badge--available .bd-status-badge__dot { background: #10b981; }
-
-/* Full */
-.bd-status-badge--full {
-  background: rgba(239,68,68,0.08);
-  color: #dc2626;
-  border-color: rgba(239,68,68,0.25);
-}
-.bd-status-badge--full .bd-status-badge__dot { background: #ef4444; }
-
-/* Maintenance */
-.bd-status-badge--maintenance {
-  background: rgba(245,158,11,0.08);
-  color: #b45309;
-  border-color: rgba(245,158,11,0.25);
-}
-.bd-status-badge--maintenance .bd-status-badge__dot { background: #f59e0b; }
-
-/* Property type label */
 .bd-type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(89,56,182,0.07);
+  background: linear-gradient(135deg, rgba(89, 56, 182, 0.1), rgba(236, 72, 153, 0.1));
   color: #5938B6;
-  border: 1.5px solid rgba(89,56,182,0.14);
-  text-transform: capitalize;
-  letter-spacing: 0.3px;
+  border: 1.5px solid rgba(89, 56, 182, 0.15);
+  font-weight: 800;
+  font-size: 0.78rem;
+  padding: 8px 18px;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
 }
 
 /* ─────────────────────────────────────────────
-   Title
+   Mesh-Gradient Title
    ───────────────────────────────────────────── */
 .bd-header-card__title {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 900;
-  line-height: 1.15;
-  letter-spacing: -0.5px;
-  margin: 0 0 0.875rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #5938B6 60%, #7c5cbf 100%);
+  font-size: clamp(1.4rem, 3.8vw, 2.1rem);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -1.2px;
+  margin: 0 0 0.75rem;
+  background: linear-gradient(135deg, #111827 0%, #3730a3 40%, #5938B6 70%, #ec4899 100%);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.05));
 }
-
-/* ─────────────────────────────────────────────
-   Location Chip
-   ───────────────────────────────────────────── */
-.bd-header-card__location { margin-top: 0; }
 
 .bd-location-chip {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 1);
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 700;
+  color: #4b5563;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #475569;
-  background: rgba(71,85,105,0.06);
-  border: 1px solid rgba(71,85,105,0.12);
-  padding: 7px 16px;
-  border-radius: 14px;
-}
-
-.bd-location-chip .bi-geo-alt-fill {
-  color: #ef4444;
-  font-size: 0.95rem;
+  gap: 8px;
 }
 
 /* ─────────────────────────────────────────────
-   Price Block
+   Holographic Floating Price Card
    ───────────────────────────────────────────── */
 .bd-price-block {
-  background: linear-gradient(145deg, rgba(89,56,182,0.06), rgba(167,139,250,0.08));
-  border: 2px solid rgba(89,56,182,0.12);
-  border-radius: 22px;
-  padding: 1.25rem 1.75rem;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(243, 240, 251, 0.98));
+  border-radius: 30px;
+  padding: 0.75rem 1.5rem;
+  min-width: 180px;
   text-align: right;
-  flex-shrink: 0;
   position: relative;
-  overflow: hidden;
-  min-width: 190px;
+  box-shadow: 
+    0 20px 40px -10px rgba(89, 56, 182, 0.12),
+    0 10px 20px -5px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 1);
+  transform: translateY(-5px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(89, 56, 182, 0.08);
 }
 
-.bd-price-block::before {
+.bd-price-block:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 35px 70px -15px rgba(89, 56, 182, 0.18);
+}
+
+.bd-price-block::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.6), transparent);
-  pointer-events: none;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #5938B6, #ec4899, transparent, transparent);
+  opacity: 0.15;
+  z-index: -1;
 }
 
 .bd-price-block__label {
-  font-size: 0.7rem;
-  font-weight: 800;
+  font-size: 0.8rem;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #7c5cbf;
-  margin: 0 0 0.4rem;
-}
-
-.bd-price-block__amount {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 4px;
-  line-height: 1;
-}
-
-.bd-price-block__currency {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #5938B6;
-  padding-top: 6px;
+  letter-spacing: 2px;
+  color: #94a3b8;
+  margin-bottom: 8px;
 }
 
 .bd-price-block__value {
-  font-size: 2.4rem;
-  font-weight: 900;
-  letter-spacing: -1.5px;
-  background: linear-gradient(135deg, #5938B6 0%, #ec4899 100%);
+  font-size: 2.2rem;
+  font-weight: 950;
+  letter-spacing: -2.2px;
+  background: linear-gradient(135deg, #1e1b4b 0%, #5938B6 50%, #ec4899 100%);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 2px 8px rgba(89,56,182,0.2));
+  -webkit-text-fill-color: transparent;
+  line-height: 0.9;
+  display: block;
+}
+
+.bd-price-block__currency {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #1e1b4b;
+  margin-right: 4px;
 }
 
 .bd-price-block__note {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  font-weight: 600;
-  display: block;
-  text-align: right;
-  margin-top: 4px;
-  letter-spacing: 0.3px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-top: 8px;
+  opacity: 0.8;
 }
 
 /* old details-header-card kept as alias */
