@@ -43,8 +43,47 @@ const getReviewsForOwner = async (req, res) => {
   }
 };
 
+// @desc    Update a review
+// @route   PUT /api/reviews/:id
+const updateReview = async (req, res) => {
+  try {
+    const updatedReview = await reviewService.updateReview(req.params.id, req.body);
+    res.status(200).json({ success: true, data: updatedReview });
+  } catch (error) {
+    console.error('Error in updateReview:', error);
+    res.status(400).json({ success: false, message: 'Server Error' });
+  }
+};
+
+// @desc    Delete a review
+// @route   DELETE /api/reviews/:id
+const deleteReview = async (req, res) => {
+  try {
+    await reviewService.deleteReview(req.params.id);
+    res.status(200).json({ success: true, message: 'Review deleted successfully' });
+  } catch (error) {
+    console.error('Error in deleteReview:', error);
+    res.status(400).json({ success: false, message: 'Server Error' });
+  }
+};
+
+// @desc    Add owner reply to review
+// @route   PUT /api/reviews/:id/reply
+const addOwnerReply = async (req, res) => {
+  try {
+    const repliedReview = await reviewService.addOwnerReply(req.params.id, req.body.reply);
+    res.status(200).json({ success: true, data: repliedReview });
+  } catch (error) {
+    console.error('Error in addOwnerReply:', error);
+    res.status(400).json({ success: false, message: 'Server Error' });
+  }
+};
+
 module.exports = {
   addReview,
   getReviewsForBoarding,
   getReviewsForOwner,
+  updateReview,
+  deleteReview,
+  addOwnerReply,
 };

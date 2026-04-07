@@ -4,6 +4,24 @@ import BoardingCard from '../components/BoardingCard';
 import Navbar from '../components/Navbar';
 import './BoardingsList.css';
 
+const SkeletonCard = () => (
+  <div className="bc-card is-skeleton">
+    <div className="bc-img-wrap"></div>
+    <div className="bc-body">
+      <div className="bc-title mb-2"></div>
+      <div className="bc-location"></div>
+      <div className="bc-amenities mt-3">
+        <div className="bc-amenity"></div>
+        <div className="bc-amenity"></div>
+        <div className="bc-amenity"></div>
+      </div>
+      <div className="bc-footer mt-auto">
+        <div className="bc-price__amount"></div>
+      </div>
+    </div>
+  </div>
+);
+
 const BoardingsList = () => {
   const [boardings, setBoardings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +96,18 @@ const BoardingsList = () => {
 
   return (
     <div className="boarding-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
+
+      {/* Aurora glow layer — Layer -2 */}
+      <div className="bg-aurora" aria-hidden="true">
+        <div className="aurora-blob aurora-blob-1" />
+        <div className="aurora-blob aurora-blob-2" />
+        <div className="aurora-blob aurora-blob-3" />
+        <div className="aurora-blob aurora-blob-4" />
+      </div>
+
+      {/* Film grain layer — Layer -1 */}
+      <div className="bg-grain" aria-hidden="true" />
+
       <Navbar />
 
       {/* Modern Hero Section */}
@@ -88,38 +118,62 @@ const BoardingsList = () => {
         <div className="hero-shape hero-shape-3"></div>
         
         <div className="container text-center position-relative" style={{ zIndex: 1 }}>
-           <h1 className="hero-title-modern">
-             Discover Your <span className="highlight-text">Perfect Student Home</span>
-           </h1>
-           <p className="hero-subtitle-modern mb-5 mt-4">
-              Explore thousands of verified boarding places, apartments, and rooms near your university.
-           </p>
+          <h1 className="hero-title-modern">
+            Discover Your <span className="highlight-text">Perfect Student Home</span>
+          </h1>
+          <p className="hero-subtitle-modern mt-3 mb-3">
+            Explore thousands of verified boarding places, apartments, and rooms near your university.
+          </p>
 
-           {/* Search Bar inside Hero */}
-           <div className="row justify-content-center w-100 mt-5 mx-0">
-             <div className="col-12 col-xl-8">
-               <div className="input-group input-group-lg boarding-search-bar bg-white overflow-hidden shadow-lg">
-                 <span className="input-group-text bg-transparent border-0 text-secondary ps-4">
+          <div className="row justify-content-center w-100 mt-5 mx-0">
+            <div className="col-12 col-xl-8">
+              
+              {/* Category Icons (Airbnb Style) */}
+              <div className="bl-hero-categories mb-4">
+                {[
+                  { label: 'All', icon: 'bi-grid-1x2-fill' },
+                  { label: 'Room', icon: 'bi-door-open-fill' },
+                  { label: 'House', icon: 'bi-house-heart-fill' },
+                  { label: 'Apartment', icon: 'bi-building-fill' }
+                ].map(cat => (
+                  <div 
+                    key={cat.label} 
+                    className={`bl-hero-cat-item ${propertyType === cat.label ? 'active' : ''}`}
+                    onClick={() => setPropertyType(cat.label)}
+                  >
+                    <i className={`bi ${cat.icon} bl-hero-cat-icon`}></i>
+                    <span className="bl-hero-cat-label">{cat.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Modern Search Bar */}
+              <div className="bl-hero-search">
+                <div className="bl-hero-search-icon">
                    <i className="bi bi-search"></i>
-                 </span>
-                 <input 
-                   type="text" 
-                   placeholder="Search by city, district, or address..." 
-                   value={searchQuery}
-                   onChange={(e) => setSearchQuery(e.target.value)}
-                   className="form-control border-0 bg-transparent py-4 px-3 shadow-none boarding-search-input"
-                   style={{ fontSize: '1.15rem' }}
-                 />
-                 <button 
-                   onClick={() => setIsMobileFiltersOpen(true)}
-                   className="btn btn-light d-lg-none border-start border-0 px-4"
-                   aria-label="Open Filters"
-                 >
-                   <i className="bi bi-sliders fs-5"></i>
-                 </button>
-               </div>
-             </div>
-           </div>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Search by city, district, or address..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bl-hero-search-input"
+                />
+                <button className="bl-hero-search-btn">
+                   Search
+                </button>
+                
+                {/* Mobile Toggle */}
+                <button 
+                  onClick={() => setIsMobileFiltersOpen(true)}
+                  className="bl-hero-mobile-toggle d-md-none"
+                >
+                  <i className="bi bi-sliders"></i>
+                </button>
+              </div>
+
+            </div>
+          </div>
         </div>
       </section>
 
@@ -133,13 +187,11 @@ const BoardingsList = () => {
             
             <div className="card h-100 glass-filter-card d-flex flex-column" style={isMobileFiltersOpen ? { borderRadius: '0 !important', padding: '2rem 1.5rem' } : { padding: '2rem 1.5rem' }}>
               
-              <div className="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-                <div className="d-flex align-items-center gap-2 text-dark fs-5 fw-bold">
-                  <i className="bi bi-funnel-fill text-primary"></i>
-                  Filters
-                </div>
+              <div className="bl-filter-header">
+                <div className="bl-filter-header__icon"><i className="bi bi-funnel-fill" /></div>
+                <h5 className="bl-filter-header__title">Filters</h5>
                 {isMobileFiltersOpen && (
-                  <button onClick={() => setIsMobileFiltersOpen(false)} className="btn btn-sm btn-link text-secondary p-0">
+                  <button onClick={() => setIsMobileFiltersOpen(false)} className="btn btn-sm btn-link text-secondary p-0 ms-auto">
                     <i className="bi bi-x-lg fs-5"></i>
                   </button>
                 )}
@@ -151,19 +203,17 @@ const BoardingsList = () => {
                   <h6 className="filter-heading">Property Type</h6>
                   <div className="d-flex flex-column gap-2">
                     {['All', 'Room', 'House', 'Apartment'].map(type => (
-                      <div key={type} className="form-check">
-                        <input 
-                          type="radio" 
-                          name="propertyType" 
+                      <div key={type} className="form-check d-flex align-items-center gap-2">
+                        <input
+                          type="radio"
+                          name="propertyType"
                           id={`type-${type}`}
                           value={type}
                           checked={propertyType === type}
                           onChange={(e) => setPropertyType(e.target.value)}
                           className="form-check-input filter-radio"
                         />
-                        <label className="form-check-label text-dark fw-medium" htmlFor={`type-${type}`}>
-                          {type}
-                        </label>
+                        <label className="filter-label" htmlFor={`type-${type}`}>{type}</label>
                       </div>
                     ))}
                   </div>
@@ -172,14 +222,13 @@ const BoardingsList = () => {
                 {/* Price Range */}
                 <div className="border-top pt-4">
                   <h6 className="filter-heading">Max Price (LKR)</h6>
-                   <div className="input-group">
-                    <span className="input-group-text bg-light text-secondary border-end-0">₨</span>
-                    <input 
-                      type="number" 
-                      placeholder="Any price" 
+                  <div className="bl-price-input-group">
+                    <span className="bl-price-input-group__prefix">Rs</span>
+                    <input
+                      type="number"
+                      placeholder="Any price"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
-                      className="form-control bg-light border-start-0 ps-0 shadow-none"
                     />
                   </div>
                 </div>
@@ -190,19 +239,19 @@ const BoardingsList = () => {
                   <div className="d-flex flex-column gap-2">
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="wifi" name="wifi" checked={amenities.wifi} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="wifi">WiFi access</label>
+                      <label className="filter-label" htmlFor="wifi">WiFi access</label>
                     </div>
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="bath" name="attachedBathroom" checked={amenities.attachedBathroom} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="bath">Attached Bathroom</label>
+                      <label className="filter-label" htmlFor="bath">Attached Bathroom</label>
                     </div>
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="park" name="parking" checked={amenities.parking} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="park">Parking Space</label>
+                      <label className="filter-label" htmlFor="park">Parking Space</label>
                     </div>
                     <div className="form-check d-flex align-items-center gap-2">
                       <input type="checkbox" id="furnish" name="furnished" checked={amenities.furnished} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
-                      <label className="form-check-label text-dark fw-medium" htmlFor="furnish">Fully Furnished</label>
+                      <label className="filter-label" htmlFor="furnish">Fully Furnished</label>
                     </div>
                   </div>
                 </div>
@@ -223,21 +272,18 @@ const BoardingsList = () => {
 
           {/* Results Grid */}
           <main className="boardings-results">
-            <div className="d-flex align-items-center justify-content-between mb-4">
-              <div className="glass-pill px-4 py-2">
-                <h3 className="fw-bold text-dark mb-0 fs-5">
-                  {filteredBoardings.length} {filteredBoardings.length === 1 ? 'place' : 'places'} found
-                </h3>
+            <div className="bl-results-header">
+              <div className="bl-count-pill">
+                <i className="bi bi-grid-3x3-gap-fill" />
+                <span className="bl-count-pill__num">{filteredBoardings.length}</span>
+                {filteredBoardings.length === 1 ? 'place' : 'places'} found
               </div>
             </div>
             
             {loading ? (
-               <div className="d-flex flex-column align-items-center justify-content-center py-5" style={{ minHeight: '300px' }}>
-                  <div className="spinner-border text-primary border-4" style={{ width: '3rem', height: '3rem' }} role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="text-secondary fw-medium mt-4">Loading amazing places...</p>
-               </div>
+             <div className="boardings-grid">
+               {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+             </div>
             ) : filteredBoardings.length > 0 ? (
             <div className="boardings-grid">
                 {filteredBoardings.map(boarding => (

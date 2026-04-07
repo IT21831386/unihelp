@@ -5,6 +5,7 @@ import './BoardingCard.css';
 
 const BoardingCard = ({ boarding }) => {
   const [ratingData, setRatingData] = useState({ average: 0, count: 0 });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRating = async () => {
@@ -18,120 +19,131 @@ const BoardingCard = ({ boarding }) => {
           setRatingData({ average: sum / reviews.length, count: reviews.length });
         }
       } catch (error) {
-        console.error("Error fetching rating", error);
+        console.error('Error fetching rating', error);
       }
     };
     fetchRating();
   }, [boarding]);
 
-  const navigate = useNavigate();
+  const displayImage =
+    boarding.imageUrls && boarding.imageUrls.length > 0
+      ? boarding.imageUrls[0]
+      : 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop';
 
-  // Determine the display image
-  const displayImage = boarding.imageUrls && boarding.imageUrls.length > 0 
-    ? boarding.imageUrls[0] 
-    : 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop'; // fallback image
+  const statusClass =
+    boarding.availabilityStatus === 'Available' ? 'bc-status--available' :
+    boarding.availabilityStatus === 'Full'      ? 'bc-status--full' :
+                                                   'bc-status--maintenance';
+
+  const amenities = [
+    { key: 'wifi',             icon: 'bi-wifi',          label: 'WiFi'    },
+    { key: 'parking',          icon: 'bi-car-front-fill', label: 'Parking' },
+    { key: 'attachedBathroom', icon: 'bi-droplet-half',   label: 'Bath'    },
+    { key: 'kitchen',          icon: 'bi-cup-hot-fill',   label: 'Kitchen' },
+    { key: 'furnished',        icon: 'bi-lamp',           label: 'Furnished'},
+    { key: 'laundry',          icon: 'bi-wind',           label: 'Laundry' },
+  ].filter((a) => boarding[a.key]);
 
   return (
-    <div className="boarding-card-modern d-flex flex-column h-100">
-      
-      {/* Image Container */}
-      <div 
-        className="boarding-card-img-wrapper cursor-pointer" 
-        style={{ aspectRatio: '5/4' }}
-        onClick={() => navigate(`/boarding/${boarding._id || boarding.id}`)}
-      >
-        <img 
-          src={displayImage} 
-          alt={boarding.title} 
-          className="w-100 h-100 object-fit-cover boarding-place-card__img"
-          style={{ transition: 'transform 0.5s ease-in-out' }}
-        />
-        {/* Badges Stack */}
-        <div className="position-absolute top-0 start-0 p-3 d-flex flex-column gap-2 align-items-start" style={{ pointerEvents: 'none' }}>
-          {/* Type Badge */}
-          <div className="badge rounded-pill px-3 py-2 boarding-badge-glass">
-            {boarding.propertyType}
-          </div>
+    <div
+      className="bc-card"
+      onClick={() => navigate(`/boarding/${boarding._id || boarding.id}`)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && navigate(`/boarding/${boarding._id || boarding.id}`)}
+    >
+      {/* ── Image ── */}
+      <div className="bc-img-wrap">
+        <img src={displayImage} alt={boarding.title} className="bc-img" />
 
-          {/* Status Badge */}
-          <div className={`badge rounded-pill px-3 py-2 ${
-            boarding.availabilityStatus === 'Available' ? 'bg-success text-white' : 
-            boarding.availabilityStatus === 'Full' ? 'bg-danger text-white' : 
-            'bg-warning text-dark'
-          } boarding-status-glass`}>
-            {boarding.availabilityStatus}
-          </div>
-        </div>
-      </div>
+        {/* Gradient overlay */}
+        <div className="bc-img-overlay" />
 
-      {/* Content */}
-      <div className="card-body d-flex flex-column p-4">
-        <h5 className="boarding-place-card__title card-title fw-bolder text-dark text-truncate mb-1" title={boarding.title}>
-          {boarding.title}
-        </h5>
-        
-        <div className="d-flex align-items-center mb-2">
-          {ratingData.count > 0 ? (
-            <>
-              <div className="text-warning me-1 small">
-                <i className="bi bi-star-fill"></i>
-              </div>
-              <span className="fw-bold me-1 text-dark small">{ratingData.average.toFixed(1)}</span>
-              <span className="text-secondary small" style={{ fontSize: '0.75rem' }}>({ratingData.count})</span>
-            </>
-          ) : (
-            <span className="text-secondary small" style={{ fontSize: '0.75rem' }}>No reviews yet</span>
+        {/* Top badges */}
+        <div className="bc-badges">
+          {/* Verified Badge (Simulated logic or from DB) */}
+          {(boarding.isVerified || boarding.userId) && (
+            <span className="bc-verified-badge">
+              <i className="bi bi-patch-check-fill" /> Verified
+            </span>
           )}
-        </div>
+          
+          {/* Hot Deal Badge (Property-specific thresholds) */}
+          {(boarding.isHotDeal || 
+            (boarding.price > 0 && (
+              (boarding.propertyType === 'Room' && boarding.price < 15000) ||
+              ((boarding.propertyType === 'Apartment' || boarding.propertyType === 'House') && boarding.price < 40000)
+            ))
+          ) && (
+            <span className="bc-hotdeal-badge">
+              <i className="bi bi-fire" /> Hot Deal
+            </span>
+          )}
 
-        <div className="d-flex align-items-center text-secondary small mb-3">
-          <i className="bi bi-geo-alt-fill me-2 text-primary"></i>
-          <span className="text-truncate">
-            {boarding.city}, {boarding.district}
+          <span className="bc-type-badge">
+            <i className="bi bi-building" /> {boarding.propertyType}
+          </span>
+          <span className={`bc-status ${statusClass}`}>
+            <span className="bc-status__dot" />
+            {boarding.availabilityStatus}
           </span>
         </div>
 
-        <div className="mt-auto">
-          {/* Amenities Row */}
-          <div className="boarding-place-card__amenities d-flex flex-wrap gap-2 mb-4 pt-3 border-top">
-            {boarding.wifi && (
-              <span className="amenity-chip" title="WiFi Included">
-                <i className="bi bi-wifi me-1 text-primary"></i> WiFi
-              </span>
-            )}
-            {boarding.parking && (
-              <span className="amenity-chip" title="Parking Available">
-                <i className="bi bi-car-front-fill me-1 text-primary"></i> Parking
-              </span>
-            )}
-            {boarding.attachedBathroom && (
-              <span className="amenity-chip" title="Attached Bathroom">
-                <i className="bi bi-droplet-half me-1 text-primary"></i> Bath
-              </span>
-            )}
-            {boarding.kitchen && (
-              <span className="amenity-chip" title="Kitchen Access">
-                <i className="bi bi-cup-hot-fill me-1 text-primary"></i> Kitchen
-              </span>
-            )}
+        {/* Rating pill overlaid on image bottom */}
+        {ratingData.count > 0 && (
+          <div className="bc-rating-pill">
+            <i className="bi bi-star-fill" />
+            <span>{ratingData.average.toFixed(1)}</span>
+            <span className="bc-rating-pill__count">({ratingData.count})</span>
           </div>
+        )}
+      </div>
 
-          {/* Price & Action */}
-          <div className="d-flex align-items-end justify-content-between pt-1">
-            <div>
-              <p className="boarding-place-card__price-label text-secondary small fw-medium mb-1">Price / month</p>
-              <div className="d-flex align-items-baseline text-primary">
-                <span className="fs-6 fw-bold me-1">{boarding.currency === 'LKR' ? '₨' : boarding.currency}</span>
-                <span className="fs-4 fw-bolder">{boarding.price.toLocaleString()}</span>
-              </div>
-            </div>
-            <button 
-              onClick={() => navigate(`/boarding/${boarding._id || boarding.id}`)}
-              className="boarding-cta-btn border-0" 
-            >
-              <i className="bi bi-arrow-right-short fs-4 lh-1"></i>
-            </button>
+      {/* ── Body ── */}
+      <div className="bc-body">
+        <h5 className="bc-title" title={boarding.title}>{boarding.title}</h5>
+
+        {ratingData.count === 0 && (
+          <p className="bc-no-reviews">
+            <i className="bi bi-chat-dots me-1" />No reviews yet
+          </p>
+        )}
+
+        <div className="bc-location">
+          <i className="bi bi-geo-alt-fill" />
+          <span>{boarding.city}, {boarding.district}</span>
+        </div>
+
+        {/* Amenity chips */}
+        {amenities.length > 0 && (
+          <div className="bc-amenities">
+            {amenities.slice(0, 4).map((a) => (
+              <span key={a.key} className="bc-amenity">
+                <i className={`bi ${a.icon}`} />
+                {a.label}
+              </span>
+            ))}
           </div>
+        )}
+
+        {/* Price + CTA */}
+        <div className="bc-footer">
+          <div className="bc-price">
+            <span className="bc-price__label">Price / month</span>
+            <div className="bc-price__amount">
+              <span className="bc-price__currency">
+                {boarding.currency === 'LKR' ? 'Rs' : boarding.currency}
+              </span>
+              <span className="bc-price__value">{boarding.price.toLocaleString()}</span>
+            </div>
+          </div>
+          <button
+            className="bc-cta"
+            onClick={(e) => { e.stopPropagation(); navigate(`/boarding/${boarding._id || boarding.id}`); }}
+            aria-label="View details"
+          >
+            <i className="bi bi-arrow-right" />
+          </button>
         </div>
       </div>
     </div>

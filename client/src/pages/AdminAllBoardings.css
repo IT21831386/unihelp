@@ -1,0 +1,222 @@
+/* ═══════════════════════════════════════════════
+   Admin Boarding Management — Premium UI
+   ═══════════════════════════════════════════════ */
+
+.admin-mgmt-page {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 80px;
+  overflow-x: hidden;
+  background: #f8fafc;
+}
+
+/* Aurora Backdrop (Same as BoardingList for consistency) */
+.bg-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora-blob {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  filter: blur(100px);
+  opacity: 0.25;
+  border-radius: 50%;
+  animation: blob-float 20s infinite alternate ease-in-out;
+}
+
+.aurora-blob-1 { background: #5938B6; top: -10%; left: -10%; }
+.aurora-blob-2 { background: #ec4899; bottom: -10%; right: -10%; animation-delay: -5s; }
+.aurora-blob-3 { background: #38b2ac; top: 40%; left: 30%; animation-delay: -10s; }
+
+@keyframes blob-float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(10%, 15%) scale(1.1); }
+}
+
+.bg-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Header Section */
+.admin-header {
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(89, 56, 182, 0.08);
+}
+
+.admin-header__icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1.5rem;
+  box-shadow: 0 10px 25px rgba(89, 56, 182, 0.3);
+}
+
+.admin-header__title {
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: #1e1b4b;
+}
+
+/* Stats Pill */
+.admin-stats-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.admin-stat-pill {
+  padding: 10px 20px;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(89, 56, 182, 0.1);
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  transition: transform 0.3s ease;
+}
+.admin-stat-pill:hover { transform: translateY(-3px); }
+.admin-stat-pill__val { font-weight: 900; color: #5938B6; font-size: 1.1rem; }
+.admin-stat-pill__label { color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Table Glass Card */
+.admin-table-card {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 25px 60px rgba(89, 56, 182, 0.08) !important;
+  overflow: hidden;
+}
+
+.admin-table th {
+  background: rgba(248, 250, 252, 0.5) !important;
+  padding: 1.25rem 1.5rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748b;
+  border-bottom: 1px solid rgba(0,0,0,0.04) !important;
+}
+
+.admin-table td {
+  padding: 1.25rem 1.5rem !important;
+  border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+  background: transparent !important;
+  transition: background 0.2s ease;
+}
+
+.admin-table tr:hover td {
+  background: rgba(89, 56, 182, 0.02) !important;
+}
+
+/* Property Item */
+.table-img-wrap {
+  width: 70px; height: 70px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  border: 2px solid white;
+}
+
+.table-prop-title {
+  font-weight: 800;
+  color: #1e1b4b;
+  margin-bottom: 4px;
+}
+
+.table-price-val {
+  font-weight: 900;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Modern Badges */
+.status-badge-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+.dot-indicator {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  position: relative;
+}
+.dot-indicator::after {
+  content: ''; position: absolute; inset: -2px;
+  border-radius: 50%; border: 2px solid currentColor;
+  animation: dot-ping 1.5s infinite;
+}
+@keyframes dot-ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+.badge-available { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.badge-full      { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.badge-other     { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+/* Admin Actions */
+.admin-action-btn {
+  width: 42px; height: 42px;
+  border-radius: 14px;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.btn-edit {
+  background: rgba(89, 56, 182, 0.08);
+  color: #5938B6;
+}
+.btn-edit:hover {
+  background: #5938B6; color: white;
+  transform: translateY(-3px) rotate(-8deg);
+  box-shadow: 0 8px 20px rgba(89, 56, 182, 0.3);
+}
+
+.btn-delete {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+}
+.btn-delete:hover {
+  background: #ef4444; color: white;
+  transform: translateY(-3px) rotate(8deg);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+/* Floating Add Button Refinement */
+.btn-premium-add {
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  color: white !important;
+  border: none !important;
+  padding: 12px 28px !important;
+  border-radius: 16px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+  box-shadow: 0 10px 25px rgba(89, 56, 182, 0.4) !important;
+  transition: all 0.3s ease !important;
+}
+.btn-premium-add:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(89, 56, 182, 0.5) !important;
+}
