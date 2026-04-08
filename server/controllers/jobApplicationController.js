@@ -66,3 +66,36 @@ exports.getApplications = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// @desc    Update an application (name, email, phone, optional CV)
+// @route   PUT /api/job-applications/:id
+exports.updateApplication = async (req, res) => {
+  try {
+    const { fullName, email, phone } = req.body;
+    const updateData = { fullName, email, phone };
+    if (req.file) {
+      updateData.cvFilePath = req.file.path;
+    }
+    const app = await JobApplication.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    res.json(app);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Delete an application
+// @route   DELETE /api/job-applications/:id
+exports.deleteApplication = async (req, res) => {
+  try {
+    const app = await JobApplication.findByIdAndDelete(req.params.id);
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    res.json({ message: 'Application deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

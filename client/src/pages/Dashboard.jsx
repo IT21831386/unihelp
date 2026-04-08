@@ -20,6 +20,7 @@ function Dashboard() {
   const [myBookings, setMyBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [editingJob, setEditingJob] = useState(null);
+  const [editingApp, setEditingApp] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   
   const [currentUser, setCurrentUser] = useState(null);
@@ -164,6 +165,45 @@ function Dashboard() {
       } else {
         const errData = await res.json();
         alert(errData.message || 'Failed to update job');
+      }
+    } catch (e) { alert('Network error'); }
+  };
+
+  const handleDeleteApp = async (appId) => {
+    if (!window.confirm('Are you sure you want to withdraw this application? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/job-applications/${appId}`, { method: 'DELETE' });
+      if (res.ok) setApplications(prev => prev.filter(a => a._id !== appId));
+      else alert('Failed to delete application');
+    } catch (e) { alert('Network error'); }
+  };
+
+  const handleUpdateApp = async (e) => {
+    e.preventDefault();
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const PHONE_REGEX = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{3,5}[-\s\.]?[0-9]{4,6}$/;
+    if (editingApp.fullName.trim().length < 3) { alert('Full name must be at least 3 characters.'); return; }
+    if (!EMAIL_REGEX.test(editingApp.email)) { alert('Enter a valid email address.'); return; }
+    if (!PHONE_REGEX.test(editingApp.phone.trim())) { alert('Enter a valid phone number.'); return; }
+    try {
+      const payload = new FormData();
+      payload.append('fullName', editingApp.fullName);
+      payload.append('email', editingApp.email);
+      payload.append('phone', editingApp.phone);
+      if (editingApp.newCvFile) {
+        payload.append('cvFile', editingApp.newCvFile);
+      }
+      const res = await fetch(`http://localhost:5000/api/job-applications/${editingApp._id}`, {
+        method: 'PUT',
+        body: payload
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setApplications(prev => prev.map(a => a._id === updated._id ? { ...a, ...updated } : a));
+        setEditingApp(null);
+      } else {
+        const errData = await res.json();
+        alert(errData.message || 'Failed to update application');
       }
     } catch (e) { alert('Network error'); }
   };
@@ -419,11 +459,12 @@ function Dashboard() {
                     <th>Contact</th>
                     <th>Applied On</th>
                     <th>CV / Resume</th>
+                    {currentUser.role === 'user' && <th>Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {applications.length === 0 ? (
-                    <tr><td colSpan="5" className="empty-row">No applications received yet.</td></tr>
+                    <tr><td colSpan={currentUser.role === 'user' ? '6' : '5'} className="empty-row">No applications received yet.</td></tr>
                   ) : (
                     applications.map(app => (
                       <tr key={app._id}>
@@ -453,12 +494,60 @@ function Dashboard() {
                             ⬇ Download
                           </a> */}
                         </td>
+                        {currentUser.role === 'user' && (
+                          <td>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button onClick={() => setEditingApp({ ...app })} style={{ background: 'none', border: 'none', color: '#0366d6', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: '13px' }}>Edit</button>
+                              <button onClick={() => handleDeleteApp(app._id)} style={{ background: 'none', border: 'none', color: '#cb2431', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: '13px' }}>Withdraw</button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
+
+            {editingApp && (
+              <div onClick={() => setEditingApp(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '12px', padding: '30px', maxWidth: '420px', width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                  <h3 style={{ marginBottom: '20px', color: '#24292e' }}>Edit Application</h3>
+                  <form onSubmit={handleUpdateApp} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Full Name</label>
+                      <input type="text" value={editingApp.fullName} onChange={e => setEditingApp({ ...editingApp, fullName: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required minLength={3} maxLength={100} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Email Address</label>
+                      <input type="email" value={editingApp.email} onChange={e => setEditingApp({ ...editingApp, email: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>Phone Number</label>
+                      <input type="tel" value={editingApp.phone} onChange={e => setEditingApp({ ...editingApp, phone: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px' }} required placeholder="+94 77 123 4567" />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>CV / Resume</label>
+                      {editingApp.cvFilePath && (
+                        <div style={{ marginBottom: '8px', padding: '8px 12px', background: '#f6f8fa', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '16px' }}>📄</span>
+                          <a href={`http://localhost:5000/${editingApp.cvFilePath.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#0366d6', fontSize: '13px', textDecoration: 'underline', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {editingApp.cvFilePath.split(/[/\\]/).pop()}
+                          </a>
+                          <span style={{ fontSize: '12px', color: '#586069' }}>(current)</span>
+                        </div>
+                      )}
+                      <input type="file" accept=".pdf,.doc,.docx" onChange={e => { if (e.target.files[0]) setEditingApp({ ...editingApp, newCvFile: e.target.files[0] }); }} style={{ width: '100%', padding: '6px', border: '1px solid #d1d5da', borderRadius: '4px', fontSize: '13px' }} />
+                      <small style={{ color: '#586069', fontSize: '12px' }}>Upload a new file to replace. PDF, DOC, DOCX (Max 5MB)</small>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '5px' }}>
+                      <button type="button" onClick={() => setEditingApp(null)} style={{ padding: '8px 15px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
+                      <button type="submit" style={{ padding: '8px 15px', background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Save Changes</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         );
 

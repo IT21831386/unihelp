@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const { applyForJob, getApplications } = require('../controllers/jobApplicationController');
+const { applyForJob, getApplications, updateApplication, deleteApplication } = require('../controllers/jobApplicationController');
 
 // Multer storage configuration
 const storage = multer.diskStorage({
@@ -21,5 +21,7 @@ const upload = multer({
 
 router.post('/', upload.single('cvFile'), applyForJob);
 router.get('/', getApplications);
+router.put('/:id', upload.single('cvFile'), updateApplication);
+router.delete('/:id', deleteApplication);
 
 module.exports = router;
