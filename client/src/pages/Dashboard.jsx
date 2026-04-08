@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AreaLayoutEditor from '../components/AreaLayoutEditor';
@@ -22,10 +22,12 @@ function Dashboard() {
   const [editingJob, setEditingJob] = useState(null);
   const [editingApp, setEditingApp] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  
+  const [newAreaId, setNewAreaId] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [boardings, setBoardings] = useState([]);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Authentication & Role check
   useEffect(() => {
@@ -37,14 +39,21 @@ function Dashboard() {
     const parsedUser = JSON.parse(userStr);
     setCurrentUser(parsedUser);
 
-    if (parsedUser.role === 'user') {
-      setActiveTab('bookings');
+    // Initial tab based on role or query param
+    const queryParams = new URLSearchParams(location.search);
+    const tabParam = queryParams.get('tab');
+    
+    if (tabParam) {
+      setActiveTab(tabParam);
+    } else {
+      if (parsedUser.role === 'user') {
+        setActiveTab('bookings');
+      }
+      if (parsedUser.role === 'employer') {
+        setActiveTab('jobs');
+      }
     }
-
-    if (parsedUser.role === 'employer') {
-      setActiveTab('jobs');
-    }
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +75,15 @@ function Dashboard() {
           if (areasRes.ok) {
             const areasData = await areasRes.json();
             setAreas(Array.isArray(areasData) ? areasData : []);
+          }
+
+          // Fetch Boardings for Admin
+          const boardingsRes = await fetch('http://localhost:5000/api/boardings');
+          if (boardingsRes.ok) {
+            const boardingsData = await boardingsRes.json();
+            if (boardingsData.success) {
+              setBoardings(boardingsData.data || []);
+            }
           }
         }
 
@@ -208,6 +226,21 @@ function Dashboard() {
     } catch (e) { alert('Network error'); }
   };
 
+  const handleDeleteBoarding = async (id, title) => {
+    if (!window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/boardings/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setBoardings(prev => prev.filter(b => (b._id || b.id) !== id));
+      } else {
+        alert(data.message || 'Failed to delete boarding');
+      }
+    } catch (e) {
+      alert('Network error');
+    }
+  };
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -299,6 +332,95 @@ function Dashboard() {
                 </div>
               </div>
             )}
+          </div>
+        );
+
+      case 'boardings':
+        if (currentUser.role !== 'admin') return null;
+        return (
+          <div className="dashboard-card premium-table-card border-0">
+            <div className="dashboard-card__header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+                  <div style={{ padding: '8px', background: 'linear-gradient(135deg, #5938B6, #ec4899)', borderRadius: '10px', color: '#fff', fontSize: '18px' }}><i className="bi bi-buildings-fill"></i></div>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0 }}>Manage Boarding Places</h2>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span className="dashboard-badge">{boardings.length} Total</span>
+                  <span className="dashboard-badge" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
+                    {boardings.filter(b => b.availabilityStatus === 'Available').length} Available
+                  </span>
+                </div>
+              </div>
+              <Link to="/admin/addboarding" className="btn-premium-add-new">
+                <i className="bi bi-plus-circle-fill me-2"></i> Add New Boarding
+              </Link>
+            </div>
+            <div className="table-responsive">
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Property Name</th>
+                    <th>Location</th>
+                    <th>Pricing</th>
+                    <th>Status</th>
+                    <th className="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {boardings.length === 0 ? (
+                    <tr><td colSpan="5" className="empty-row">No boarding places found</td></tr>
+                  ) : (
+                    boardings.map((boarding) => {
+                      const id = boarding._id || boarding.id;
+                      const displayImage = boarding.imageUrls?.[0] || 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop';
+                      const statusClass = boarding.availabilityStatus === 'Available' ? 'badge-available' : 
+                                         boarding.availabilityStatus === 'Full' ? 'badge-full' : 'badge-other';
+                      
+                      return (
+                        <tr key={id}>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                              <div className="premium-img-wrap">
+                                <img src={displayImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: '800', fontSize: '14.5px', color: '#1e1b4b' }}>{boarding.title}</div>
+                                <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>{boarding.propertyType}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ fontSize: '13px', fontWeight: 600, color: '#4b5563' }}>
+                            <i className="bi bi-geo-alt-fill text-danger me-1 opacity-75"></i> {boarding.city}
+                          </td>
+                          <td>
+                            <span className="premium-price-val">
+                              {boarding.currency} {boarding.price.toLocaleString()}
+                            </span>
+                          </td>
+                          <td>
+                            <div className={`status-badge-premium ${statusClass}`}>
+                              <span className="dot-indicator" style={{ color: 'currentColor' }}></span>
+                              {boarding.availabilityStatus}
+                            </div>
+                          </td>
+                          <td className="text-end">
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button onClick={() => navigate(`/admin/editboarding/${id}`)} className="premium-action-btn btn-premium-edit" title="Edit Listing">
+                                <i className="bi bi-pencil-fill"></i>
+                              </button>
+                              <button onClick={() => handleDeleteBoarding(id, boarding.title)} className="premium-action-btn btn-premium-delete" title="Permanently Delete">
+                                <i className="bi bi-trash3-fill"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         );
 
@@ -821,7 +943,7 @@ function Dashboard() {
                   <h3 style={{ marginBottom: '5px', color: '#24292e' }}>Booking QR Code</h3>
                   <p style={{ fontSize: '13px', color: '#586069', marginBottom: '20px' }}>Scan with your phone camera</p>
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-                    <QRCodeCanvas
+                    <QRCodeSVG
                       id="qr-code-canvas"
                       value={`UniHelp Booking\nStudent: ${currentUser?.name || 'N/A'}\nArea: ${selectedBooking.area}\nDate: ${selectedBooking.date}\nTime: ${selectedBooking.to12h(selectedBooking.time)} - ${selectedBooking.to12h(selectedBooking.endTime)}\nSeats: ${selectedBooking.seats.join(', ')}\nStatus: ${selectedBooking.getStatusLabel()}`}
                       size={200}
@@ -872,44 +994,69 @@ function Dashboard() {
             <h3>Dashboard</h3>
           </div>
           <nav className="dashboard-nav">
+            {/* Student View */}
             {currentUser.role === 'user' && (
-              <button 
-                className={`dashboard-nav__btn ${activeTab === 'bookings' ? 'active' : ''}`}
-                onClick={() => setActiveTab('bookings')}
-              >
-                <span className="nav-icon">📅</span> My Bookings
-              </button>
+              <>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'bookings' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('bookings')}
+                >
+                  <span className="nav-icon">📅</span> My Bookings
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('applications')}
+                >
+                  <span className="nav-icon">📄</span> My Applications
+                </button>
+              </>
             )}
 
-            {currentUser.role === 'admin' && (
-              <button 
-                className={`dashboard-nav__btn ${activeTab === 'students' ? 'active' : ''}`}
-                onClick={() => setActiveTab('students')}
-              >
-                  <span className="nav-icon">🎓</span> Students
-              </button>
-            )}
-
-            <button 
-              className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
-              onClick={() => setActiveTab('applications')}
-            >
-              <span className="nav-icon">&#128221;</span> {currentUser.role === 'user' ? 'My Applications' : 'Applications'}
-            </button>
-            
-            {currentUser.role !== 'user' && (
+            {/* Employer View */}
+            {currentUser.role === 'employer' && (
               <>
                 <button 
                   className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
                   onClick={() => setActiveTab('jobs')}
                 >
-                  <span className="nav-icon">&#128188;</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
+                  <span className="nav-icon">💼</span> My Jobs
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('applications')}
+                >
+                  <span className="nav-icon">📄</span> Applications
                 </button>
               </>
             )}
-            
+
+            {/* Admin View */}
             {currentUser.role === 'admin' && (
               <>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'students' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('students')}
+                >
+                  <span className="nav-icon">🎓</span> Students
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'boardings' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('boardings')}
+                >
+                  <span className="nav-icon">🏠</span> Boarding Places
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('applications')}
+                >
+                  <span className="nav-icon">📄</span> Applications
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('jobs')}
+                >
+                  <span className="nav-icon">💼</span> Jobs
+                </button>
                 <button 
                   className={`dashboard-nav__btn ${activeTab === 'companies' ? 'active' : ''}`}
                   onClick={() => setActiveTab('companies')}

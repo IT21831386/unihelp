@@ -264,3 +264,105 @@
     padding: var(--spacing-md);
   }
 }
+
+/* ── Premium Boarding Table Styles (Integrated) ── */
+.premium-table-card {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 50px rgba(89, 56, 182, 0.08) !important;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+.premium-img-wrap {
+  width: 50px; height: 50px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  border: 2px solid white;
+}
+
+.premium-price-val {
+  font-weight: 800;
+  font-size: 1.05rem;
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Modern Status Dots */
+.status-badge-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: capitalize;
+}
+
+.dot-indicator {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  position: relative;
+}
+.dot-indicator::after {
+  content: ''; position: absolute; inset: -2px;
+  border-radius: 50%; border: 1.5px solid currentColor;
+  animation: dot-ping 1.5s infinite;
+}
+@keyframes dot-ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
+
+.badge-available { background: rgba(16, 185, 129, 0.08); color: #10b981; }
+.badge-full      { background: rgba(239, 68, 68, 0.08); color: #ef4444; }
+.badge-other     { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
+
+/* Admin Actions Premium */
+.premium-action-btn {
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+.btn-premium-edit {
+  background: rgba(89, 56, 182, 0.08);
+  color: #5938B6;
+}
+.btn-premium-edit:hover {
+  background: #5938B6; color: white;
+  transform: translateY(-2px) rotate(-5deg);
+}
+
+.btn-premium-delete {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+}
+.btn-premium-delete:hover {
+  background: #ef4444; color: white;
+  transform: translateY(-2px) rotate(5deg);
+}
+
+.btn-premium-add-new {
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  color: white !important;
+  border: none !important;
+  padding: 10px 24px !important;
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 8px 20px rgba(89, 56, 182, 0.3) !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.btn-premium-add-new:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(89, 56, 182, 0.4) !important;
+}
