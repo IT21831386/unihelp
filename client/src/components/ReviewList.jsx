@@ -12,6 +12,8 @@ const ReviewList = ({ boardingId, boardingEmail: boardingEmailProp }) => {
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [editContent, setEditContent] = useState({ rating: 5, comment: '' });
   const [replyInput, setReplyInput] = useState({});
+  const [filterRating, setFilterRating] = useState('all'); // 'all', 1, 2, 3, 4, 5
+  const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'highest', 'lowest'
 
   const fetchReviews = async () => {
     try {
@@ -124,6 +126,22 @@ const ReviewList = ({ boardingId, boardingEmail: boardingEmailProp }) => {
   // Debug: uncomment to troubleshoot
   // console.log('[ReviewList] isBoardingOwner check:', { userEmail: user?.email, boardingEmail: resolvedBoardingEmail, role: user?.role, result: isBoardingOwner });
 
+  // Filtering and Sorting Logic
+  const filteredAndSortedReviews = reviews
+    .filter((review) => {
+      if (filterRating === 'all') return true;
+      return review.rating === parseInt(filterRating);
+    })
+    .sort((a, b) => {
+      if (sortBy === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === 'highest') return b.rating - a.rating;
+      if (sortBy === 'lowest') return a.rating - b.rating;
+      return 0;
+    });
+
+  const getRatingCount = (rating) => reviews.filter(r => r.rating === rating).length;
+
   return (
     <div className="review-section">
       {/* Header */}
@@ -137,15 +155,56 @@ const ReviewList = ({ boardingId, boardingEmail: boardingEmailProp }) => {
         )}
       </div>
 
+      {/* Filter & Sort Bar */}
+      {reviews.length > 0 && (
+        <div className="review-filter-bar mb-4">
+          <div className="review-filter-bar__group">
+            <label className="review-filter-bar__label">Filter Rating</label>
+            <div className="review-filter-bar__chips">
+              <button 
+                className={`review-filter-chip ${filterRating === 'all' ? 'is-active' : ''}`}
+                onClick={() => setFilterRating('all')}
+              >
+                All
+              </button>
+              {[5, 4, 3, 2, 1].map((star) => (
+                <button 
+                  key={star}
+                  className={`review-filter-chip ${filterRating === star ? 'is-active' : ''}`}
+                  onClick={() => setFilterRating(star)}
+                >
+                  {star} <i className="bi bi-star-fill text-warning ms-1" />
+                  <span className="review-filter-chip__count">{getRatingCount(star)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="review-filter-bar__group ms-lg-auto">
+            <label className="review-filter-bar__label">Sort By</label>
+            <select 
+              className="review-sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="highest">Highest Rated</option>
+              <option value="lowest">Lowest Rated</option>
+            </select>
+          </div>
+        </div>
+      )}
+
       {/* Review List */}
       {loading ? (
         <div className="review-loading">
           <div className="review-loading__spinner" />
           Loading reviews…
         </div>
-      ) : reviews.length > 0 ? (
+      ) : filteredAndSortedReviews.length > 0 ? (
         <div className="d-flex flex-column gap-3 mb-4">
-          {reviews.map((review) => (
+          {filteredAndSortedReviews.map((review) => (
             <div key={review._id} className="review-card">
               {editingReviewId === review._id ? (
                 /* ── EDIT MODE ── */
@@ -165,16 +224,37 @@ const ReviewList = ({ boardingId, boardingEmail: boardingEmailProp }) => {
                     ))}
                   </div>
 
+                  {/* Edit Textarea with Counter */}
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <span className="review-edit-mode__label mb-0">Edit Your Review</span>
+                    <span className={`small fw-bold ${editContent.comment.length > 450 ? 'text-danger' : 'text-secondary'}`} style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                      {editContent.comment.length}/500
+                    </span>
+                  </div>
+
                   <textarea
-                    className="review-edit-textarea form-control mb-0"
+                    className={`review-edit-textarea form-control ${editContent.comment.length > 0 && editContent.comment.trim().length < 10 ? 'is-invalid border-danger' : 'mb-0'}`}
                     rows="3"
+                    maxLength={500}
                     value={editContent.comment}
                     onChange={(e) => setEditContent({ ...editContent, comment: e.target.value })}
-                    placeholder="Update your comment…"
+                    placeholder="Update your comment (min. 10 characters)…"
                   />
 
-                  <div className="review-edit-actions">
-                    <button className="btn-review-save" onClick={() => handleUpdate(review._id)}>
+                  {editContent.comment.length > 0 && editContent.comment.trim().length < 10 && (
+                    <div className="text-danger mt-1" style={{ fontSize: '0.65rem', fontWeight: 600 }}>
+                      <i className="bi bi-info-circle me-1" />
+                      Must be at least 10 characters.
+                    </div>
+                  )}
+
+                  <div className="review-edit-actions mt-3">
+                    <button 
+                      className="btn-review-save" 
+                      onClick={() => handleUpdate(review._id)}
+                      disabled={editContent.comment.trim().length < 10}
+                      style={{ opacity: editContent.comment.trim().length < 10 ? 0.6 : 1 }}
+                    >
                       <i className="bi bi-check-lg" /> Save Changes
                     </button>
                     <button className="btn-review-cancel" onClick={() => setEditingReviewId(null)}>
