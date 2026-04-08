@@ -38,6 +38,8 @@ const BoardingsList = () => {
   });
 
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [selectedToCompare, setSelectedToCompare] = useState([]); // Array of boarding objects
+  const [isComparing, setIsComparing] = useState(false);
 
   useEffect(() => {
     fetchBoardings();
@@ -68,6 +70,17 @@ const BoardingsList = () => {
     setPropertyType('All');
     setMaxPrice('');
     setAmenities({ wifi: false, attachedBathroom: false, parking: false, furnished: false });
+  };
+
+  const handleCompareToggle = (boarding) => {
+    setSelectedToCompare(prev => {
+      const isSelected = prev.find(item => (item._id || item.id) === (boarding._id || boarding.id));
+      if (isSelected) {
+        return prev.filter(item => (item._id || item.id) !== (boarding._id || boarding.id));
+      }
+      if (prev.length >= 3) return prev; // Limit to 3
+      return [...prev, boarding];
+    });
   };
 
   // Filter Logic
@@ -286,11 +299,18 @@ const BoardingsList = () => {
              </div>
             ) : filteredBoardings.length > 0 ? (
             <div className="boardings-grid">
-                {filteredBoardings.map(boarding => (
-                  <div key={boarding._id || boarding.id || Math.random()} className="boarding-grid-item">
-                      <BoardingCard boarding={boarding} />
-                  </div>
-                ))}
+                {filteredBoardings.map(boarding => {
+                  const isSelected = selectedToCompare.some(item => (item._id || item.id) === (boarding._id || boarding.id));
+                  return (
+                    <div key={boarding._id || boarding.id || Math.random()} className="boarding-grid-item">
+                        <BoardingCard 
+                          boarding={boarding} 
+                          onCompareToggle={() => handleCompareToggle(boarding)}
+                          isSelected={isSelected}
+                        />
+                    </div>
+                  );
+                })}
               </div>
             ) : (
                <div className="card no-results-card p-5 text-center w-100">
@@ -310,6 +330,108 @@ const BoardingsList = () => {
           </main>
         </div>
       </div>
+
+      {/* ── Comparison Floating Bar ── */}
+      {selectedToCompare.length > 0 && (
+        <div className="bl-compare-bar animate__animated animate__slideInUp">
+          <div className="container d-flex align-items-center justify-content-between">
+            <div className="bl-compare-items d-flex gap-3">
+              {selectedToCompare.map(item => (
+                <div key={item._id || item.id} className="bl-compare-item-chip">
+                  <img src={item.imageUrls?.[0] || 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop'} alt={item.title} />
+                  <span>{item.title}</span>
+                  <button onClick={() => handleCompareToggle(item)}><i className="bi bi-x" /></button>
+                </div>
+              ))}
+              {selectedToCompare.length < 3 && (
+                <div className="bl-compare-placeholder">
+                  Add {3 - selectedToCompare.length} more to compare
+                </div>
+              )}
+            </div>
+            <div className="bl-compare-actions d-flex gap-2">
+              <button 
+                className="btn-clear-compare"
+                onClick={() => setSelectedToCompare([])}
+              >
+                Clear All
+              </button>
+              <button 
+                className="btn-compare-trigger"
+                disabled={selectedToCompare.length < 2}
+                onClick={() => setIsComparing(true)}
+              >
+                Compare Now ({selectedToCompare.length}/3)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Comparison Modal ── */}
+      {isComparing && (
+        <div className="bl-compare-modal-overlay">
+          <div className="bl-compare-modal-content scale-in-center">
+            <div className="bl-compare-modal-header">
+              <h3 className="mb-0">Compare Listings</h3>
+              <button className="close-btn" onClick={() => setIsComparing(false)}><i className="bi bi-x-lg" /></button>
+            </div>
+            <div className="bl-compare-modal-body table-responsive">
+              <table className="table bl-compare-table">
+                <thead>
+                  <tr>
+                    <th style={{ minWidth: '150px' }}>Features</th>
+                    {selectedToCompare.map(item => (
+                      <th key={item._id || item.id} style={{ minWidth: '220px' }}>
+                        <div className="compare-th-card">
+                          <img src={item.imageUrls?.[0] || 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop'} alt={item.title} />
+                          <h6>{item.title}</h6>
+                          <div className="compare-price">Rs.{item.price.toLocaleString()}</div>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Property Type</strong></td>
+                    {selectedToCompare.map((item, idx) => <td key={item._id || idx}>{item.propertyType}</td>)}
+                  </tr>
+                  <tr>
+                    <td><strong>Location</strong></td>
+                    {selectedToCompare.map((item, idx) => <td key={item._id || idx}>{item.city}, {item.district}</td>)}
+                  </tr>
+                  <tr>
+                    <td><strong>Amenities</strong></td>
+                    {selectedToCompare.map((item, idx) => (
+                      <td key={item._id || idx}>
+                        <div className="compare-amenities-list">
+                          {item.wifi && <span><i className="bi bi-wifi" /> WiFi</span>}
+                          {item.parking && <span><i className="bi bi-car-front" /> Parking</span>}
+                          {item.attachedBathroom && <span><i className="bi bi-droplet" /> Bath</span>}
+                          {item.furnished && <span><i className="bi bi-lamp" /> Furnished</span>}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td><strong>Gender Preference</strong></td>
+                    {selectedToCompare.map((item, idx) => <td key={item._id || idx}>{item.genderPreference || 'Any'}</td>)}
+                  </tr>
+                  <tr>
+                    <td>Action</td>
+                    {selectedToCompare.map((item, idx) => (
+                      <td key={item._id || idx}>
+                        <a href={`/boarding/${item._id || item.id}`} className="btn-view-compare">View Listing</a>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
