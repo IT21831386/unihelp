@@ -71,8 +71,12 @@ exports.getApplications = async (req, res) => {
 // @route   PUT /api/job-applications/:id
 exports.updateApplication = async (req, res) => {
   try {
-    const { fullName, email, phone } = req.body;
-    const updateData = { fullName, email, phone };
+    const { fullName, email, phone, status } = req.body;
+    const updateData = {};
+    if (fullName) updateData.fullName = fullName;
+    if (email) updateData.email = email;
+    if (phone) updateData.phone = phone;
+    if (status) updateData.status = status;
     if (req.file) {
       updateData.cvFilePath = req.file.path;
     }
