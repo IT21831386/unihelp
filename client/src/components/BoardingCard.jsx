@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './BoardingCard.css';
 
-const BoardingCard = ({ boarding }) => {
+const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
   const [ratingData, setRatingData] = useState({ average: 0, count: 0 });
   const navigate = useNavigate();
 
@@ -87,6 +87,19 @@ const BoardingCard = ({ boarding }) => {
             <span className="bc-status__dot" />
             {boarding.availabilityStatus}
           </span>
+        </div>
+
+        {/* Compare Checkbox */}
+        <div 
+          className={`bc-compare-checkbox ${isSelected ? 'is-selected' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onCompareToggle();
+          }}
+          title="Add to compare"
+        >
+          <i className={`bi ${isSelected ? 'bi-check-circle-fill' : 'bi-plus-circle'}`} />
+          <span>{isSelected ? 'Selected' : 'Compare'}</span>
         </div>
 
         {/* Rating pill overlaid on image bottom */}

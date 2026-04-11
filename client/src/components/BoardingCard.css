@@ -383,3 +383,56 @@
 .bc-card.is-skeleton .bc-location { width: 50%; height: 16px; margin-top: 10px; }
 .bc-card.is-skeleton .bc-amenity { width: 60px; height: 24px; border-radius: 99px; }
 .bc-card.is-skeleton .bc-price__amount { width: 100px; height: 32px; }
+
+/* ── Compare Checkbox Overlay ── */
+.bc-compare-checkbox {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 6px 14px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bc-compare-checkbox i {
+  font-size: 1rem;
+  transition: transform 0.3s;
+}
+
+.bc-compare-checkbox:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.bc-compare-checkbox.is-selected {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+  transform: scale(1.05) translateY(-2px);
+}
+
+.bc-compare-checkbox.is-selected i {
+  transform: scale(1.2);
+}
+
+.bc-card:hover .bc-compare-checkbox:not(.is-selected) {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a2e;
+}

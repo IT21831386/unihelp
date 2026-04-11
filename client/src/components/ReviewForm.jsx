@@ -80,31 +80,49 @@ const ReviewForm = ({ boardingId, onReviewAdded, studentId, studentName }) => {
           </div>
         </div>
 
-        {/* Comment */}
-        <div className="mb-4">
-          <span className="review-form__label">Your Comment</span>
+        {/* Comment with Character Counter */}
+        <div className="mb-4 position-relative">
+          <div className="d-flex justify-content-between align-items-center mb-1">
+            <span className="review-form__label mb-0">Your Comment</span>
+            <span className={`small fw-bold ${comment.length > 450 ? 'text-danger' : 'text-secondary'}`} style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+              {comment.length}/500
+            </span>
+          </div>
           <textarea
-            className="review-form-textarea form-control"
+            className={`review-form-textarea form-control ${comment.length > 0 && comment.trim().length < 10 ? 'is-invalid border-danger' : ''}`}
             rows="3"
-            placeholder="Share your experience with this boarding place…"
+            maxLength={500}
+            placeholder="Share your experience (min. 10 characters)…"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             disabled={submitting}
+            style={{ transition: 'all 0.3s' }}
           />
+          {comment.length > 0 && comment.trim().length < 10 && (
+            <div className="text-danger mt-1" style={{ fontSize: '0.65rem', fontWeight: 600 }}>
+              <i className="bi bi-info-circle me-1" />
+              Please write at least 10 characters for a helpful review.
+            </div>
+          )}
         </div>
 
-        <button type="submit" className="btn-submit-review" disabled={submitting}>
+        <button 
+          type="submit" 
+          className="btn-submit-review" 
+          disabled={submitting || comment.trim().length < 10}
+          style={{ opacity: (submitting || comment.trim().length < 10) ? 0.6 : 1 }}
+        >
           {submitting ? (
             <>
               <span
-                className="spinner-border spinner-border-sm"
+                className="spinner-border spinner-border-sm me-2"
                 style={{ width: '14px', height: '14px', borderWidth: '2px' }}
               />
-              Submitting…
+              Submitting Review…
             </>
           ) : (
             <>
-              <i className="bi bi-send-fill" />
+              <i className="bi bi-send-fill me-2" />
               Submit Review
             </>
           )}
