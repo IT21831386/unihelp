@@ -31,6 +31,10 @@ const jobValidation = [
     .notEmpty().withMessage('Contact email is required')
     .isEmail().withMessage('Enter a valid email address')
     .normalizeEmail(),
+  body('postedByEmail')
+    .notEmpty().withMessage('Poster email is required for ownership tracking')
+    .isEmail().withMessage('Invalid poster email')
+    .normalizeEmail(),
   body('link')
     .optional({ checkFalsy: true })
     .isURL().withMessage('Please enter a valid URL'),

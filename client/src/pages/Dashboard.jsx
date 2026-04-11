@@ -22,6 +22,8 @@ function Dashboard() {
   const [editingJob, setEditingJob] = useState(null);
   const [editingApp, setEditingApp] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [appSearchTerm, setAppSearchTerm] = useState('');
+  const [appJobFilter, setAppJobFilter] = useState('');
   
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -84,7 +86,7 @@ function Dashboard() {
             const jobsData = await jobsRes.json();
             let allJobs = Array.isArray(jobsData) ? jobsData : [];
             if (currentUser.role === 'employer') {
-               allJobs = allJobs.filter(job => job.contactEmail === currentUser.email);
+               allJobs = allJobs.filter(job => job.postedByEmail === currentUser.email);
             }
             setJobs(allJobs);
           }
@@ -372,8 +374,12 @@ function Dashboard() {
                             <Link to={`/careers/job/${job._id}`} className="dashboard-link">View</Link>
                             {currentUser.role === 'employer' && (
                               <>
-                                <button onClick={() => setEditingJob({...job})} style={{ background: 'none', border: 'none', color: '#0366d6', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Edit</button>
-                                <button onClick={() => handleDeleteJob(job._id)} style={{ background: 'none', border: 'none', color: '#cb2431', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Delete</button>
+                                <button onClick={() => setEditingJob({...job})} title="Edit" style={{ background: '#0366d6', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <button onClick={() => handleDeleteJob(job._id)} title="Delete" style={{ background: '#cb2431', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                </button>
                               </>
                             )}
                           </div>
@@ -444,12 +450,45 @@ function Dashboard() {
         );
 
       case 'applications':
+        const filteredApps = applications.filter(app => {
+          if (currentUser.role !== 'employer') return true;
+          const matchesSearch = app.fullName.toLowerCase().includes(appSearchTerm.toLowerCase());
+          const matchesJob = appJobFilter ? (app.jobId && app.jobId._id === appJobFilter) : true;
+          return matchesSearch && matchesJob;
+        });
+
+        const employerJobs = applications
+          .map(app => app.jobId)
+          .filter((job, index, self) => job && self.findIndex(j => j._id === job._id) === index);
+
         return (
           <div className="dashboard-card">
             <div className="dashboard-card__header">
               <h2>{currentUser.role === 'user' ? 'My Sent Applications' : 'Job Applications'}</h2>
-              <span className="dashboard-badge">{applications.length} Total</span>
+              <span className="dashboard-badge">{filteredApps.length} Total</span>
             </div>
+            
+            {currentUser.role === 'employer' && (
+              <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8', display: 'flex', gap: '15px', alignItems: 'center' }}>
+                <input 
+                  type="text" 
+                  placeholder="Search by applicant name..." 
+                  value={appSearchTerm} 
+                  onChange={e => setAppSearchTerm(e.target.value)} 
+                  style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1 }}
+                />
+                <select 
+                  value={appJobFilter} 
+                  onChange={e => setAppJobFilter(e.target.value)}
+                  style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1 }}
+                >
+                  <option value="">All Jobs</option>
+                  {employerJobs.map(job => (
+                    <option key={job._id} value={job._id}>{job.title}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="table-responsive">
               <table className="dashboard-table">
                 <thead>
@@ -463,10 +502,10 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {applications.length === 0 ? (
-                    <tr><td colSpan={currentUser.role === 'user' ? '6' : '5'} className="empty-row">No applications received yet.</td></tr>
+                  {filteredApps.length === 0 ? (
+                    <tr><td colSpan={currentUser.role === 'user' ? '6' : '5'} className="empty-row">No applications found.</td></tr>
                   ) : (
-                    applications.map(app => (
+                    filteredApps.map(app => (
                       <tr key={app._id}>
                         <td><strong>{app.fullName}</strong></td>
                         <td>{app.jobId ? app.jobId.title : 'Deleted Job'}</td>
@@ -475,7 +514,7 @@ function Dashboard() {
                           <small>{app.phone}</small>
                         </td>
                         <td>{formatDate(app.createdAt)}</td>
-                        <td style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <td style={{ verticalAlign: 'middle' }}>
                           <a
                             href={`http://localhost:5000/${app.cvFilePath.replace(/\\/g, '/')}`}
                             target="_blank"
@@ -497,8 +536,12 @@ function Dashboard() {
                         {currentUser.role === 'user' && (
                           <td>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => setEditingApp({ ...app })} style={{ background: 'none', border: 'none', color: '#0366d6', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: '13px' }}>Edit</button>
-                              <button onClick={() => handleDeleteApp(app._id)} style={{ background: 'none', border: 'none', color: '#cb2431', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: '13px' }}>Withdraw</button>
+                              <button onClick={() => setEditingApp({ ...app })} title="Edit" style={{ background: '#0366d6', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                              </button>
+                              <button onClick={() => handleDeleteApp(app._id)} title="Withdraw" style={{ background: '#cb2431', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                              </button>
                             </div>
                           </td>
                         )}
@@ -890,12 +933,14 @@ function Dashboard() {
               </button>
             )}
 
-            <button 
-              className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
-              onClick={() => setActiveTab('applications')}
-            >
-              <span className="nav-icon">&#128221;</span> {currentUser.role === 'user' ? 'My Applications' : 'Applications'}
-            </button>
+            {currentUser.role !== 'admin' && (
+              <button 
+                className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+                onClick={() => setActiveTab('applications')}
+              >
+                <span className="nav-icon">&#128221;</span> {currentUser.role === 'user' ? 'My Applications' : 'Applications'}
+              </button>
+            )}
             
             {currentUser.role !== 'user' && (
               <>

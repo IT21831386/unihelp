@@ -41,13 +41,13 @@ exports.getApplications = async (req, res) => {
 
     // First fetch all applications and populate the Job details
     let applications = await JobApplication.find()
-      .populate('jobId', 'title company contactEmail')
+      .populate('jobId', 'title company contactEmail postedByEmail')
       .sort({ createdAt: -1 });
 
     // If an employer email is provided, filter the populated results
     if (employerEmail) {
       applications = applications.filter(app => 
-        app.jobId && app.jobId.contactEmail === employerEmail
+        app.jobId && app.jobId.postedByEmail === employerEmail
       );
     }
 

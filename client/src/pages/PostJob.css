@@ -25,6 +25,7 @@
 /* Page Header */
 .post-job-header {
   margin: var(--spacing-xl) 0 var(--spacing-2xl);
+  text-align: center;
 }
 
 .post-job-header h1 {
@@ -46,9 +47,8 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: var(--spacing-3xl);
-  margin-bottom: var(--spacing-4xl);
-  box-shadow: var(--shadow-md);
   max-width: 720px;
+  margin: 0 auto var(--spacing-4xl);
   position: relative;
   overflow: hidden;
 }
@@ -216,7 +216,7 @@
   padding: var(--spacing-2xl);
   text-align: center;
   max-width: 720px;
-  margin-bottom: var(--spacing-4xl);
+  margin: 0 auto var(--spacing-4xl);
   animation: slideUp 0.4s ease-out;
 }
 

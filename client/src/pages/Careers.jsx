@@ -33,8 +33,8 @@ function Careers() {
   const navigate = useNavigate();
   const user = getLoggedInUser();
 
-  // Students go directly to Find Jobs
-  if (user && user.role === 'user') {
+  // Students and Admins go directly to Find Jobs
+  if (user && (user.role === 'user' || user.role === 'admin')) {
     return <Navigate to="/careers/find-jobs" replace />;
   }
 

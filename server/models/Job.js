@@ -43,6 +43,12 @@ const jobSchema = new mongoose.Schema(
       minlength: [20, 'Description must be at least 20 characters'],
       maxlength: [5000, 'Description cannot exceed 5000 characters'],
     },
+    postedByEmail: {
+      type: String,
+      required: [true, 'Poster email is required for ownership tracking'],
+      trim: true,
+      lowercase: true,
+    },
     contactEmail: {
       type: String,
       required: [true, 'Contact email is required'],

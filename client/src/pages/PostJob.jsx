@@ -109,10 +109,13 @@ function PostJob() {
 
     setLoading(true);
     try {
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : {};
+
       const response = await fetch('http://localhost:5000/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, salary: Number(formData.salary) }),
+        body: JSON.stringify({ ...formData, salary: Number(formData.salary), postedByEmail: user.email }),
       });
 
       const data = await response.json();
