@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AreaLayoutEditor from '../components/AreaLayoutEditor';
-import { QRCodeSVG } from '../../node_modules/qrcode.react/lib/esm/index.js';
+import { QRCodeCanvas } from '../../node_modules/qrcode.react/lib/esm/index.js';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -22,9 +22,15 @@ function Dashboard() {
   const [editingJob, setEditingJob] = useState(null);
   const [editingApp, setEditingApp] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [jobSearchTerm, setJobSearchTerm] = useState('');
+  const [companySearchTerm, setCompanySearchTerm] = useState('');
   const [appSearchTerm, setAppSearchTerm] = useState('');
   const [appJobFilter, setAppJobFilter] = useState('');
-  
+  const [appStatusFilter, setAppStatusFilter] = useState('');
+  const [bookingFilterStatus, setBookingFilterStatus] = useState('all');
+  const [bookingFilterArea, setBookingFilterArea] = useState('all');
+  const [bookingSort, setBookingSort] = useState('newest');  
   const [currentUser, setCurrentUser] = useState(null);
 
   const navigate = useNavigate();
@@ -250,11 +256,26 @@ function Dashboard() {
     switch (activeTab) {
       case 'students':
         if (currentUser.role !== 'admin') return null;
+        
+        const filteredStudents = students.filter(student => 
+          student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()) || 
+          student.email.toLowerCase().includes(studentSearchTerm.toLowerCase())
+        );
+
         return (
           <div className="dashboard-card">
             <div className="dashboard-card__header">
               <h2>Registered Students</h2>
-              <span className="dashboard-badge">{students.length} Total</span>
+              <span className="dashboard-badge">{filteredStudents.length} Total</span>
+            </div>
+            <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8' }}>
+              <input 
+                type="text" 
+                placeholder="Search students by name or email..." 
+                value={studentSearchTerm} 
+                onChange={e => setStudentSearchTerm(e.target.value)} 
+                style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', width: '100%', maxWidth: '400px' }}
+              />
             </div>
             <div className="table-responsive">
               <table className="dashboard-table">
@@ -268,10 +289,10 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {students.length === 0 ? (
-                    <tr><td colSpan="5" className="empty-row">No students found</td></tr>
+                  {filteredStudents.length === 0 ? (
+                    <tr><td colSpan="5" className="empty-row">No students found matching your search</td></tr>
                   ) : (
-                    students.map(student => (
+                    filteredStudents.map(student => (
                       <tr key={student._id}>
                         <td><strong>{student.name}</strong></td>
                         <td>{student.email}</td>
@@ -360,11 +381,24 @@ function Dashboard() {
         );
 
       case 'jobs':
+        const filteredJobs = jobs.filter(job => 
+          job.title.toLowerCase().includes(jobSearchTerm.toLowerCase()) || 
+          job.company.toLowerCase().includes(jobSearchTerm.toLowerCase())
+        );
         return (
           <div className="dashboard-card">
             <div className="dashboard-card__header">
               <h2>{currentUser.role === 'employer' ? 'Your Job Postings' : 'Job Opportunities'}</h2>
-              <span className="dashboard-badge">{jobs.length} Total</span>
+              <span className="dashboard-badge">{filteredJobs.length} Total</span>
+            </div>
+            <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8' }}>
+              <input 
+                type="text" 
+                placeholder="Search jobs by Title or Company..." 
+                value={jobSearchTerm} 
+                onChange={e => setJobSearchTerm(e.target.value)} 
+                style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', width: '100%', maxWidth: '400px' }}
+              />
             </div>
             <div className="table-responsive">
               <table className="dashboard-table">
@@ -378,10 +412,10 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {jobs.length === 0 ? (
-                    <tr><td colSpan="5" className="empty-row">No jobs found</td></tr>
+                  {filteredJobs.length === 0 ? (
+                    <tr><td colSpan="5" className="empty-row">No jobs found matching your search</td></tr>
                   ) : (
-                    jobs.map(job => (
+                    filteredJobs.map(job => (
                       <tr key={job._id}>
                         <td><strong>{job.title}</strong></td>
                         <td>{job.company}</td>
@@ -469,10 +503,21 @@ function Dashboard() {
 
       case 'applications':
         const filteredApps = applications.filter(app => {
-          if (currentUser.role !== 'employer') return true;
-          const matchesSearch = app.fullName.toLowerCase().includes(appSearchTerm.toLowerCase());
-          const matchesJob = appJobFilter ? (app.jobId && app.jobId._id === appJobFilter) : true;
-          return matchesSearch && matchesJob;
+          const matchesStatus = appStatusFilter ? (app.status || 'Pending') === appStatusFilter : true;
+          if (!matchesStatus) return false;
+          
+          if (currentUser.role === 'employer') {
+            const matchesSearch = app.fullName.toLowerCase().includes(appSearchTerm.toLowerCase());
+            const matchesJob = appJobFilter ? (app.jobId && app.jobId._id === appJobFilter) : true;
+            return matchesSearch && matchesJob;
+          } else if (currentUser.role === 'user') {
+            if (!appSearchTerm) return true;
+            const term = appSearchTerm.toLowerCase();
+            const jobTitle = app.jobId ? app.jobId.title.toLowerCase() : '';
+            const company = app.jobId ? app.jobId.company.toLowerCase() : '';
+            return jobTitle.includes(term) || company.includes(term);
+          }
+          return true;
         });
 
         const employerJobs = applications
@@ -505,6 +550,38 @@ function Dashboard() {
                     <option key={job._id} value={job._id}>{job.title}</option>
                   ))}
                 </select>
+                <select 
+                  value={appStatusFilter} 
+                  onChange={e => setAppStatusFilter(e.target.value)}
+                  style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1 }}
+                >
+                  <option value="">All Statuses</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Accepted">Accepted</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+            )}
+            
+            {currentUser.role === 'user' && (
+              <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8', display: 'flex', gap: '15px', alignItems: 'center' }}>
+                <input 
+                  type="text" 
+                  placeholder="Search by Job Title or Company..." 
+                  value={appSearchTerm} 
+                  onChange={e => setAppSearchTerm(e.target.value)} 
+                  style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1 }}
+                />
+                <select 
+                  value={appStatusFilter} 
+                  onChange={e => setAppStatusFilter(e.target.value)}
+                  style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1 }}
+                >
+                  <option value="">All Statuses</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Accepted">Accepted</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
               </div>
             )}
             <div className="table-responsive">
@@ -513,6 +590,7 @@ function Dashboard() {
                   <tr>
                     <th>Applicant Name</th>
                     <th>Job Title</th>
+                    <th>Company</th>
                     <th>Contact</th>
                     <th>Applied On</th>
                     <th>Status</th>
@@ -522,12 +600,13 @@ function Dashboard() {
                 </thead>
                 <tbody>
                   {filteredApps.length === 0 ? (
-                    <tr><td colSpan={currentUser.role === 'user' ? '6' : '5'} className="empty-row">No applications found.</td></tr>
+                    <tr><td colSpan={currentUser.role === 'user' ? '7' : '6'} className="empty-row">No applications found.</td></tr>
                   ) : (
                     filteredApps.map(app => (
                       <tr key={app._id}>
                         <td><strong>{app.fullName}</strong></td>
                         <td>{app.jobId ? app.jobId.title : 'Deleted Job'}</td>
+                        <td>{app.jobId ? app.jobId.company : 'N/A'}</td>
                         <td>
                           <a href={`mailto:${app.email}`} className="dashboard-link">{app.email}</a><br/>
                           <small>{app.phone}</small>
@@ -632,11 +711,25 @@ function Dashboard() {
 
       case 'companies':
         if (currentUser.role !== 'admin') return null;
+        
+        const filteredCompanies = companies.filter(company => 
+          company.name.toLowerCase().includes(companySearchTerm.toLowerCase())
+        );
+
         return (
           <div className="dashboard-card">
             <div className="dashboard-card__header">
               <h2>Associated Companies</h2>
-              <span className="dashboard-badge">{companies.length} Total</span>
+              <span className="dashboard-badge">{filteredCompanies.length} Total</span>
+            </div>
+            <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8' }}>
+              <input 
+                type="text" 
+                placeholder="Search companies by name..." 
+                value={companySearchTerm} 
+                onChange={e => setCompanySearchTerm(e.target.value)} 
+                style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', width: '100%', maxWidth: '400px' }}
+              />
             </div>
             <div className="table-responsive">
               <table className="dashboard-table">
@@ -648,10 +741,10 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {companies.length === 0 ? (
-                    <tr><td colSpan="3" className="empty-row">No companies found</td></tr>
+                  {filteredCompanies.length === 0 ? (
+                    <tr><td colSpan="3" className="empty-row">No companies found matching your search</td></tr>
                   ) : (
-                    companies.map((company, index) => (
+                    filteredCompanies.map((company, index) => (
                       <tr key={index}>
                         <td><strong>{company.name}</strong></td>
                         <td>{company.jobCount} jobs</td>
@@ -794,11 +887,55 @@ function Dashboard() {
 
       case 'bookings':
         if (currentUser.role !== 'user') return null;
+        
+        let displayBookings = [...myBookings];
+        
+        // Filter by Status
+        if (bookingFilterStatus !== 'all') {
+          displayBookings = displayBookings.filter(b => {
+             const bookingEnd = new Date(`${b.date}T${b.endTime || '23:59'}`);
+             const isExpired = bookingEnd < new Date();
+             const isCancelled = b.status === 'cancelled';
+             if (bookingFilterStatus === 'active') return !isCancelled && !isExpired;
+             if (bookingFilterStatus === 'completed') return isExpired && !isCancelled;
+             if (bookingFilterStatus === 'cancelled') return isCancelled;
+             return true;
+          });
+        }
+        
+        // Filter by Area
+        if (bookingFilterArea !== 'all') {
+          displayBookings = displayBookings.filter(b => b.area === bookingFilterArea);
+        }
+
+        // Apply Sort (Backend returns newest first, so we just reverse it if oldest is selected)
+        if (bookingSort === 'oldest') {
+          displayBookings.reverse();
+        }
+        
+        const uniqueAreas = [...new Set(myBookings.map(b => b.area))];
+
         return (
           <div className="dashboard-card">
             <div className="dashboard-card__header">
               <h2>My Booked Seats</h2>
-              <span className="dashboard-badge">{myBookings.length} Total</span>
+              <span className="dashboard-badge">{displayBookings.length} Total</span>
+            </div>
+            <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <select value={bookingFilterStatus} onChange={e => setBookingFilterStatus(e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1, minWidth: '150px' }}>
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <select value={bookingFilterArea} onChange={e => setBookingFilterArea(e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1, minWidth: '150px', textTransform: 'capitalize' }}>
+                <option value="all">All Areas</option>
+                {uniqueAreas.map(area => <option key={area} value={area}>{area}</option>)}
+              </select>
+              <select value={bookingSort} onChange={e => setBookingSort(e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1, minWidth: '150px' }}>
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+              </select>
             </div>
             <div className="table-responsive">
               <table className="dashboard-table">
@@ -814,10 +951,10 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {myBookings.length === 0 ? (
-                    <tr><td colSpan="7" className="empty-row">No bookings found</td></tr>
+                  {displayBookings.length === 0 ? (
+                    <tr><td colSpan="7" className="empty-row">No bookings found matching your filters</td></tr>
                   ) : (
-                    myBookings.map(booking => {
+                    displayBookings.map(booking => {
                       const bookingEnd = new Date(`${booking.date}T${booking.endTime || '23:59'}`);
                       const isExpired = bookingEnd < new Date();
                       const isCancelled = booking.status === 'cancelled';

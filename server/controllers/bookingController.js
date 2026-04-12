@@ -50,7 +50,7 @@ const getBookings = async (req, res) => {
       filter.status = 'active';
     }
     
-    const bookings = await Booking.find(filter);
+    const bookings = await Booking.find(filter).sort({ date: -1, time: -1 });
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error' });
