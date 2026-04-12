@@ -207,10 +207,20 @@ function BookingSeats() {
   );
 
   return (
-    <>
+    <div className="booking-page-bg">
+      {/* Aurora glow layer */}
+      <div className="bs-bg-aurora" aria-hidden="true">
+        <div className="bs-aurora-blob bs-aurora-blob-1" />
+        <div className="bs-aurora-blob bs-aurora-blob-2" />
+        <div className="bs-aurora-blob bs-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="bs-bg-grain" aria-hidden="true" />
+
       <Navbar />
 
-      <div className="container">
+      <div className="container booking-seats-main">
         {/* Breadcrumb */}
         <nav className="booking-seats-breadcrumb">
           <Link to="/bookings">Bookings</Link>
@@ -367,7 +377,7 @@ function BookingSeats() {
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 }
 
