@@ -25,9 +25,12 @@ import ItemDetail from './components/ItemDetail/ItemDetail.jsx';
 import Chat from './components/Chat/Chat.jsx';
 import OwnerReviews from './pages/OwnerReviews';
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/bookings" element={<Bookings />} />

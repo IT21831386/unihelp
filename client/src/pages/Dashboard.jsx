@@ -4,6 +4,19 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AreaLayoutEditor from '../components/AreaLayoutEditor';
 import { QRCodeSVG } from '../../node_modules/qrcode.react/lib/esm/index.js';
+import toast from 'react-hot-toast';
+import { 
+  Users, 
+  Home as HomeIcon, 
+  Briefcase, 
+  FileText, 
+  ShieldCheck, 
+  Trash2, 
+  Edit3, 
+  ExternalLink,
+  PlusCircle,
+  Layout
+} from 'lucide-react';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -25,6 +38,7 @@ function Dashboard() {
   const [newAreaId, setNewAreaId] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [boardings, setBoardings] = useState([]);
+  const [deletingIds, setDeletingIds] = useState([]); // Track which items are currently being deleted
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -161,11 +175,20 @@ function Dashboard() {
 
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm('Are you sure you want to delete this job posting? This cannot be undone.')) return;
+    setDeletingIds(prev => [...prev, jobId]);
     try {
       const res = await fetch(`http://localhost:5000/api/jobs/${jobId}`, { method: 'DELETE' });
-      if (res.ok) setJobs(prev => prev.filter(j => j._id !== jobId));
-      else alert('Failed to delete job');
-    } catch (e) { alert('Network error'); }
+      if (res.ok) {
+        setJobs(prev => prev.filter(j => j._id !== jobId));
+        toast.success('Job posting deleted successfully');
+      } else {
+        toast.error('Failed to delete job');
+      }
+    } catch (e) { 
+      toast.error('Network error. Failed to delete job.'); 
+    } finally {
+      setDeletingIds(prev => prev.filter(id => id !== jobId));
+    }
   };
 
   const handleUpdateJob = async (e) => {
@@ -180,20 +203,29 @@ function Dashboard() {
         const updated = await res.json();
         setJobs(prev => prev.map(j => j._id === updated._id ? updated : j));
         setEditingJob(null);
+        toast.success('Job updated successfully!');
       } else {
         const errData = await res.json();
-        alert(errData.message || 'Failed to update job');
+        toast.error(errData.message || 'Failed to update job');
       }
-    } catch (e) { alert('Network error'); }
+    } catch (e) { 
+      toast.error('Network error. Failed to update job.'); 
+    }
   };
 
   const handleDeleteApp = async (appId) => {
     if (!window.confirm('Are you sure you want to withdraw this application? This cannot be undone.')) return;
     try {
       const res = await fetch(`http://localhost:5000/api/job-applications/${appId}`, { method: 'DELETE' });
-      if (res.ok) setApplications(prev => prev.filter(a => a._id !== appId));
-      else alert('Failed to delete application');
-    } catch (e) { alert('Network error'); }
+      if (res.ok) {
+        setApplications(prev => prev.filter(a => a._id !== appId));
+        toast.success('Application withdrawn successfully');
+      } else {
+        toast.error('Failed to delete application');
+      }
+    } catch (e) { 
+      toast.error('Network error. Failed to withdraw application.'); 
+    }
   };
 
   const handleUpdateApp = async (e) => {
@@ -219,26 +251,58 @@ function Dashboard() {
         const updated = await res.json();
         setApplications(prev => prev.map(a => a._id === updated._id ? { ...a, ...updated } : a));
         setEditingApp(null);
+        toast.success('Application updated successfully!');
       } else {
         const errData = await res.json();
-        alert(errData.message || 'Failed to update application');
+        toast.error(errData.message || 'Failed to update application');
       }
-    } catch (e) { alert('Network error'); }
+    } catch (e) { 
+      toast.error('Network error. Failed to update application.'); 
+    }
   };
 
   const handleDeleteBoarding = async (id, title) => {
     if (!window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
+    setDeletingIds(prev => [...prev, id]);
     try {
       const res = await fetch(`http://localhost:5000/api/boardings/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setBoardings(prev => prev.filter(b => (b._id || b.id) !== id));
+        toast.success('Boarding place deleted successfully');
       } else {
-        alert(data.message || 'Failed to delete boarding');
+        toast.error(data.message || 'Failed to delete boarding');
       }
     } catch (e) {
-      alert('Network error');
+      toast.error('Network error. Failed to delete boarding.');
+    } finally {
+      setDeletingIds(prev => prev.filter(idd => idd !== id));
     }
+  };
+  
+  const StatsOverview = () => {
+    const stats = [
+      { label: 'Students', value: students.length, icon: <Users />, class: 'students' },
+      { label: 'Boardings', value: boardings.length, icon: <HomeIcon />, class: 'boardings' },
+      { label: 'Jobs', value: jobs.length, icon: <Briefcase />, class: 'jobs' },
+      { label: 'Applications', value: applications.length, icon: <FileText />, class: 'apps' },
+    ];
+
+    if (currentUser.role !== 'admin') return null;
+
+    return (
+      <div className="dashboard-stats-grid">
+        {stats.map((stat, i) => (
+          <div key={i} className={`stat-card ${stat.class}`}>
+            <div className="stat-icon-wrapper">{stat.icon}</div>
+            <div className="stat-info">
+              <span className="stat-value">{stat.value}</span>
+              <span className="stat-label">{stat.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const renderContent = () => {
@@ -260,7 +324,10 @@ function Dashboard() {
       );
     }
 
-    switch (activeTab) {
+    return (
+      <>
+        {(() => {
+          switch (activeTab) {
       case 'students':
         if (currentUser.role !== 'admin') return null;
         return (
@@ -291,20 +358,28 @@ function Dashboard() {
                         <td><span className="role-tag role-student">Student</span></td>
                         <td>{formatDate(student.createdAt)}</td>
                         <td>
-                          <button onClick={() => setSelectedStudent(student)} style={{ padding: '5px 12px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', marginRight: '5px', fontWeight: 'bold' }}>View</button>
-                          <button onClick={async () => {
-                            if (!window.confirm('Are you sure you want to delete this student?')) return;
-                            try {
-                              const res = await fetch(`http://localhost:5000/api/auth/users/${student._id}`, { method: 'DELETE' });
-                              if (res.ok) {
-                                setUsers(prev => prev.filter(u => u._id !== student._id));
-                              } else {
-                                alert('Failed to delete student');
-                              }
-                            } catch (e) {
-                              alert(e.message);
-                            }
-                          }} style={{ padding: '5px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Delete</button>
+                          <div style={{ display: 'flex', gap: '5px' }}>
+                            <button onClick={() => setSelectedStudent(student)} style={{ padding: '5px 12px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>View</button>
+                            <button onClick={async () => {
+                                if (!window.confirm('Are you sure you want to delete this student?')) return;
+                                try {
+                                  setDeletingIds(prev => [...prev, student._id]);
+                                  const res = await fetch(`http://localhost:5000/api/auth/users/${student._id}`, { method: 'DELETE' });
+                                  if (res.ok) {
+                                    setUsers(prev => prev.filter(u => u._id !== student._id));
+                                    toast.success('Student deleted successfully');
+                                  } else {
+                                    toast.error('Failed to delete student');
+                                  }
+                                } catch (e) {
+                                  toast.error(e.message);
+                                } finally {
+                                  setDeletingIds(prev => prev.filter(id => id !== student._id));
+                                }
+                            }} style={{ padding: '6px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {deletingIds.includes(student._id) ? <div className="spinner-border spinner-border-sm" style={{width: '14px', height: '14px'}}></div> : <Trash2 size={14} />}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -407,10 +482,15 @@ function Dashboard() {
                           <td className="text-end">
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                               <button onClick={() => navigate(`/admin/editboarding/${id}`)} className="premium-action-btn btn-premium-edit" title="Edit Listing">
-                                <i className="bi bi-pencil-fill"></i>
+                                <Edit3 size={18} />
                               </button>
-                              <button onClick={() => handleDeleteBoarding(id, boarding.title)} className="premium-action-btn btn-premium-delete" title="Permanently Delete">
-                                <i className="bi bi-trash3-fill"></i>
+                              <button 
+                                onClick={() => handleDeleteBoarding(id, boarding.title)} 
+                                className="premium-action-btn btn-premium-delete" 
+                                title="Permanently Delete"
+                                disabled={deletingIds.includes(id)}
+                              >
+                                {deletingIds.includes(id) ? <div className="spinner-border spinner-border-sm" role="status" style={{width: '1rem', height: '1rem'}}></div> : <Trash2 size={18} />}
                               </button>
                             </div>
                           </td>
@@ -490,12 +570,23 @@ function Dashboard() {
                         <td><span className="level-tag">{job.level}</span></td>
                         <td>{formatDate(job.createdAt)}</td>
                         <td>
-                          <div style={{ display: 'flex', gap: '10px' }}>
-                            <Link to={`/careers/job/${job._id}`} className="dashboard-link">View</Link>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <Link to={`/careers/job/${job._id}`} className="premium-action-btn btn-premium-edit" title="View Details" style={{ textDecoration: 'none' }}>
+                               <ExternalLink size={16} />
+                            </Link>
                             {currentUser.role === 'employer' && (
                               <>
-                                <button onClick={() => setEditingJob({...job})} style={{ background: 'none', border: 'none', color: '#0366d6', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Edit</button>
-                                <button onClick={() => handleDeleteJob(job._id)} style={{ background: 'none', border: 'none', color: '#cb2431', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Delete</button>
+                                <button onClick={() => setEditingJob({...job})} className="premium-action-btn btn-premium-edit" title="Edit Job">
+                                   <Edit3 size={16} />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteJob(job._id)} 
+                                  className="premium-action-btn btn-premium-delete" 
+                                  title="Delete Job"
+                                  disabled={deletingIds.includes(job._id)}
+                                >
+                                  {deletingIds.includes(job._id) ? <div className="spinner-border spinner-border-sm" style={{width: '14px', height: '14px'}}></div> : <Trash2 size={16} />}
+                                </button>
                               </>
                             )}
                           </div>
@@ -619,8 +710,16 @@ function Dashboard() {
                         {currentUser.role === 'user' && (
                           <td>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <button onClick={() => setEditingApp({ ...app })} style={{ background: 'none', border: 'none', color: '#0366d6', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: '13px' }}>Edit</button>
-                              <button onClick={() => handleDeleteApp(app._id)} style={{ background: 'none', border: 'none', color: '#cb2431', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: '13px' }}>Withdraw</button>
+                              <button onClick={() => setEditingApp({ ...app })} className="premium-action-btn btn-premium-edit" title="Edit Application">
+                                 <Edit3 size={16} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteApp(app._id)} 
+                                className="premium-action-btn btn-premium-delete" 
+                                title="Withdraw Application"
+                              >
+                                 <Trash2 size={16} />
+                              </button>
                             </div>
                           </td>
                         )}
@@ -821,10 +920,10 @@ function Dashboard() {
                              headers: { 'Content-Type': 'application/json' },
                              body: JSON.stringify({ layoutConfig: newLayoutConfig })
                            });
-                           if (res.ok) alert('Saved successfully!');
-                           else alert('Failed to save configuration');
+                           if (res.ok) toast.success('Saved successfully!');
+                           else toast.error('Failed to save configuration');
                          } catch(e) {
-                           alert('Failed to save! ' + e.message);
+                           toast.error('Failed to save! ' + e.message);
                          }
                        }}
                      />
@@ -981,7 +1080,10 @@ function Dashboard() {
       default:
         return null;
     }
-  };
+  })()}
+</>
+);
+};
 
   return (
     <div className="dashboard-page">
