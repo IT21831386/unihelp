@@ -116,7 +116,7 @@ const BoardingsList = () => {
   });
 
   return (
-    <div className="boarding-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
+    <div className="unihelp-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
 
       {/* Aurora glow layer — Layer -2 */}
       <div className="bg-aurora" aria-hidden="true">
