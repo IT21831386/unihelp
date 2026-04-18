@@ -1,10 +1,14 @@
 {
-    "name": "unihelp",
-    "version": "1.0.0",
-    "description": "UniHelp - University student platform",
-    "scripts": {
-        "client": "cd client && npm run dev",
-        "server": "cd server && npm run dev",
-        "dev": "cd client && npm run dev"
-    }
+  "name": "notice-management",
+  "version": "1.0.0",
+  "description": "Root package to quickly start both frontend and backend",
+  "scripts": {
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm run dev",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }
