@@ -4,8 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../../utils/user';
 import './ItemDetail.css';
 
-const BASE_URL = 'http://localhost:5000/marketplace';
-const CONV_URL = 'http://localhost:5000/conversations';
+const BASE_URL = 'http://localhost:5000/api/marketplace';
+const CONV_URL = 'http://localhost:5000/api/conversations';
 
 function ItemDetail() {
   const { id } = useParams();
@@ -19,10 +19,29 @@ function ItemDetail() {
   const [chatLoading, setChatLoading] = useState(false);
 
   const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return (
+      <div className="ch-loading">
+        <p>Please log in to view your chats.</p>
+        <button className="id-btn-chat" onClick={() => navigate('/login')}>Log In</button>
+      </div>
+    );
+  }
 
   useEffect(() => {
     axios.get(`${BASE_URL}/${id}`).then((res) => setItem(res.data.item));
-  }, [id]);
+    
+    // Check if item is saved
+    if (currentUser) {
+      axios.get(`${BASE_URL}/saved/${currentUser.id || currentUser._id}`)
+        .then((res) => {
+          const savedItems = res.data.items || [];
+          const isSaved = savedItems.some(i => i._id === id);
+          setSaved(isSaved);
+        })
+        .catch(err => console.log('Error fetching saved items', err));
+    }
+  }, [id, currentUser]);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -30,20 +49,35 @@ function ItemDetail() {
     setTimeout(() => setToastVisible(false), 2500);
   };
 
-  const toggleSave = () => {
-    setSaved(!saved);
-    showToast(saved ? 'Removed from saved items' : 'Item saved to your list');
+  const toggleSave = async () => {
+    const endpoint = saved ? '/unsave' : '/save';
+    try {
+      await axios.post(`${BASE_URL}${endpoint}`, {
+        userId: currentUser.id || currentUser._id,
+        itemId: item._id
+      });
+      setSaved(!saved);
+      showToast(saved ? 'Removed from saved items' : 'Item saved to your list');
+    } catch (err) {
+      showToast('Error updating saved items');
+    }
   };
 
   const handleChat = async () => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
     setChatLoading(true);
     try {
       const res = await axios.post(CONV_URL, {
         itemId: item._id,
         itemName: item.itemName,
         itemPhoto: item.photos && item.photos.length > 0 ? item.photos[0] : '',
+        buyerId: currentUser.id,
         buyerName: currentUser.name,
         sellerId: item.sellerId,
+        sellerName: item.sellerName || 'Unknown Seller',
       });
       const convId = res.data.conversation._id;
       navigate(`/marketplace/chats?conv=${convId}`);
@@ -63,7 +97,7 @@ function ItemDetail() {
   }
 
   const photos = item.photos && item.photos.length > 0 ? item.photos : [];
-  const isOwner = item.sellerId === currentUser.id;
+  const isOwner = currentUser && item.sellerId === currentUser.id;
 
   return (
     <div className="id-page">
@@ -173,9 +207,12 @@ function ItemDetail() {
             {isOwner && (
               <button
                 className="id-btn-chat"
-                onClick={() => navigate(`/marketplace/sell/update/${item._id}`)}
+                onClick={() => navigate(`/marketplace/chats`)}
               >
-                Edit My Listing
+                <svg viewBox="0 0 24 24" fill="white" width="17" height="17">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+                </svg>
+                Chat
               </button>
             )}
 

@@ -26,7 +26,7 @@ function UpdateItem() {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/marketplace/${id}`)
+    axios.get(`http://localhost:5000/api/marketplace/${id}`)
       .then((res) => {
         const item = res.data.item;
         setInputs({
@@ -107,7 +107,7 @@ function UpdateItem() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.put(`http://localhost:5000/marketplace/${id}`, {
+      const response = await axios.put(`http://localhost:5000/api/marketplace/${id}`, {
         itemName: inputs.itemName,
         category: selectedCat,
         condition: selectedCond,
