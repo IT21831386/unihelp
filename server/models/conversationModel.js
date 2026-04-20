@@ -10,7 +10,10 @@ const conversationSchema = new mongoose.Schema({
   itemId: { type: String, default: '' },
   itemName: { type: String, required: true },
   itemPhoto: { type: String, default: '' },
+  buyerId: { type: String, default: '' },
   buyerName: { type: String, required: true },
+  sellerId: { type: String, default: '' },
+  sellerName: { type: String, default: '' },
   messages: [messageSchema]
 }, { timestamps: true });
 

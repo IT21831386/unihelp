@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './BuyItems.css';
 
-const URL = 'http://localhost:5000/marketplace';
+const URL = 'http://localhost:5000/api/marketplace';
 
 const CATEGORIES = [
   'Electronics',
@@ -17,9 +17,16 @@ const CATEGORIES = [
 ];
 
 function BuyItems() {
-  const [items, setItems]     = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate              = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedConditions, setSelectedConditions] = useState([]);
+  const [onlyNegotiable, setOnlyNegotiable] = useState(false);
+  
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get(URL).then((res) => {
@@ -31,8 +38,19 @@ function BuyItems() {
     });
   }, []);
 
-  const getItemsByCategory = (cat) =>
-    items.filter((item) => item.category === cat);
+  const filteredItems = items.filter((item) => {
+    const matchesSearch = item.itemName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+    const matchesMinPrice = minPrice === '' || Number(item.price) >= Number(minPrice);
+    const matchesMaxPrice = maxPrice === '' || Number(item.price) <= Number(maxPrice);
+    const matchesCondition = selectedConditions.length === 0 || selectedConditions.includes(item.condition);
+    const matchesNegotiable = !onlyNegotiable || item.isNegotiable;
+
+    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesCondition && matchesNegotiable;
+  });
+
+  const getItemsByCategory = (cat, itemList) =>
+    itemList.filter((item) => item.category === cat);
 
   if (loading) {
     return (
@@ -76,111 +94,221 @@ function BuyItems() {
 
       {/* ══ CONTENT ══ */}
       <div className="bi-content">
-        {items.length === 0 ? (
-
-          /* Empty state */
-          <div className="bi-empty">
-            <div className="bi-empty-icon">🛒</div>
-            <p>No items available right now</p>
-            <span>Check back later or post your own items to sell</span>
+        
+        {/* ══ SIDEBAR ══ */}
+        <aside className="bi-sidebar">
+          <div className="bi-sidebar-section">
+            <h3 className="bi-sidebar-title">Search</h3>
+            <div className="bi-search-wrap">
+              <input 
+                type="text" 
+                placeholder="Find item..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bi-search-input"
+              />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="bi-search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
           </div>
 
-        ) : (
-          CATEGORIES.map((cat) => {
-            const catItems = getItemsByCategory(cat);
-            if (catItems.length === 0) return null;
+          <div className="bi-sidebar-section">
+            <h3 className="bi-sidebar-title">Categories</h3>
+            <div className="bi-filter-list">
+              <button 
+                className={`bi-filter-btn ${selectedCategory === 'All' ? 'bi-filter-btn--active' : ''}`}
+                onClick={() => setSelectedCategory('All')}
+              >
+                All Categories
+              </button>
+              {CATEGORIES.map(cat => (
+                <button 
+                  key={cat}
+                  className={`bi-filter-btn ${selectedCategory === cat ? 'bi-filter-btn--active' : ''}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            return (
-              <div key={cat} className="bi-category-section">
+          <div className="bi-sidebar-section">
+            <h3 className="bi-sidebar-title">Price Range (LKR)</h3>
+            <div className="bi-price-inputs">
+              <input 
+                type="number" 
+                placeholder="Min" 
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="bi-price-input"
+              />
+              <span className="bi-price-sep">-</span>
+              <input 
+                type="number" 
+                placeholder="Max" 
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="bi-price-input"
+              />
+            </div>
+          </div>
 
-                {/* Category header */}
-                <div className="bi-category-header">
-                  <span className="bi-category-tag">Category</span>
-                  <span className="bi-category-title">{cat}</span>
-                  <div className="bi-category-line" />
-                </div>
+          <div className="bi-sidebar-section">
+            <h3 className="bi-sidebar-title">Condition</h3>
+            <div className="bi-condition-grid">
+              {['Like New', 'Good', 'Fair', 'Poor'].map(cond => (
+                <button 
+                  key={cond}
+                  className={`bi-cond-pill ${selectedConditions.includes(cond) ? 'bi-cond-pill--active' : ''}`}
+                  onClick={() => {
+                    if (selectedConditions.includes(cond)) {
+                      setSelectedConditions(selectedConditions.filter(c => c !== cond));
+                    } else {
+                      setSelectedConditions([...selectedConditions, cond]);
+                    }
+                  }}
+                >
+                  {cond}
+                </button>
+              ))}
+            </div>
+          </div>
 
-                {/* Items grid */}
-                <div className="bi-cards-grid">
-                  {catItems.map((item, i) => (
-                    <div
-                      key={i}
-                      className="bi-card"
-                      onClick={() => navigate(`/marketplace/item/${item._id}`)}
-                    >
+          <div className="bi-sidebar-section">
+            <h3 className="bi-sidebar-title">Options</h3>
+            <label className="bi-option-item">
+              <input 
+                type="checkbox" 
+                checked={onlyNegotiable}
+                onChange={(e) => setOnlyNegotiable(e.target.checked)}
+              />
+              <span>Negotiable only</span>
+            </label>
+          </div>
 
-                      {/* Image area */}
-                      <div className="bi-card-img">
-                        {item.photos && item.photos.length > 0 ? (
-                          <img src={item.photos[0]} alt={item.itemName} />
-                        ) : (
-                          <div className="bi-card-no-img">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
-                              stroke="#ffffff" strokeWidth="1.2"
-                              strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="3" y="3" width="18" height="18" rx="2"/>
-                              <circle cx="8.5" cy="8.5" r="1.5"/>
-                              <polyline points="21 15 16 10 5 21"/>
-                            </svg>
-                            No Image
-                          </div>
-                        )}
-                        <div className="bi-card-img-overlay" />
-                        {item.condition && (
-                          <span className="bi-card-cond-badge">
-                            {item.condition}
-                          </span>
-                        )}
-                      </div>
+          <button 
+            className="bi-clear-filters"
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedCategory('All');
+              setMinPrice('');
+              setMaxPrice('');
+              setSelectedConditions([]);
+              setOnlyNegotiable(false);
+            }}
+          >
+            Clear All Filters
+          </button>
+        </aside>
 
-                      {/* Card body */}
-                      <div className="bi-card-body">
-                        <div className="bi-card-name">{item.itemName}</div>
-                        <div className="bi-card-price">
-                          {Number(item.price).toLocaleString()}
-                          <span>LKR</span>
-                        </div>
-                        <div className="bi-card-meta">
-                          {item.condition}
-                          {item.isNegotiable && (
-                            <span className="bi-neg-badge">Negotiable</span>
+        {/* ══ MAIN AREA ══ */}
+        <main className="bi-main">
+          {filteredItems.length === 0 ? (
+
+            /* Empty state */
+            <div className="bi-empty">
+              <div className="bi-empty-icon">🛒</div>
+              <p>No items match your filters</p>
+              <span>Try adjusting your search or price range</span>
+            </div>
+
+          ) : (
+            (selectedCategory === 'All' ? CATEGORIES : [selectedCategory]).map((cat) => {
+              const catItems = getItemsByCategory(cat, filteredItems);
+              if (catItems.length === 0) return null;
+
+              return (
+                <div key={cat} className="bi-category-section">
+
+                  {/* Category header */}
+                  <div className="bi-category-header">
+                    <span className="bi-category-tag">Category</span>
+                    <span className="bi-category-title">{cat}</span>
+                    <div className="bi-category-line" />
+                  </div>
+
+                  {/* Items grid */}
+                  <div className="bi-cards-grid">
+                    {catItems.map((item, i) => (
+                      <div
+                        key={i}
+                        className="bi-card"
+                        onClick={() => navigate(`/marketplace/item/${item._id}`)}
+                      >
+
+                        {/* Image area */}
+                        <div className="bi-card-img">
+                          {item.photos && item.photos.length > 0 ? (
+                            <img src={item.photos[0]} alt={item.itemName} />
+                          ) : (
+                            <div className="bi-card-no-img">
+                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                stroke="#ffffff" strokeWidth="1.2"
+                                strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <polyline points="21 15 16 10 5 21" />
+                              </svg>
+                              No Image
+                            </div>
+                          )}
+                          <div className="bi-card-img-overlay" />
+                          {item.condition && (
+                            <span className="bi-card-cond-badge">
+                              {item.condition}
+                            </span>
                           )}
                         </div>
 
-                        {/* Footer: text button + arrow */}
-                        <div className="bi-card-footer">
-                          <button
-                            className="bi-view-btn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/marketplace/item/${item._id}`);
-                            }}
-                          >
-                            View Details
-                          </button>
-                          <div
-                            className="bi-card-arrow"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/marketplace/item/${item._id}`);
-                            }}
-                          >
-                            <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                              <path d="M2 6h8M6 2l4 4-4 4"
-                                stroke="#fff" strokeWidth="1.6"
-                                strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                        {/* Card body */}
+                        <div className="bi-card-body">
+                          <div className="bi-card-name">{item.itemName}</div>
+                          <div className="bi-card-price">
+                            {Number(item.price).toLocaleString()}
+                            <span>LKR</span>
+                          </div>
+                          <div className="bi-card-meta">
+                            {item.condition}
+                            {item.isNegotiable && (
+                              <span className="bi-neg-badge">Negotiable</span>
+                            )}
+                          </div>
+
+                          {/* Footer: text button + arrow */}
+                          <div className="bi-card-footer">
+                            <button
+                              className="bi-view-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/marketplace/item/${item._id}`);
+                              }}
+                            >
+                              View Details
+                            </button>
+                            <div
+                              className="bi-card-arrow"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/marketplace/item/${item._id}`);
+                              }}
+                            >
+                              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                                <path d="M2 6h8M6 2l4 4-4 4"
+                                  stroke="#fff" strokeWidth="1.6"
+                                  strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                    </div>
-                  ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })
-        )}
+              );
+            })
+          )}
+        </main>
       </div>
 
     </div>

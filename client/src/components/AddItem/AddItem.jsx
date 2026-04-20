@@ -83,7 +83,7 @@ function AddItem() {
   const handleSubmit = async () => {
   const currentUser = getCurrentUser();
   try {
-    await axios.post('http://localhost:5000/marketplace', {
+    await axios.post('http://localhost:5000/api/marketplace', {
       itemName: inputs.itemName,
       category: selectedCat,
       condition: selectedCond,

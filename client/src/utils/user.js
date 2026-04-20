@@ -1,19 +1,18 @@
 const DEFAULT_USER = {
   id: 'user_001',
-  name: 'Ashan Karunaratne',
-  faculty: 'Faculty of Engineering',
-  year: '2nd Year',
+  name: 'University Student',
+  faculty: 'General Faculty',
+  year: 'Unknown Year',
 };
 
 export const getCurrentUser = () => {
-  const stored = localStorage.getItem('currentUser');
+  const stored = localStorage.getItem('user');
   if (stored) return JSON.parse(stored);
-  localStorage.setItem('currentUser', JSON.stringify(DEFAULT_USER));
-  return DEFAULT_USER;
+  return null;
 };
 
 export const setCurrentUser = (user) => {
-  localStorage.setItem('currentUser', JSON.stringify(user));
+  localStorage.setItem('user', JSON.stringify(user));
 };
 
 // When you connect real auth later, replace getCurrentUser() with:

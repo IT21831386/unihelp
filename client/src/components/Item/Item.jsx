@@ -13,7 +13,7 @@ function Item(props) {
     e.stopPropagation();
     if (window.confirm(`Are you sure you want to delete "${itemName}"?`)) {
       try {
-        await axios.delete(`http://localhost:5000/marketplace/${_id}`);
+        await axios.delete(`http://localhost:5000/api/marketplace/${_id}`);
         window.location.reload();
       } catch (err) {
         alert('Failed to delete item. Please try again.');

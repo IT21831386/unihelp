@@ -5,7 +5,7 @@ import Item from '../Item/Item';
 import { getCurrentUser } from '../../utils/user';
 import './SellItems.css';
 
-const URL = 'http://localhost:5000/marketplace';
+const URL = 'http://localhost:5000/api/marketplace';
 
 function SellItems() {
   const [items, setItems] = useState([]);

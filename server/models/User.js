@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'employer', 'admin'],
       default: 'user',
     },
+    savedItems: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'marketplaceModel',
+      },
+    ],
   },
   {
     timestamps: true,
