@@ -93,65 +93,10 @@ const deleteBoarding = async (req, res) => {
   }
 };
 
-// @desc    Save a boarding to favorites
-// @route   POST /api/boardings/save
-// @access  Private
-const saveBoarding = async (req, res) => {
-  try {
-    const { userId, boardingId } = req.body;
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-    if (!user.savedBoardings.includes(boardingId)) {
-      user.savedBoardings.push(boardingId);
-      await user.save();
-    }
-
-    res.status(200).json({ success: true, message: 'Boarding saved to favorites', savedBoardings: user.savedBoardings });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// @desc    Remove a boarding from favorites
-// @route   POST /api/boardings/unsave
-// @access  Private
-const unsaveBoarding = async (req, res) => {
-  try {
-    const { userId, boardingId } = req.body;
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-    user.savedBoardings = user.savedBoardings.filter(id => id.toString() !== boardingId);
-    await user.save();
-
-    res.status(200).json({ success: true, message: 'Boarding removed from favorites', savedBoardings: user.savedBoardings });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// @desc    Get all saved boardings for a user
-// @route   GET /api/boardings/saved/:userId
-// @access  Private
-const getSavedBoardings = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId).populate('savedBoardings');
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-    res.status(200).json({ success: true, count: user.savedBoardings.length, data: user.savedBoardings });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 module.exports = {
   addBoardingPlace,
   getBoardings,
   getBoardingById,
   updateBoarding,
-  deleteBoarding,
-  saveBoarding,
-  unsaveBoarding,
-  getSavedBoardings
+  deleteBoarding
 };

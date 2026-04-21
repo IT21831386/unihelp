@@ -5,9 +5,7 @@ import './BoardingCard.css';
 
 const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
   const [ratingData, setRatingData] = useState({ average: 0, count: 0 });
-  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
-  const currentUser = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     const fetchRating = async () => {
@@ -26,47 +24,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
     };
     fetchRating();
   }, [boarding]);
-
-  useEffect(() => {
-    const checkSaved = async () => {
-      if (!currentUser) return;
-      try {
-        const userId = currentUser.id || currentUser._id;
-        const res = await axios.get(`http://localhost:5000/api/boardings/saved/${userId}`);
-        if (res.data.success) {
-          const savedItems = res.data.data;
-          const isItemSaved = savedItems.some(item => (item._id || item.id) === (boarding._id || boarding.id));
-          setIsSaved(isItemSaved);
-        }
-      } catch (err) {
-        console.error("Error checking saved status", err);
-      }
-    };
-    checkSaved();
-  }, [boarding, currentUser]);
-
-  const toggleSave = async (e) => {
-    e.stopPropagation();
-    if (!currentUser) {
-      alert("Please login to save favorites!");
-      return;
-    }
-
-    try {
-      const userId = currentUser.id || currentUser._id;
-      const boardingId = boarding._id || boarding.id;
-      
-      if (isSaved) {
-        await axios.post('http://localhost:5000/api/boardings/unsave', { userId, boardingId });
-        setIsSaved(false);
-      } else {
-        await axios.post('http://localhost:5000/api/boardings/save', { userId, boardingId });
-        setIsSaved(true);
-      }
-    } catch (err) {
-      console.error("Error toggling save status", err);
-    }
-  };
 
   const displayImage =
     boarding.imageUrls && boarding.imageUrls.length > 0
@@ -136,14 +93,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
         >
           <i className={`bi ${isSelected ? 'bi-check-circle-fill' : 'bi-plus-circle'}`} />
           <span>{isSelected ? 'Selected' : 'Compare'}</span>
-        </div>
-
-        <div 
-          className={`bc-wishlist-btn ${isSaved ? 'is-active' : ''}`}
-          onClick={toggleSave}
-          title={isSaved ? "Remove from wishlist" : "Add to wishlist"}
-        >
-          <i className={`bi ${isSaved ? 'bi-heart-fill' : 'bi-heart'}`} />
         </div>
 
         {ratingData.count > 0 && (

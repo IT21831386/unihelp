@@ -44,7 +44,6 @@ function Dashboard() {
   const [viewingMarketplaceItem, setViewingMarketplaceItem] = useState(null);
   const [newAreaId, setNewAreaId] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
-  const [savedBoardings, setSavedBoardings] = useState([]);
   const [boardings, setBoardings] = useState([]);
   const [deletingIds, setDeletingIds] = useState([]); // Track which items are currently being deleted
 
@@ -126,14 +125,10 @@ function Dashboard() {
             const savedData = await savedRes.json();
             setSavedMarketplaceItems(Array.isArray(savedData.items) ? savedData.items : []);
           }
-
-          // Fetch saved boarding places
-          const savedBoardingsRes = await fetch(`http://localhost:5000/api/boardings/saved/${currentUser.id || currentUser._id}`);
-          if (savedBoardingsRes.ok) {
-            const savedBoardingsData = await savedBoardingsRes.json();
-            setSavedBoardings(Array.isArray(savedBoardingsData.data) ? savedBoardingsData.data : []);
-          }
         }
+
+        }
+
 
         // Fetch jobs for both admin and employer
         if (currentUser.role === 'admin' || currentUser.role === 'employer') {
@@ -1408,76 +1403,6 @@ function Dashboard() {
           </div>
         );
 
-      case 'saved-boardings':
-        return (
-          <div className="dashboard-card">
-            <div className="dashboard-card__header">
-              <h2>My Wishlist (Boardings)</h2>
-              <span className="dashboard-badge">{savedBoardings.length} Total</span>
-            </div>
-            <div className="table-responsive">
-              <table className="dashboard-table">
-                <thead>
-                  <tr>
-                    <th>Place Name</th>
-                    <th>Location</th>
-                    <th>Monthly Price</th>
-                    <th>Type</th>
-                    <th>Availability</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {savedBoardings.length === 0 ? (
-                    <tr><td colSpan="6" className="empty-row">Your wishlist is empty! Go to "Find a boarding" and click the heart icon.</td></tr>
-                  ) : (
-                    savedBoardings.map(item => (
-                      <tr key={item._id}>
-                        <td><strong>{item.title}</strong></td>
-                        <td>{item.city}, {item.district}</td>
-                        <td>Rs.{item.price?.toLocaleString()}</td>
-                        <td><span className="level-tag">{item.propertyType}</span></td>
-                        <td>
-                          <span style={{
-                            padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold',
-                            backgroundColor: item.availabilityStatus === 'Available' ? '#dcffe4' : '#ffe8e8',
-                            color: item.availabilityStatus === 'Available' ? '#22863a' : '#cb2431'
-                          }}>
-                            {item.availabilityStatus}
-                          </span>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <Link to={`/boarding/${item._id}`} className="dashboard-link">View</Link>
-                            <button 
-                              onClick={async () => {
-                                if (!window.confirm('Remove from wishlist?')) return;
-                                try {
-                                  const res = await fetch('http://localhost:5000/api/boardings/unsave', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ userId: currentUser.id || currentUser._id, boardingId: item._id })
-                                  });
-                                  if (res.ok) {
-                                    setSavedBoardings(prev => prev.filter(i => i._id !== item._id));
-                                  }
-                                } catch (e) { alert('Error updating wishlist'); }
-                              }}
-                              style={{ background: '#cb2431', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px 10px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' }}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
-
       default:
         return null;
     }
@@ -1519,12 +1444,6 @@ function Dashboard() {
                   onClick={() => setActiveTab('saved-items')}
                 >
                   <span className="nav-icon">🔖</span> Saved Items
-                </button>
-                <button 
-                  className={`dashboard-nav__btn ${activeTab === 'saved-boardings' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('saved-boardings')}
-                >
-                  <span className="nav-icon">🏠</span> Saved Boardings
                 </button>
               </>
             )}

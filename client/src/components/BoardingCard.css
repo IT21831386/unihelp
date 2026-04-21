@@ -433,56 +433,6 @@
 
 .bc-card:hover .bc-compare-checkbox:not(.is-selected) {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.95);
+   background: rgba(255, 255, 255, 0.95);
   color: #1a1a2e;
-}
-/* ── Wishlist Button ── */
-.bc-wishlist-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.bc-wishlist-btn:hover {
-  background: rgba(255, 255, 255, 0.4);
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.bc-wishlist-btn.is-active {
-  background: white;
-  color: #ef4444;
-  border-color: transparent;
-  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
-  animation: bc-heart-pop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes bc-heart-pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.4) rotate(15deg); }
-  100% { transform: scale(1); }
-}
-
-.bc-wishlist-btn i {
-  transition: transform 0.2s;
-}
-
-.bc-wishlist-btn:active i {
-  transform: scale(0.85);
 }

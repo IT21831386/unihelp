@@ -33,12 +33,6 @@ const userSchema = new mongoose.Schema(
         ref: 'marketplaceModel',
       },
     ],
-    savedBoardings: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'boarding',
-      },
-    ],
   },
   {
     timestamps: true,

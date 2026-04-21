@@ -5,19 +5,8 @@ const {
   getBoardings, 
   getBoardingById, 
   updateBoarding, 
-  deleteBoarding, 
-  saveBoarding, 
-  unsaveBoarding, 
-  getSavedBoardings 
+  deleteBoarding 
 } = require('../controllers/boardingController');
-
-// Test route to verify the router is active
-router.get('/test-ping', (req, res) => res.json({ message: 'Boarding router is active' }));
-
-// Route for favorite boardings (Moved to top for priority)
-router.post('/save', saveBoarding);
-router.post('/unsave', unsaveBoarding);
-router.get('/saved/:userId', getSavedBoardings);
 
 // Route to create a new boarding place
 router.post('/', addBoardingPlace);
