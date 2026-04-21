@@ -264,3 +264,199 @@
     padding: var(--spacing-md);
   }
 }
+
+/* ── Premium Boarding Table Styles (Integrated) ── */
+.premium-table-card {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 50px rgba(89, 56, 182, 0.08) !important;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+.premium-img-wrap {
+  width: 50px; height: 50px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  border: 2px solid white;
+}
+
+.premium-price-val {
+  font-weight: 800;
+  font-size: 1.05rem;
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Modern Status Dots */
+.status-badge-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: capitalize;
+}
+
+.dot-indicator {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  position: relative;
+}
+.dot-indicator::after {
+  content: ''; position: absolute; inset: -2px;
+  border-radius: 50%; border: 1.5px solid currentColor;
+  animation: dot-ping 1.5s infinite;
+}
+@keyframes dot-ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
+
+.badge-available { background: rgba(16, 185, 129, 0.08); color: #10b981; }
+.badge-full      { background: rgba(239, 68, 68, 0.08); color: #ef4444; }
+.badge-other     { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
+
+/* Admin Actions Premium */
+.premium-action-btn {
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+.btn-premium-edit {
+  background: rgba(89, 56, 182, 0.08);
+  color: #5938B6;
+}
+.btn-premium-edit:hover {
+  background: #5938B6; color: white;
+  transform: translateY(-2px) rotate(-5deg);
+}
+
+.btn-premium-delete {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+}
+.btn-premium-delete:hover {
+  background: #ef4444; color: white;
+  transform: translateY(-2px) rotate(5deg);
+}
+
+.btn-premium-add-new {
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  color: white !important;
+  border: none !important;
+  padding: 10px 24px !important;
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 8px 20px rgba(89, 56, 182, 0.3) !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.btn-premium-add-new:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(89, 56, 182, 0.4) !important;
+}
+/* ── Premium Statistics Cards ── */
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-3xl);
+}
+
+.stat-card {
+  background: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-primary-light);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--color-primary);
+  opacity: 0.8;
+}
+
+.stat-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  background: var(--color-bg-light);
+  color: var(--color-primary);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-icon-wrapper {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-info .stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.stat-info .stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Specific Card Colors */
+.stat-card.students::before { background: #3b82f6; }
+.stat-card.boardings::before { background: #10b981; }
+.stat-card.jobs::before { background: #8b5cf6; }
+.stat-card.apps::before { background: #f59e0b; }
+
+@media (max-width: 768px) {
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

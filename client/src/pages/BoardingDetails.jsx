@@ -64,7 +64,19 @@ const BoardingDetails = () => {
     : ['https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop'];
 
   return (
-    <div className="boarding-details-bg pb-5 boarding-details" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '120px' }}>
+    <div className="unihelp-page-bg pb-5 boarding-details" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '120px' }}>
+      
+      {/* Aurora glow layer */}
+      <div className="bg-aurora" aria-hidden="true">
+        <div className="aurora-blob aurora-blob-1" />
+        <div className="aurora-blob aurora-blob-2" />
+        <div className="aurora-blob aurora-blob-3" />
+        <div className="aurora-blob aurora-blob-4" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="bg-grain" aria-hidden="true" />
+
       <Navbar />
       <Toaster position="top-center" />
 

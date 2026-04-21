@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import BoardingCard from '../components/BoardingCard';
 import Navbar from '../components/Navbar';
 import './BoardingsList.css';
@@ -23,9 +24,16 @@ const SkeletonCard = () => (
 );
 
 const BoardingsList = () => {
+  const navigate = useNavigate();
   const [boardings, setBoardings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
   
   // Filter States
   const [propertyType, setPropertyType] = useState('All');
@@ -108,7 +116,7 @@ const BoardingsList = () => {
   });
 
   return (
-    <div className="boarding-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
+    <div className="unihelp-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
 
       {/* Aurora glow layer — Layer -2 */}
       <div className="bg-aurora" aria-hidden="true">
@@ -291,6 +299,19 @@ const BoardingsList = () => {
                 <span className="bl-count-pill__num">{filteredBoardings.length}</span>
                 {filteredBoardings.length === 1 ? 'place' : 'places'} found
               </div>
+              
+              {user && user.role === 'admin' && (
+                <div className="bl-admin-actions">
+                  <button 
+                    onClick={() => navigate('/dashboard?tab=boardings')} 
+                    className="btn btn-premium-add d-flex align-items-center gap-2"
+                    style={{ padding: '8px 20px', fontSize: '14px', borderRadius: '50px' }}
+                  >
+                    <i className="bi bi-shield-lock-fill"></i>
+                    Manage Boardings
+                  </button>
+                </div>
+              )}
             </div>
             
             {loading ? (
