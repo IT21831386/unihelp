@@ -112,7 +112,6 @@ function Dashboard() {
             const marketplaceData = await marketplaceRes.json();
             setMarketplaceItems(Array.isArray(marketplaceData.items) ? marketplaceData.items : []);
           }
-        }
         if (currentUser.role === 'user') {
           const bookingsRes = await fetch(`http://localhost:5000/api/bookings?user=${currentUser.id}`);
           if (bookingsRes.ok) {
