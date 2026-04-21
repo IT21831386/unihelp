@@ -5,7 +5,7 @@ function Hero() {
     <section className="hero" id="home">
       <div className="container">
         <h1 className="hero__title">
-          <em>Find everything you need in one place</em>
+          Find everything you need in one place
         </h1>
         <p className="hero__subtitle">
           Drop the hassle, solutions are everywhere

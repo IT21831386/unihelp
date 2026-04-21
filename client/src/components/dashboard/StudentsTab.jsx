@@ -3,11 +3,16 @@ import { useState } from 'react';
 function StudentsTab({ students, formatDate, onDeleteUser }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [sortOrder, setSortOrder] = useState('newest');
 
   const filteredStudents = students.filter(student =>
     student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+  });
 
   return (
     <div className="dashboard-card">
@@ -15,14 +20,22 @@ function StudentsTab({ students, formatDate, onDeleteUser }) {
         <h2>Registered Students</h2>
         <span className="dashboard-badge">{filteredStudents.length} Total</span>
       </div>
-      <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8' }}>
+      <div style={{ padding: '15px', background: 'rgba(255, 255, 255, 0.3)', borderBottom: '1px solid rgba(0, 0, 0, 0.05)', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
           type="text"
           placeholder="Search students by name or email..."
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', width: '100%', maxWidth: '400px' }}
+          style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: '1', minWidth: '200px', maxWidth: '400px' }}
         />
+        <select 
+          value={sortOrder} 
+          onChange={(e) => setSortOrder(e.target.value)}
+          style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', background: '#fff', cursor: 'pointer', fontSize: '14px' }}
+        >
+          <option value="newest">Sort by Date: Newest First</option>
+          <option value="oldest">Sort by Date: Oldest First</option>
+        </select>
       </div>
       <div className="table-responsive">
         <table className="dashboard-table">
