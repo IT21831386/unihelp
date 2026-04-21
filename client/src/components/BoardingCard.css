@@ -80,7 +80,7 @@
   top: 12px; left: 12px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 10px;
   pointer-events: none;
 }
 
@@ -261,8 +261,8 @@
 .bc-amenities {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 0.75rem 0;
+  gap: 10px;
+  padding: 0.85rem 0;
   border-top: 1.5px solid rgba(89, 56, 182, 0.07);
   margin-bottom: 0.875rem;
 }
@@ -387,8 +387,8 @@
 /* ── Compare Checkbox Overlay ── */
 .bc-compare-checkbox {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  bottom: 12px;
+  left: 12px;
   z-index: 5;
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(12px);
@@ -433,6 +433,6 @@
 
 .bc-card:hover .bc-compare-checkbox:not(.is-selected) {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.95);
+   background: rgba(255, 255, 255, 0.95);
   color: #1a1a2e;
 }

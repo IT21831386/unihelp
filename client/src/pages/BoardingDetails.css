@@ -1,8 +1,6 @@
 /* BoardingDetails.css */
-.boarding-details-bg {
-  background:
-    linear-gradient(135deg, rgba(243,240,251,0.55) 0%, rgba(255,255,255,0.65) 100%),
-    url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2070&auto=format&fit=crop') center/cover fixed;
+.boarding-details {
+  position: relative;
   min-height: 100vh;
 }
 

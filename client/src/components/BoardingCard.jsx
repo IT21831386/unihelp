@@ -52,23 +52,17 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && navigate(`/boarding/${boarding._id || boarding.id}`)}
     >
-      {/* ── Image ── */}
       <div className="bc-img-wrap">
         <img src={displayImage} alt={boarding.title} className="bc-img" />
-
-        {/* Gradient overlay */}
         <div className="bc-img-overlay" />
-
-        {/* Top badges */}
+        
         <div className="bc-badges">
-          {/* Verified Badge (Simulated logic or from DB) */}
           {(boarding.isVerified || boarding.userId) && (
             <span className="bc-verified-badge">
               <i className="bi bi-patch-check-fill" /> Verified
             </span>
           )}
           
-          {/* Hot Deal Badge (Property-specific thresholds) */}
           {(boarding.isHotDeal || 
             (boarding.price > 0 && (
               (boarding.propertyType === 'Room' && boarding.price < 15000) ||
@@ -89,7 +83,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           </span>
         </div>
 
-        {/* Compare Checkbox */}
         <div 
           className={`bc-compare-checkbox ${isSelected ? 'is-selected' : ''}`}
           onClick={(e) => {
@@ -102,7 +95,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           <span>{isSelected ? 'Selected' : 'Compare'}</span>
         </div>
 
-        {/* Rating pill overlaid on image bottom */}
         {ratingData.count > 0 && (
           <div className="bc-rating-pill">
             <i className="bi bi-star-fill" />
@@ -112,7 +104,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
         )}
       </div>
 
-      {/* ── Body ── */}
       <div className="bc-body">
         <h5 className="bc-title" title={boarding.title}>{boarding.title}</h5>
 
@@ -127,7 +118,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           <span>{boarding.city}, {boarding.district}</span>
         </div>
 
-        {/* Amenity chips */}
         {amenities.length > 0 && (
           <div className="bc-amenities">
             {amenities.slice(0, 4).map((a) => (
@@ -139,7 +129,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           </div>
         )}
 
-        {/* Price + CTA */}
         <div className="bc-footer">
           <div className="bc-price">
             <span className="bc-price__label">Price / month</span>

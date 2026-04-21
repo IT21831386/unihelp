@@ -16,6 +16,7 @@ import BoardingsList from './pages/BoardingsList';
 import BoardingDetails from './pages/BoardingDetails';
 import AdminAllBoardings from './pages/AdminAllBoardings';
 import AdminEditBoarding from './pages/AdminEditBoarding';
+import MarketplaceLayout from './components/MarketPlace/MarketplaceLayout.jsx';
 import Marketplace from './components/MarketPlace/MarketPlace.jsx';
 import BuyItems from './components/BuyItems/BuyItems.jsx';
 import SellItems from './components/SellItems/SellItems.jsx';
@@ -25,9 +26,12 @@ import ItemDetail from './components/ItemDetail/ItemDetail.jsx';
 import Chat from './components/Chat/Chat.jsx';
 import OwnerReviews from './pages/OwnerReviews';
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/bookings" element={<Bookings />} />
@@ -45,13 +49,18 @@ function App() {
         <Route path="/admin/addboarding" element={<AdminAddBoarding />} />
         <Route path="/admin/allboardings" element={<AdminAllBoardings />} />
         <Route path="/admin/editboarding/:id" element={<AdminEditBoarding />} />
-        <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/marketplace/buy" element={<BuyItems />} />
-        <Route path="/marketplace/sell" element={<SellItems />} />
-        <Route path="/marketplace/sell/add" element={<AddItem />} />
-        <Route path="/marketplace/sell/update/:id" element={<UpdateItem />} />
-        <Route path="/marketplace/item/:id" element={<ItemDetail />} />
-        <Route path="/marketplace/chats" element={<Chat />} />
+        
+        {/* Marketplace Routes with Layout */}
+        <Route path="/marketplace" element={<MarketplaceLayout />}>
+          <Route index element={<Marketplace />} />
+          <Route path="buy" element={<BuyItems />} />
+          <Route path="sell" element={<SellItems />} />
+          <Route path="sell/add" element={<AddItem />} />
+          <Route path="sell/update/:id" element={<UpdateItem />} />
+          <Route path="item/:id" element={<ItemDetail />} />
+          <Route path="chats" element={<Chat />} />
+        </Route>
+
         <Route path="/owner/reviews" element={<OwnerReviews />} />
       </Routes>
     </Router>

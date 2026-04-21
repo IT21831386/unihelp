@@ -1,9 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AreaLayoutEditor from '../components/AreaLayoutEditor';
 import { QRCodeSVG } from '../../node_modules/qrcode.react/lib/esm/index.js';
+import toast from 'react-hot-toast';
+import { 
+  Users, 
+  Home as HomeIcon, 
+  Briefcase, 
+  FileText, 
+  ShieldCheck, 
+  Trash2, 
+  Edit3, 
+  ExternalLink,
+  PlusCircle,
+  Layout
+} from 'lucide-react';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -29,10 +42,13 @@ function Dashboard() {
   const [savedMarketplaceItems, setSavedMarketplaceItems] = useState([]);
   const [editingMarketplaceItem, setEditingMarketplaceItem] = useState(null);
   const [viewingMarketplaceItem, setViewingMarketplaceItem] = useState(null);
-  
+  const [newAreaId, setNewAreaId] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [boardings, setBoardings] = useState([]);
+  const [deletingIds, setDeletingIds] = useState([]); // Track which items are currently being deleted
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Authentication & Role check
   useEffect(() => {
@@ -44,14 +60,21 @@ function Dashboard() {
     const parsedUser = JSON.parse(userStr);
     setCurrentUser(parsedUser);
 
-    if (parsedUser.role === 'user') {
-      setActiveTab('bookings');
+    // Initial tab based on role or query param
+    const queryParams = new URLSearchParams(location.search);
+    const tabParam = queryParams.get('tab');
+    
+    if (tabParam) {
+      setActiveTab(tabParam);
+    } else {
+      if (parsedUser.role === 'user') {
+        setActiveTab('bookings');
+      }
+      if (parsedUser.role === 'employer') {
+        setActiveTab('jobs');
+      }
     }
-
-    if (parsedUser.role === 'employer') {
-      setActiveTab('jobs');
-    }
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,13 +97,21 @@ function Dashboard() {
             const areasData = await areasRes.json();
             setAreas(Array.isArray(areasData) ? areasData : []);
           }
+          // Fetch Boardings for Admin
+          const boardingsRes = await fetch('http://localhost:5000/api/boardings');
+          if (boardingsRes.ok) {
+            const boardingsData = await boardingsRes.json();
+            if (boardingsData.success) {
+              setBoardings(boardingsData.data || []);
+            }
+          }
+        }
 
           const marketplaceRes = await fetch('http://localhost:5000/api/marketplace');
           if (marketplaceRes.ok) {
             const marketplaceData = await marketplaceRes.json();
             setMarketplaceItems(Array.isArray(marketplaceData.items) ? marketplaceData.items : []);
           }
-        }
         if (currentUser.role === 'user') {
           const bookingsRes = await fetch(`http://localhost:5000/api/bookings?user=${currentUser.id}`);
           if (bookingsRes.ok) {
@@ -162,11 +193,20 @@ function Dashboard() {
 
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm('Are you sure you want to delete this job posting? This cannot be undone.')) return;
+    setDeletingIds(prev => [...prev, jobId]);
     try {
       const res = await fetch(`http://localhost:5000/api/jobs/${jobId}`, { method: 'DELETE' });
-      if (res.ok) setJobs(prev => prev.filter(j => j._id !== jobId));
-      else alert('Failed to delete job');
-    } catch (e) { alert('Network error'); }
+      if (res.ok) {
+        setJobs(prev => prev.filter(j => j._id !== jobId));
+        toast.success('Job posting deleted successfully');
+      } else {
+        toast.error('Failed to delete job');
+      }
+    } catch (e) { 
+      toast.error('Network error. Failed to delete job.'); 
+    } finally {
+      setDeletingIds(prev => prev.filter(id => id !== jobId));
+    }
   };
 
   const handleUpdateJob = async (e) => {
@@ -181,20 +221,29 @@ function Dashboard() {
         const updated = await res.json();
         setJobs(prev => prev.map(j => j._id === updated._id ? updated : j));
         setEditingJob(null);
+        toast.success('Job updated successfully!');
       } else {
         const errData = await res.json();
-        alert(errData.message || 'Failed to update job');
+        toast.error(errData.message || 'Failed to update job');
       }
-    } catch (e) { alert('Network error'); }
+    } catch (e) { 
+      toast.error('Network error. Failed to update job.'); 
+    }
   };
 
   const handleDeleteApp = async (appId) => {
     if (!window.confirm('Are you sure you want to withdraw this application? This cannot be undone.')) return;
     try {
       const res = await fetch(`http://localhost:5000/api/job-applications/${appId}`, { method: 'DELETE' });
-      if (res.ok) setApplications(prev => prev.filter(a => a._id !== appId));
-      else alert('Failed to delete application');
-    } catch (e) { alert('Network error'); }
+      if (res.ok) {
+        setApplications(prev => prev.filter(a => a._id !== appId));
+        toast.success('Application withdrawn successfully');
+      } else {
+        toast.error('Failed to delete application');
+      }
+    } catch (e) { 
+      toast.error('Network error. Failed to withdraw application.'); 
+    }
   };
 
   const handleUpdateApp = async (e) => {
@@ -220,11 +269,58 @@ function Dashboard() {
         const updated = await res.json();
         setApplications(prev => prev.map(a => a._id === updated._id ? { ...a, ...updated } : a));
         setEditingApp(null);
+        toast.success('Application updated successfully!');
       } else {
         const errData = await res.json();
-        alert(errData.message || 'Failed to update application');
+        toast.error(errData.message || 'Failed to update application');
       }
-    } catch (e) { alert('Network error'); }
+    } catch (e) { 
+      toast.error('Network error. Failed to update application.'); 
+    }
+  };
+
+  const handleDeleteBoarding = async (id, title) => {
+    if (!window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
+    setDeletingIds(prev => [...prev, id]);
+    try {
+      const res = await fetch(`http://localhost:5000/api/boardings/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setBoardings(prev => prev.filter(b => (b._id || b.id) !== id));
+        toast.success('Boarding place deleted successfully');
+      } else {
+        toast.error(data.message || 'Failed to delete boarding');
+      }
+    } catch (e) {
+      toast.error('Network error. Failed to delete boarding.');
+    } finally {
+      setDeletingIds(prev => prev.filter(idd => idd !== id));
+    }
+  };
+  
+  const StatsOverview = () => {
+    const stats = [
+      { label: 'Students', value: students.length, icon: <Users />, class: 'students' },
+      { label: 'Boardings', value: boardings.length, icon: <HomeIcon />, class: 'boardings' },
+      { label: 'Jobs', value: jobs.length, icon: <Briefcase />, class: 'jobs' },
+      { label: 'Applications', value: applications.length, icon: <FileText />, class: 'apps' },
+    ];
+
+    if (currentUser.role !== 'admin') return null;
+
+    return (
+      <div className="dashboard-stats-grid">
+        {stats.map((stat, i) => (
+          <div key={i} className={`stat-card ${stat.class}`}>
+            <div className="stat-icon-wrapper">{stat.icon}</div>
+            <div className="stat-info">
+              <span className="stat-value">{stat.value}</span>
+              <span className="stat-label">{stat.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   };
   const handleUpdateAppStatus = async (appId, newStatus) => {
     try {
@@ -301,7 +397,10 @@ function Dashboard() {
       );
     }
 
-    switch (activeTab) {
+    return (
+      <>
+        {(() => {
+          switch (activeTab) {
       case 'students':
         if (currentUser.role !== 'admin') return null;
         return (
@@ -332,20 +431,28 @@ function Dashboard() {
                         <td><span className="role-tag role-student">Student</span></td>
                         <td>{formatDate(student.createdAt)}</td>
                         <td>
-                          <button onClick={() => setSelectedStudent(student)} style={{ padding: '5px 12px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', marginRight: '5px', fontWeight: 'bold' }}>View</button>
-                          <button onClick={async () => {
-                            if (!window.confirm('Are you sure you want to delete this student?')) return;
-                            try {
-                              const res = await fetch(`http://localhost:5000/api/auth/users/${student._id}`, { method: 'DELETE' });
-                              if (res.ok) {
-                                setUsers(prev => prev.filter(u => u._id !== student._id));
-                              } else {
-                                alert('Failed to delete student');
-                              }
-                            } catch (e) {
-                              alert(e.message);
-                            }
-                          }} style={{ padding: '5px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Delete</button>
+                          <div style={{ display: 'flex', gap: '5px' }}>
+                            <button onClick={() => setSelectedStudent(student)} style={{ padding: '5px 12px', background: '#e1e4e8', color: '#24292e', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>View</button>
+                            <button onClick={async () => {
+                                if (!window.confirm('Are you sure you want to delete this student?')) return;
+                                try {
+                                  setDeletingIds(prev => [...prev, student._id]);
+                                  const res = await fetch(`http://localhost:5000/api/auth/users/${student._id}`, { method: 'DELETE' });
+                                  if (res.ok) {
+                                    setUsers(prev => prev.filter(u => u._id !== student._id));
+                                    toast.success('Student deleted successfully');
+                                  } else {
+                                    toast.error('Failed to delete student');
+                                  }
+                                } catch (e) {
+                                  toast.error(e.message);
+                                } finally {
+                                  setDeletingIds(prev => prev.filter(id => id !== student._id));
+                                }
+                            }} style={{ padding: '6px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {deletingIds.includes(student._id) ? <div className="spinner-border spinner-border-sm" style={{width: '14px', height: '14px'}}></div> : <Trash2 size={14} />}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -373,6 +480,100 @@ function Dashboard() {
                 </div>
               </div>
             )}
+          </div>
+        );
+
+      case 'boardings':
+        if (currentUser.role !== 'admin') return null;
+        return (
+          <div className="dashboard-card premium-table-card border-0">
+            <div className="dashboard-card__header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+                  <div style={{ padding: '8px', background: 'linear-gradient(135deg, #5938B6, #ec4899)', borderRadius: '10px', color: '#fff', fontSize: '18px' }}><i className="bi bi-buildings-fill"></i></div>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0 }}>Manage Boarding Places</h2>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span className="dashboard-badge">{boardings.length} Total</span>
+                  <span className="dashboard-badge" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
+                    {boardings.filter(b => b.availabilityStatus === 'Available').length} Available
+                  </span>
+                </div>
+              </div>
+              <Link to="/admin/addboarding" className="btn-premium-add-new">
+                <i className="bi bi-plus-circle-fill me-2"></i> Add New Boarding
+              </Link>
+            </div>
+            <div className="table-responsive">
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Property Name</th>
+                    <th>Location</th>
+                    <th>Pricing</th>
+                    <th>Status</th>
+                    <th className="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {boardings.length === 0 ? (
+                    <tr><td colSpan="5" className="empty-row">No boarding places found</td></tr>
+                  ) : (
+                    boardings.map((boarding) => {
+                      const id = boarding._id || boarding.id;
+                      const displayImage = boarding.imageUrls?.[0] || 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop';
+                      const statusClass = boarding.availabilityStatus === 'Available' ? 'badge-available' : 
+                                         boarding.availabilityStatus === 'Full' ? 'badge-full' : 'badge-other';
+                      
+                      return (
+                        <tr key={id}>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                              <div className="premium-img-wrap">
+                                <img src={displayImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: '800', fontSize: '14.5px', color: '#1e1b4b' }}>{boarding.title}</div>
+                                <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>{boarding.propertyType}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ fontSize: '13px', fontWeight: 600, color: '#4b5563' }}>
+                            <i className="bi bi-geo-alt-fill text-danger me-1 opacity-75"></i> {boarding.city}
+                          </td>
+                          <td>
+                            <span className="premium-price-val">
+                              {boarding.currency} {boarding.price.toLocaleString()}
+                            </span>
+                          </td>
+                          <td>
+                            <div className={`status-badge-premium ${statusClass}`}>
+                              <span className="dot-indicator" style={{ color: 'currentColor' }}></span>
+                              {boarding.availabilityStatus}
+                            </div>
+                          </td>
+                          <td className="text-end">
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button onClick={() => navigate(`/admin/editboarding/${id}`)} className="premium-action-btn btn-premium-edit" title="Edit Listing">
+                                <Edit3 size={18} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteBoarding(id, boarding.title)} 
+                                className="premium-action-btn btn-premium-delete" 
+                                title="Permanently Delete"
+                                disabled={deletingIds.includes(id)}
+                              >
+                                {deletingIds.includes(id) ? <div className="spinner-border spinner-border-sm" role="status" style={{width: '1rem', height: '1rem'}}></div> : <Trash2 size={18} />}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         );
 
@@ -442,15 +643,22 @@ function Dashboard() {
                         <td><span className="level-tag">{job.level}</span></td>
                         <td>{formatDate(job.createdAt)}</td>
                         <td>
-                          <div style={{ display: 'flex', gap: '10px' }}>
-                            <Link to={`/careers/job/${job._id}`} className="dashboard-link">View</Link>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <Link to={`/careers/job/${job._id}`} className="premium-action-btn btn-premium-edit" title="View Details" style={{ textDecoration: 'none' }}>
+                               <ExternalLink size={16} />
+                            </Link>
                             {currentUser.role === 'employer' && (
                               <>
-                                <button onClick={() => setEditingJob({...job})} title="Edit" style={{ background: '#0366d6', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                <button onClick={() => setEditingJob({...job})} className="premium-action-btn btn-premium-edit" title="Edit Job">
+                                   <Edit3 size={16} />
                                 </button>
-                                <button onClick={() => handleDeleteJob(job._id)} title="Delete" style={{ background: '#cb2431', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                <button 
+                                  onClick={() => handleDeleteJob(job._id)} 
+                                  className="premium-action-btn btn-premium-delete" 
+                                  title="Delete Job"
+                                  disabled={deletingIds.includes(job._id)}
+                                >
+                                  {deletingIds.includes(job._id) ? <div className="spinner-border spinner-border-sm" style={{width: '14px', height: '14px'}}></div> : <Trash2 size={16} />}
                                 </button>
                               </>
                             )}
@@ -619,11 +827,15 @@ function Dashboard() {
                           <td style={{ verticalAlign: 'middle' }}>
                             {currentUser.role === 'user' && (
                               <div style={{ display: 'flex', gap: '8px' }}>
-                                <button onClick={() => setEditingApp({ ...app })} title="Edit" style={{ background: '#0366d6', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                <button onClick={() => setEditingApp({ ...app })} className="premium-action-btn btn-premium-edit" title="Edit Application">
+                                   <Edit3 size={16} />
                                 </button>
-                                <button onClick={() => handleDeleteApp(app._id)} title="Withdraw" style={{ background: '#cb2431', color: '#ffffff', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                <button 
+                                  onClick={() => handleDeleteApp(app._id)} 
+                                  className="premium-action-btn btn-premium-delete" 
+                                  title="Withdraw Application"
+                                >
+                                   <Trash2 size={16} />
                                 </button>
                               </div>
                             )}
@@ -832,10 +1044,10 @@ function Dashboard() {
                              headers: { 'Content-Type': 'application/json' },
                              body: JSON.stringify({ layoutConfig: newLayoutConfig })
                            });
-                           if (res.ok) alert('Saved successfully!');
-                           else alert('Failed to save configuration');
+                           if (res.ok) toast.success('Saved successfully!');
+                           else toast.error('Failed to save configuration');
                          } catch(e) {
-                           alert('Failed to save! ' + e.message);
+                           toast.error('Failed to save! ' + e.message);
                          }
                        }}
                      />
@@ -954,7 +1166,7 @@ function Dashboard() {
                   <h3 style={{ marginBottom: '5px', color: '#24292e' }}>Booking QR Code</h3>
                   <p style={{ fontSize: '13px', color: '#586069', marginBottom: '20px' }}>Scan with your phone camera</p>
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-                    <QRCodeCanvas
+                    <QRCodeSVG
                       id="qr-code-canvas"
                       value={`UniHelp Booking\nStudent: ${currentUser?.name || 'N/A'}\nArea: ${selectedBooking.area}\nDate: ${selectedBooking.date}\nTime: ${selectedBooking.to12h(selectedBooking.time)} - ${selectedBooking.to12h(selectedBooking.endTime)}\nSeats: ${selectedBooking.seats.join(', ')}\nStatus: ${selectedBooking.getStatusLabel()}`}
                       size={200}
@@ -1191,7 +1403,10 @@ function Dashboard() {
       default:
         return null;
     }
-  };
+  })()}
+</>
+);
+};
 
   return (
     <div className="dashboard-page">
@@ -1204,55 +1419,77 @@ function Dashboard() {
             <h3>Dashboard</h3>
           </div>
           <nav className="dashboard-nav">
+
+
+            {/* Student View */}
             {currentUser.role === 'user' && (
-              <button 
-                className={`dashboard-nav__btn ${activeTab === 'bookings' ? 'active' : ''}`}
-                onClick={() => setActiveTab('bookings')}
-              >
-                <span className="nav-icon">📅</span> My Bookings
-              </button>
+              <>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'bookings' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('bookings')}
+                >
+                  <span className="nav-icon">📅</span> My Bookings
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('applications')}
+                >
+                  <span className="nav-icon">📄</span> My Applications
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'saved-items' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('saved-items')}
+                >
+                  <span className="nav-icon">🔖</span> Saved Items
+                </button>
+              </>
             )}
 
-            {currentUser.role === 'user' && (
-              <button 
-                className={`dashboard-nav__btn ${activeTab === 'saved-items' ? 'active' : ''}`}
-                onClick={() => setActiveTab('saved-items')}
-              >
-                <span className="nav-icon">🔖</span> Saved Items
-              </button>
-            )}
-
-            {currentUser.role === 'admin' && (
-              <button 
-                className={`dashboard-nav__btn ${activeTab === 'students' ? 'active' : ''}`}
-                onClick={() => setActiveTab('students')}
-              >
-                  <span className="nav-icon">🎓</span> Students
-              </button>
-            )}
-
-            {currentUser.role !== 'admin' && (
-              <button 
-                className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
-                onClick={() => setActiveTab('applications')}
-              >
-                <span className="nav-icon">&#128221;</span> {currentUser.role === 'user' ? 'My Applications' : 'Applications'}
-              </button>
-            )}
-            
-            {currentUser.role !== 'user' && (
+            {/* Employer View */}
+            {currentUser.role === 'employer' && (
               <>
                 <button 
                   className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
                   onClick={() => setActiveTab('jobs')}
                 >
-                  <span className="nav-icon">&#128188;</span> {currentUser.role === 'employer' ? 'My Jobs' : 'Jobs'}
+                  <span className="nav-icon">💼</span> My Jobs
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('applications')}
+                >
+                  <span className="nav-icon">📄</span> Applications
                 </button>
               </>
             )}
-            
+
+            {/* Admin View */}
             {currentUser.role === 'admin' && (
               <>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'students' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('students')}
+                >
+                  <span className="nav-icon">🎓</span> Students
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'boardings' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('boardings')}
+                >
+                  <span className="nav-icon">🏠</span> Boarding Places
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'applications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('applications')}
+                >
+                  <span className="nav-icon">📄</span> Applications
+                </button>
+                <button 
+                  className={`dashboard-nav__btn ${activeTab === 'jobs' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('jobs')}
+                >
+                  <span className="nav-icon">💼</span> Jobs
+                </button>
                 <button 
                   className={`dashboard-nav__btn ${activeTab === 'companies' ? 'active' : ''}`}
                   onClick={() => setActiveTab('companies')}

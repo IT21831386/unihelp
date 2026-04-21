@@ -1,4 +1,5 @@
 const boardingService = require('../services/boardingService');
+const User = require('../models/User');
 
 // @desc    Add a new boarding place
 // @route   POST /api/boardings
