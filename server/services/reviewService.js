@@ -21,7 +21,7 @@ const getReviewsByBoardingId = async (boardingId) => {
 
 const getReviewsByOwnerEmail = async (email) => {
   try {
-    const boardings = await Boarding.find({ email });
+    const boardings = await Boarding.find({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
     const boardingIds = boardings.map((b) => b._id);
     const reviews = await Review.find({ boardingId: { $in: boardingIds } })
       .populate('boardingId', 'title city address')
