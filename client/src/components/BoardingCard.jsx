@@ -5,7 +5,9 @@ import './BoardingCard.css';
 
 const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
   const [ratingData, setRatingData] = useState({ average: 0, count: 0 });
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     const fetchRating = async () => {
@@ -24,6 +26,47 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
     };
     fetchRating();
   }, [boarding]);
+
+  useEffect(() => {
+    const checkSaved = async () => {
+      if (!currentUser) return;
+      try {
+        const userId = currentUser.id || currentUser._id;
+        const res = await axios.get(`http://localhost:5000/api/boardings/saved/${userId}`);
+        if (res.data.success) {
+          const savedItems = res.data.data;
+          const isItemSaved = savedItems.some(item => (item._id || item.id) === (boarding._id || boarding.id));
+          setIsSaved(isItemSaved);
+        }
+      } catch (err) {
+        console.error("Error checking saved status", err);
+      }
+    };
+    checkSaved();
+  }, [boarding, currentUser]);
+
+  const toggleSave = async (e) => {
+    e.stopPropagation();
+    if (!currentUser) {
+      alert("Please login to save favorites!");
+      return;
+    }
+
+    try {
+      const userId = currentUser.id || currentUser._id;
+      const boardingId = boarding._id || boarding.id;
+      
+      if (isSaved) {
+        await axios.post('http://localhost:5000/api/boardings/unsave', { userId, boardingId });
+        setIsSaved(false);
+      } else {
+        await axios.post('http://localhost:5000/api/boardings/save', { userId, boardingId });
+        setIsSaved(true);
+      }
+    } catch (err) {
+      console.error("Error toggling save status", err);
+    }
+  };
 
   const displayImage =
     boarding.imageUrls && boarding.imageUrls.length > 0
@@ -52,23 +95,17 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && navigate(`/boarding/${boarding._id || boarding.id}`)}
     >
-      {/* ── Image ── */}
       <div className="bc-img-wrap">
         <img src={displayImage} alt={boarding.title} className="bc-img" />
-
-        {/* Gradient overlay */}
         <div className="bc-img-overlay" />
-
-        {/* Top badges */}
+        
         <div className="bc-badges">
-          {/* Verified Badge (Simulated logic or from DB) */}
           {(boarding.isVerified || boarding.userId) && (
             <span className="bc-verified-badge">
               <i className="bi bi-patch-check-fill" /> Verified
             </span>
           )}
           
-          {/* Hot Deal Badge (Property-specific thresholds) */}
           {(boarding.isHotDeal || 
             (boarding.price > 0 && (
               (boarding.propertyType === 'Room' && boarding.price < 15000) ||
@@ -89,7 +126,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           </span>
         </div>
 
-        {/* Compare Checkbox */}
         <div 
           className={`bc-compare-checkbox ${isSelected ? 'is-selected' : ''}`}
           onClick={(e) => {
@@ -102,7 +138,14 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           <span>{isSelected ? 'Selected' : 'Compare'}</span>
         </div>
 
-        {/* Rating pill overlaid on image bottom */}
+        <div 
+          className={`bc-wishlist-btn ${isSaved ? 'is-active' : ''}`}
+          onClick={toggleSave}
+          title={isSaved ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <i className={`bi ${isSaved ? 'bi-heart-fill' : 'bi-heart'}`} />
+        </div>
+
         {ratingData.count > 0 && (
           <div className="bc-rating-pill">
             <i className="bi bi-star-fill" />
@@ -112,7 +155,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
         )}
       </div>
 
-      {/* ── Body ── */}
       <div className="bc-body">
         <h5 className="bc-title" title={boarding.title}>{boarding.title}</h5>
 
@@ -127,7 +169,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           <span>{boarding.city}, {boarding.district}</span>
         </div>
 
-        {/* Amenity chips */}
         {amenities.length > 0 && (
           <div className="bc-amenities">
             {amenities.slice(0, 4).map((a) => (
@@ -139,7 +180,6 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           </div>
         )}
 
-        {/* Price + CTA */}
         <div className="bc-footer">
           <div className="bc-price">
             <span className="bc-price__label">Price / month</span>
