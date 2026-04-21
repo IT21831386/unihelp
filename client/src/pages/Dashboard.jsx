@@ -127,9 +127,6 @@ function Dashboard() {
           }
         }
 
-        }
-
-
         // Fetch jobs for both admin and employer
         if (currentUser.role === 'admin' || currentUser.role === 'employer') {
           const jobsRes = await fetch('http://localhost:5000/api/jobs');
