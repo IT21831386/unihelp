@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BoardingCard from '../components/BoardingCard';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import './BoardingsList.css';
 
 const SkeletonCard = () => (
@@ -199,7 +200,7 @@ const BoardingsList = () => {
       </section>
 
       {/* Main Content Area */}
-        <div className="container py-5 flex-grow-1">
+        <div className="container py-5 mb-5 flex-grow-1">
         <div className="boardings-layout">
           {/* Sidebar Filters */}
           <aside
@@ -453,6 +454,7 @@ const BoardingsList = () => {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 };

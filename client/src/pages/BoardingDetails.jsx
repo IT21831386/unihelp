@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import ReviewList from '../components/ReviewList';
 import './BoardingDetails.css';
 
@@ -64,7 +65,7 @@ const BoardingDetails = () => {
     : ['https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop'];
 
   return (
-    <div className="unihelp-page-bg pb-5 boarding-details" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '120px' }}>
+    <div className="unihelp-page-bg pb-5 boarding-details" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '100px' }}>
       
       {/* Aurora glow layer */}
       <div className="bg-aurora" aria-hidden="true">
@@ -90,7 +91,7 @@ const BoardingDetails = () => {
         </div>
       </div>
 
-      <div className="container mt-4 mt-lg-5 boarding-details__container">
+      <div className="container mt-4 mt-lg-5 mb-5 pb-5 boarding-details__container">
 
         {/* ── Header Title Section ── */}
         <div className="bd-header-card">
@@ -401,6 +402,7 @@ const BoardingDetails = () => {
 
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
