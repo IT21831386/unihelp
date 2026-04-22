@@ -26,22 +26,24 @@ function Bookings() {
   const [activeDot] = useState(1);
 
   return (
-    <>
+    <div className="bookings-page-bg">
+      {/* Aurora glow layer */}
+      <div className="bk-bg-aurora" aria-hidden="true">
+        <div className="bk-aurora-blob bk-aurora-blob-1" />
+        <div className="bk-aurora-blob bk-aurora-blob-2" />
+        <div className="bk-aurora-blob bk-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="bk-bg-grain" aria-hidden="true" />
+
       <Navbar />
 
-      {/* Hero Banner */}
-      <section className="bookings-hero">
-        <img
-          src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1400&h=500&fit=crop"
-          alt="Student booking"
-          className="bookings-hero__image"
-        />
-        <div className="bookings-hero__overlay">
-          <h1 className="bookings-hero__title">
-            Book seatings before you miss your favourite spots in studies.
-          </h1>
-        </div>
-      </section>
+      {/* Page Title */}
+      <div className="bookings-page-title container">
+        <h1>Book seatings before you miss your favourite spots in studies.</h1>
+        <p>Choose an area below to secure your space</p>
+      </div>
 
       {/* Booking Categories */}
       <section className="bookings-section">
@@ -80,7 +82,7 @@ function Bookings() {
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 }
 

@@ -148,7 +148,17 @@ function PostJob() {
   };
 
   return (
-    <>
+    <div className="post-job-page-bg">
+      {/* Aurora glow layer */}
+      <div className="pj-bg-aurora" aria-hidden="true">
+        <div className="pj-aurora-blob pj-aurora-blob-1" />
+        <div className="pj-aurora-blob pj-aurora-blob-2" />
+        <div className="pj-aurora-blob pj-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="pj-bg-grain" aria-hidden="true" />
+
       <Navbar />
 
       <div className="container">
@@ -403,7 +413,7 @@ function PostJob() {
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 }
 

@@ -62,9 +62,21 @@ const features = [
   },
 ];
 
+import './Home.css';
+
 function Home() {
   return (
-    <>
+    <div className="home-page-bg">
+      {/* Aurora glow layer */}
+      <div className="hm-bg-aurora" aria-hidden="true">
+        <div className="hm-aurora-blob hm-aurora-blob-1" />
+        <div className="hm-aurora-blob hm-aurora-blob-2" />
+        <div className="hm-aurora-blob hm-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="hm-bg-grain" aria-hidden="true" />
+
       <Navbar />
       <Hero />
       <EventsBanner />
@@ -72,7 +84,7 @@ function Home() {
         <FeatureSection key={feature.id} {...feature} />
       ))}
       <Footer />
-    </>
+    </div>
   );
 }
 

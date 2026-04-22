@@ -1410,6 +1410,16 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page">
+      {/* Aurora glow layer */}
+      <div className="db-bg-aurora" aria-hidden="true">
+        <div className="db-aurora-blob db-aurora-blob-1" />
+        <div className="db-aurora-blob db-aurora-blob-2" />
+        <div className="db-aurora-blob db-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="db-bg-grain" aria-hidden="true" />
+
       <Navbar />
       
       <div className="dashboard-layout container">

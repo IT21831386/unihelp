@@ -49,22 +49,24 @@ function Careers() {
   };
 
   return (
-    <>
+    <div className="careers-page-bg">
+      {/* Aurora glow layer */}
+      <div className="cr-bg-aurora" aria-hidden="true">
+        <div className="cr-aurora-blob cr-aurora-blob-1" />
+        <div className="cr-aurora-blob cr-aurora-blob-2" />
+        <div className="cr-aurora-blob cr-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="cr-bg-grain" aria-hidden="true" />
+
       <Navbar />
 
-      {/* Hero Banner */}
-      <section className="careers-hero">
-        <img
-          src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1400&h=500&fit=crop"
-          alt="Career opportunities"
-          className="careers-hero__image"
-        />
-        <div className="careers-hero__overlay">
-          <h1 className="careers-hero__title">
-            Find job opportunities and post to hire your next employee
-          </h1>
-        </div>
-      </section>
+      {/* Page Title */}
+      <div className="careers-page-title container">
+        <h1>Find job opportunities and post to hire your next employee</h1>
+        <p>Choose an option below to get started</p>
+      </div>
 
       {/* Career Categories */}
       <section className="careers-section">
@@ -102,7 +104,7 @@ function Careers() {
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 }
 

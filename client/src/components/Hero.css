@@ -3,7 +3,7 @@
   padding-top: calc(var(--navbar-height) + var(--spacing-4xl));
   padding-bottom: var(--spacing-3xl);
   text-align: center;
-  background: var(--color-white);
+  background: transparent;
   position: relative;
   overflow: hidden;
 }
@@ -27,11 +27,6 @@
   max-width: 650px;
   margin: 0 auto var(--spacing-lg);
   letter-spacing: -0.5px;
-}
-
-.hero__title em {
-  font-style: italic;
-  color: var(--color-primary);
 }
 
 .hero__subtitle {
