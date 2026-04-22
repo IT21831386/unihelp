@@ -34,6 +34,7 @@ import AreasTab from '../components/dashboard/AreasTab';
 import MarketplaceTab from '../components/dashboard/MarketplaceTab';
 import SavedItemsTab from '../components/dashboard/SavedItemsTab';
 import BookingsTab from '../components/dashboard/BookingsTab';
+import ReceivedBoardingBookings from '../components/dashboard/ReceivedBoardingBookings';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('students');
@@ -61,6 +62,8 @@ function Dashboard() {
   const [newAreaId, setNewAreaId] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [boardings, setBoardings] = useState([]);
+  const [boardingBookings, setBoardingBookings] = useState([]);
+  const [receivedBoardingBookings, setReceivedBoardingBookings] = useState([]);
   const [deletingIds, setDeletingIds] = useState([]); // Track which items are currently being deleted
 
   const navigate = useNavigate();
@@ -140,6 +143,20 @@ function Dashboard() {
           if (savedRes.ok) {
             const savedData = await savedRes.json();
             setSavedMarketplaceItems(Array.isArray(savedData.items) ? savedData.items : []);
+          }
+
+          // Fetch boarding bookings
+          const bbRes = await fetch(`http://localhost:5000/api/boarding-bookings/my-bookings/${currentUser.id || currentUser._id}`);
+          if (bbRes.ok) {
+            const bbData = await bbRes.json();
+            setBoardingBookings(Array.isArray(bbData.data) ? bbData.data : []);
+          }
+
+          // Fetch received bookings for owner
+          const rbbRes = await fetch(`http://localhost:5000/api/boarding-bookings/owner/${currentUser.email}`);
+          if (rbbRes.ok) {
+            const rbbData = await rbbRes.json();
+            setReceivedBoardingBookings(Array.isArray(rbbData.data) ? rbbData.data : []);
           }
         }
 
@@ -432,6 +449,41 @@ function Dashboard() {
     }
   };
 
+  const handleCancelBoardingBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this boarding booking?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/boarding-bookings/${bookingId}/cancel`, {
+        method: 'PATCH'
+      });
+      if (res.ok) {
+        setBoardingBookings(prev => prev.map(b => b._id === bookingId ? { ...b, status: 'Cancelled' } : b));
+        toast.success('Boarding booking cancelled');
+      } else {
+        toast.error('Failed to cancel booking');
+      }
+    } catch (e) {
+      toast.error('Network error');
+    }
+  };
+
+  const handleUpdateBoardingBookingStatus = async (bookingId, newStatus) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/boarding-bookings/${bookingId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        setReceivedBoardingBookings(prev => prev.map(b => b._id === bookingId ? { ...b, status: newStatus } : b));
+        toast.success(`Booking ${newStatus.toLowerCase()}!`);
+      } else {
+        toast.error('Failed to update status');
+      }
+    } catch (e) {
+      toast.error('Network error');
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'students':
@@ -449,7 +501,20 @@ function Dashboard() {
       case 'areas':
         return <AreasTab areas={areas} selectedAreaId={selectedAreaId} setSelectedAreaId={setSelectedAreaId} isAddingArea={isAddingArea} setIsAddingArea={setIsAddingArea} newAreaLabel={newAreaLabel} setNewAreaLabel={setNewAreaLabel} newAreaId={newAreaId} setNewAreaId={setNewAreaId} setAreas={setAreas} toast={toast} />;
       case 'bookings':
-        return <BookingsTab myBookings={myBookings} formatDate={formatDate} currentUser={currentUser} onCancelBooking={handleCancelBooking} />;
+        return <BookingsTab 
+          myBookings={myBookings} 
+          boardingBookings={boardingBookings}
+          formatDate={formatDate} 
+          currentUser={currentUser} 
+          onCancelBooking={handleCancelBooking} 
+          onCancelBoardingBooking={handleCancelBoardingBooking}
+        />;
+      case 'received-bookings':
+        return <ReceivedBoardingBookings 
+          bookings={receivedBoardingBookings} 
+          onUpdateStatus={handleUpdateBoardingBookingStatus}
+          formatDate={formatDate}
+        />;
       case 'marketplace':
         return <MarketplaceTab marketplaceItems={marketplaceItems} onDeleteItem={handleDeleteMarketplaceItem} onUpdateItem={handleUpdateMarketplaceItem} formatDate={formatDate} />;
       case 'saved-items':
@@ -582,6 +647,16 @@ function Dashboard() {
                   <span className="nav-icon">🛒</span> Marketplace
                 </button>
               </>
+            )}
+
+            {/* Property Owner Bookings (Show if admin or if they have received bookings) */}
+            {(currentUser.role === 'admin' || receivedBoardingBookings.length > 0) && (
+              <button 
+                className={`dashboard-nav__btn ${activeTab === 'received-bookings' ? 'active' : ''}`}
+                onClick={() => setActiveTab('received-bookings')}
+              >
+                <span className="nav-icon">📩</span> Property Bookings
+              </button>
             )}
           </nav>
         </aside>

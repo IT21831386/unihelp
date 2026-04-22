@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { QRCodeCanvas } from '../../../node_modules/qrcode.react/lib/esm/index.js';
 
-function BookingsTab({ myBookings, currentUser, formatDate, onCancelBooking }) {
+function BookingsTab({ myBookings, boardingBookings = [], currentUser, formatDate, onCancelBooking, onCancelBoardingBooking }) {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterArea, setFilterArea] = useState('all');
   const [sort, setSort] = useState('newest');
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [selectedBoardingBooking, setSelectedBoardingBooking] = useState(null);
 
+  // Seat Bookings Logic
   let displayBookings = [...myBookings];
-
-  // Filter by Status
   if (filterStatus !== 'all') {
     displayBookings = displayBookings.filter(b => {
       const bookingEnd = new Date(`${b.date}T${b.endTime || '23:59'}`);
@@ -21,16 +21,21 @@ function BookingsTab({ myBookings, currentUser, formatDate, onCancelBooking }) {
       return true;
     });
   }
+  if (filterArea !== 'all') displayBookings = displayBookings.filter(b => b.area === filterArea);
+  if (sort === 'oldest') displayBookings.reverse();
 
-  // Filter by Area
-  if (filterArea !== 'all') {
-    displayBookings = displayBookings.filter(b => b.area === filterArea);
+  // Boarding Bookings Logic
+  let displayBoardingBookings = [...boardingBookings];
+  if (filterStatus !== 'all') {
+    displayBoardingBookings = displayBoardingBookings.filter(b => {
+      const statusLower = b.status.toLowerCase();
+      if (filterStatus === 'active') return statusLower === 'pending' || statusLower === 'confirmed';
+      if (filterStatus === 'completed') return statusLower === 'completed';
+      if (filterStatus === 'cancelled') return statusLower === 'cancelled';
+      return true;
+    });
   }
-
-  // Apply Sort
-  if (sort === 'oldest') {
-    displayBookings.reverse();
-  }
+  if (sort === 'oldest') displayBoardingBookings.reverse();
 
   const uniqueAreas = [...new Set(myBookings.map(b => b.area))];
 
@@ -43,99 +48,170 @@ function BookingsTab({ myBookings, currentUser, formatDate, onCancelBooking }) {
   };
 
   return (
-    <div className="dashboard-card">
-      <div className="dashboard-card__header">
-        <h2>My Booked Seats</h2>
-        <span className="dashboard-badge">{displayBookings.length} Total</span>
+    <div className="bookings-tab-container">
+      {/* ── Section 1: Boarding Place Bookings ── */}
+      <div className="dashboard-card mb-5">
+        <div className="dashboard-card__header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.5rem' }}>🏠</span>
+            <h2 style={{ margin: 0 }}>Boarding Place Bookings</h2>
+          </div>
+          <span className="dashboard-badge">{displayBoardingBookings.length} Total</span>
+        </div>
+        
+        <div className="table-responsive">
+          <table className="dashboard-table">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Booking Date</th>
+                <th>City</th>
+                <th>Owner</th>
+                <th>Status</th>
+                <th className="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayBoardingBookings.length === 0 ? (
+                <tr><td colSpan="6" className="empty-row">No boarding place bookings found</td></tr>
+              ) : (
+                displayBoardingBookings.map(bb => {
+                  const boarding = bb.boarding || {};
+                  const statusClass = bb.status === 'Confirmed' ? 'badge-available' : 
+                                     bb.status === 'Cancelled' ? 'badge-full' : 'badge-other';
+                  
+                  return (
+                    <tr key={bb._id}>
+                      <td>
+                        <div style={{ fontWeight: '700' }}>{boarding.title || 'Unknown Property'}</div>
+                        <div style={{ fontSize: '11px', color: '#64748b' }}>{boarding.propertyType}</div>
+                      </td>
+                      <td>{formatDate(bb.bookingDate || bb.createdAt)}</td>
+                      <td>{boarding.city}</td>
+                      <td>{boarding.ownerName}</td>
+                      <td>
+                        <div className={`status-badge-premium ${statusClass}`} style={{ fontSize: '11px', padding: '4px 10px' }}>
+                          <span className="dot-indicator"></span>
+                          {bb.status}
+                        </div>
+                      </td>
+                      <td className="text-end">
+                        {bb.status !== 'Cancelled' && bb.status !== 'Completed' ? (
+                          <button 
+                            onClick={() => onCancelBoardingBooking(bb._id)}
+                            className="btn btn-outline-danger btn-sm rounded-pill px-3"
+                            style={{ fontSize: '11px', fontWeight: '700' }}
+                          >
+                            Cancel
+                          </button>
+                        ) : (
+                          <span style={{ fontSize: '11px', color: '#94a3b8' }}>Processed</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div style={{ padding: '15px', background: '#f6f8fa', borderBottom: '1px solid #e1e4e8', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1, minWidth: '150px' }}>
-          <option value="all">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <select value={filterArea} onChange={e => setFilterArea(e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1, minWidth: '150px', textTransform: 'capitalize' }}>
-          <option value="all">All Areas</option>
-          {uniqueAreas.map(area => <option key={area} value={area}>{area}</option>)}
-        </select>
-        <select value={sort} onChange={e => setSort(e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5da', borderRadius: '4px', flex: 1, minWidth: '150px' }}>
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-        </select>
-      </div>
-      <div className="table-responsive">
-        <table className="dashboard-table">
-          <thead>
-            <tr>
-              <th style={{ width: '40px' }}>QR Code</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th style={{ minWidth: '160px' }}>Area ID</th>
-              <th>Seats</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayBookings.length === 0 ? (
-              <tr><td colSpan="7" className="empty-row">No bookings found matching your filters</td></tr>
-            ) : (
-              displayBookings.map(booking => {
-                const bookingEnd = new Date(`${booking.date}T${booking.endTime || '23:59'}`);
-                const isExpired = bookingEnd < new Date();
-                const isCancelled = booking.status === 'cancelled';
 
-                const getStatusLabel = () => {
-                  if (isCancelled) return 'Cancelled';
-                  if (isExpired) return 'Completed';
-                  return 'Active';
-                };
-                const getStatusStyle = () => {
-                  if (isCancelled) return { background: '#f8d7da', color: '#721c24' };
-                  if (isExpired) return { background: '#e2e3e5', color: '#383d41' };
-                  return { background: '#d4edda', color: '#155724' };
-                };
+      {/* ── Section 2: Booked Seats ── */}
+      <div className="dashboard-card">
+        <div className="dashboard-card__header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.5rem' }}>🪑</span>
+            <h2 style={{ margin: 0 }}>Booked Seats (Study Areas)</h2>
+          </div>
+          <span className="dashboard-badge">{displayBookings.length} Total</span>
+        </div>
 
-                return (
-                  <tr key={booking._id} style={isCancelled ? { opacity: 0.65 } : {}}>
-                    <td style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setSelectedBooking({ ...booking, isExpired, isCancelled, to12h, getStatusLabel })} title="View QR">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
-                        <rect x="14" y="14" width="3" height="3" />
-                        <line x1="21" y1="14" x2="21" y2="21" />
-                        <line x1="14" y1="21" x2="21" y2="21" />
-                      </svg>
-                    </td>
-                    <td><strong>{formatDate(booking.date)}</strong></td>
-                    <td>{to12h(booking.time)}{booking.endTime ? ` - ${to12h(booking.endTime)}` : ''}</td>
-                    <td><span className="level-tag" style={{textTransform: 'capitalize'}}>{booking.area}</span></td>
-                    <td>{booking.seats.join(', ')}</td>
-                    <td>
-                      <span className="role-tag" style={getStatusStyle()}>
-                        {getStatusLabel()}
-                      </span>
-                    </td>
-                    <td>
-                      {!isCancelled && !isExpired ? (
-                        <button
-                          onClick={() => onCancelBooking(booking._id)}
-                          style={{ padding: '5px 12px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
-                        >
-                          Cancel
-                        </button>
-                      ) : (
-                        <span style={{ color: '#999', fontSize: '12px' }}>—</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+        <div style={{ padding: '15px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '13px', fontWeight: 500 }}>
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <select value={filterArea} onChange={e => setFilterArea(e.target.value)} style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '13px', fontWeight: 500, textTransform: 'capitalize' }}>
+            <option value="all">All Areas</option>
+            {uniqueAreas.map(area => <option key={area} value={area}>{area}</option>)}
+          </select>
+          <select value={sort} onChange={e => setSort(e.target.value)} style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '13px', fontWeight: 500 }}>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+
+        <div className="table-responsive">
+          <table className="dashboard-table">
+            <thead>
+              <tr>
+                <th style={{ width: '40px' }}>QR</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Area</th>
+                <th>Seats</th>
+                <th>Status</th>
+                <th className="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayBookings.length === 0 ? (
+                <tr><td colSpan="7" className="empty-row">No seat bookings found</td></tr>
+              ) : (
+                displayBookings.map(booking => {
+                  const bookingEnd = new Date(`${booking.date}T${booking.endTime || '23:59'}`);
+                  const isExpired = bookingEnd < new Date();
+                  const isCancelled = booking.status === 'cancelled';
+
+                  const getStatusLabel = () => {
+                    if (isCancelled) return 'Cancelled';
+                    if (isExpired) return 'Completed';
+                    return 'Active';
+                  };
+                  const getStatusStyle = () => {
+                    if (isCancelled) return { background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' };
+                    if (isExpired) return { background: 'rgba(100, 116, 139, 0.1)', color: '#64748b' };
+                    return { background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' };
+                  };
+
+                  return (
+                    <tr key={booking._id} style={isCancelled ? { opacity: 0.65 } : {}}>
+                      <td style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setSelectedBooking({ ...booking, isExpired, isCancelled, to12h, getStatusLabel })} title="View QR">
+                        <i className="bi bi-qr-code" style={{ fontSize: '1.2rem', color: '#5938B6' }}></i>
+                      </td>
+                      <td><strong>{formatDate(booking.date)}</strong></td>
+                      <td>{to12h(booking.time)}{booking.endTime ? ` - ${to12h(booking.endTime)}` : ''}</td>
+                      <td><span className="level-tag" style={{textTransform: 'capitalize'}}>{booking.area}</span></td>
+                      <td>{booking.seats.join(', ')}</td>
+                      <td>
+                        <span className="status-badge-premium" style={{ ...getStatusStyle(), fontSize: '10px' }}>
+                          <span className="dot-indicator"></span>
+                          {getStatusLabel()}
+                        </span>
+                      </td>
+                      <td className="text-end">
+                        {!isCancelled && !isExpired ? (
+                          <button
+                            onClick={() => onCancelBooking(booking._id)}
+                            className="btn btn-outline-danger btn-sm rounded-pill px-3"
+                            style={{ fontSize: '11px', fontWeight: '700' }}
+                          >
+                            Cancel
+                          </button>
+                        ) : (
+                          <span style={{ color: '#94a3b8', fontSize: '11px' }}>—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {selectedBooking && (
@@ -181,3 +257,4 @@ function BookingsTab({ myBookings, currentUser, formatDate, onCancelBooking }) {
 }
 
 export default BookingsTab;
+

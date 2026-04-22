@@ -536,3 +536,36 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Filter Bar Styles ── */
+.dashboard-filter-bar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(5px);
+}
+
+.filter-input-search:focus {
+  border-color: #5938B6 !important;
+  box-shadow: 0 0 0 3px rgba(89, 56, 182, 0.1);
+  background: white;
+}
+
+.dashboard-filter-bar select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  appearance: none;
+  padding-right: 35px !important;
+  transition: all 0.2s;
+}
+
+.dashboard-filter-bar select:hover {
+  border-color: #5938B6;
+}
+
+.dashboard-filter-bar select:focus {
+  outline: none;
+  border-color: #5938B6;
+  box-shadow: 0 0 0 3px rgba(89, 56, 182, 0.1);
+}

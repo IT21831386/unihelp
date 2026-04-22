@@ -31,6 +31,48 @@ const BoardingDetails = () => {
     }
   };
 
+  const handleBookBoarding = async () => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      toast.error('Please login to book a boarding place');
+      return;
+    }
+
+    const user = JSON.parse(userStr);
+    const userId = user.id || user._id || user.userId;
+    
+    if (!userId) {
+      toast.error('User ID not found. Please log out and log back in.');
+      return;
+    }
+
+    if (user.role !== 'user') {
+      toast.error('Only students can book boarding places');
+      return;
+    }
+
+    const confirmBooking = window.confirm(`Confirm booking request for "${boarding.title}"?`);
+    if (!confirmBooking) return;
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/boarding-bookings', {
+        boardingId: boarding._id || boarding.id,
+        userId: userId,
+        message: `Initial booking request for ${boarding.title}`
+      });
+
+      if (response.data.success) {
+        toast.success('Booking request sent successfully!');
+      } else {
+        toast.error(response.data.message || 'Failed to send booking request');
+      }
+    } catch (error) {
+      console.error('Booking Error Details:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Error processing booking';
+      toast.error(`Error: ${errorMsg}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
@@ -148,6 +190,16 @@ const BoardingDetails = () => {
               </span>
             </div>
             <span className="bd-price-block__note">per month</span>
+            
+            {boarding.availabilityStatus === 'Available' && (
+              <button 
+                onClick={handleBookBoarding}
+                className="btn btn-primary w-100 mt-3 rounded-pill fw-bold py-2 shadow-sm"
+                style={{ background: 'linear-gradient(135deg, #5938B6, #ec4899)', border: 'none' }}
+              >
+                <i className="bi bi-bookmark-plus-fill me-2"></i>Book Now
+              </button>
+            )}
           </div>
         </div>
 

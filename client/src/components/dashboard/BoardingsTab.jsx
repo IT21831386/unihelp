@@ -1,7 +1,38 @@
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, Edit3 } from 'lucide-react';
+import { Trash2, Edit3, Search, Filter, X } from 'lucide-react';
 
 function BoardingsTab({ boardings, navigate, handleDeleteBoarding, deletingIds }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+
+  // Extract unique property types for the filter dropdown
+  const propertyTypes = useMemo(() => {
+    const types = boardings.map(b => b.propertyType).filter(Boolean);
+    return [...new Set(types)];
+  }, [boardings]);
+
+  // Filter logic
+  const filteredBoardings = useMemo(() => {
+    return boardings.filter(boarding => {
+      const matchesSearch = 
+        boarding.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        boarding.city.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter ? boarding.availabilityStatus === statusFilter : true;
+      const matchesType = typeFilter ? boarding.propertyType === typeFilter : true;
+
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  }, [boardings, searchTerm, statusFilter, typeFilter]);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('');
+    setTypeFilter('');
+  };
+
   return (
     <div className="dashboard-card premium-table-card border-0">
       <div className="dashboard-card__header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
@@ -17,12 +48,89 @@ function BoardingsTab({ boardings, navigate, handleDeleteBoarding, deletingIds }
             <span className="dashboard-badge" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
               {boardings.filter(b => b.availabilityStatus === 'Available').length} Available
             </span>
+            {filteredBoardings.length !== boardings.length && (
+              <span className="dashboard-badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                {filteredBoardings.length} Matched
+              </span>
+            )}
           </div>
         </div>
         <Link to="/admin/addboarding" className="btn-premium-add-new">
           Add New Boarding
         </Link>
       </div>
+
+      {/* Filter Options Bar */}
+      <div className="dashboard-filter-bar" style={{ padding: '20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: '1 1 300px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+          <input
+            type="text"
+            placeholder="Search by property name or city..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            style={{ 
+              width: '100%', 
+              padding: '10px 10px 10px 40px', 
+              border: '1px solid #cbd5e1', 
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 500,
+              outline: 'none',
+              transition: 'all 0.2s'
+            }}
+            className="filter-input-search"
+          />
+        </div>
+        
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Filter size={16} color="#64748b" />
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', fontWeight: 500, minWidth: '130px' }}
+            >
+              <option value="">All Statuses</option>
+              <option value="Available">Available</option>
+              <option value="Full">Full</option>
+            </select>
+          </div>
+
+          <select
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}
+            style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', fontWeight: 500, minWidth: '150px' }}
+          >
+            <option value="">All Property Types</option>
+            {propertyTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+
+          {(searchTerm || statusFilter || typeFilter) && (
+            <button 
+              onClick={clearFilters}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '5px', 
+                padding: '10px 15px', 
+                background: '#fee2e2', 
+                color: '#ef4444', 
+                border: 'none', 
+                borderRadius: '8px', 
+                fontSize: '13px', 
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <X size={16} /> Clear
+            </button>
+          )}
+        </div>
+      </div>
+
       <div className="table-responsive">
         <table className="dashboard-table">
           <thead>
@@ -35,10 +143,19 @@ function BoardingsTab({ boardings, navigate, handleDeleteBoarding, deletingIds }
             </tr>
           </thead>
           <tbody>
-            {boardings.length === 0 ? (
-              <tr><td colSpan="5" className="empty-row">No boarding places found</td></tr>
+            {filteredBoardings.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="empty-row" style={{ padding: '60px 0', textAlign: 'center' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#64748b' }}>
+                    No boarding places match your current filters
+                  </div>
+                  <button onClick={clearFilters} style={{ marginTop: '10px', color: '#5938B6', fontWeight: 700, background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>
+                    Reset all filters
+                  </button>
+                </td>
+              </tr>
             ) : (
-              boardings.map((boarding) => {
+              filteredBoardings.map((boarding) => {
                 const id = boarding._id || boarding.id;
                 const displayImage = boarding.imageUrls?.[0] || 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?q=80&w=2070&auto=format&fit=crop';
                 const statusClass = boarding.availabilityStatus === 'Available' ? 'badge-available' : 

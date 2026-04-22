@@ -18,6 +18,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const jobApplicationRoutes = require('./routes/jobApplicationRoutes');
 const marketplaceRoutes = require('./routes/marketplaceRoute');
 const conversationRoutes = require('./routes/conversationRoute');
+const boardingBookingRoutes = require('./routes/boardingBookingRoutes');
 const path = require('path');
 
 // Middleware
@@ -35,6 +36,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/job-applications', jobApplicationRoutes);
 app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/conversations', conversationRoutes);
+app.use('/api/boarding-bookings', boardingBookingRoutes);
 
 // Expose uploads directory to frontend
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
