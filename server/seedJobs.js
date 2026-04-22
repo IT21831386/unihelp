@@ -12,6 +12,7 @@ const jobs = [
     salary: 120000,
     description: 'Build responsive user interfaces using React.js and modern CSS frameworks. Collaborate with UX designers to implement pixel-perfect designs and optimize web application performance.',
     contactEmail: 'careers@codegen.lk',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Backend Developer',
@@ -22,6 +23,7 @@ const jobs = [
     salary: 250000,
     description: 'Design and develop scalable RESTful APIs using Node.js and Express. Work with MongoDB and PostgreSQL databases to build robust backend systems for enterprise clients.',
     contactEmail: 'jobs@virtusa.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Full Stack Developer',
@@ -32,6 +34,7 @@ const jobs = [
     salary: 300000,
     description: 'Develop end-to-end web applications using the MERN stack. Participate in agile sprints, code reviews, and contribute to architectural decisions for cloud-native applications.',
     contactEmail: 'talent@syscolabs.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Software Engineering Intern',
@@ -42,6 +45,7 @@ const jobs = [
     salary: 50000,
     description: 'Join our engineering team to gain hands-on experience in open-source software development. Work on identity and access management products using Java and React technologies.',
     contactEmail: 'internships@wso2.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'DevOps Engineer',
@@ -52,6 +56,7 @@ const jobs = [
     salary: 350000,
     description: 'Manage CI/CD pipelines, containerized deployments using Docker and Kubernetes. Automate infrastructure provisioning with Terraform and monitor system health using Prometheus and Grafana.',
     contactEmail: 'devops@ifs.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'QA Automation Engineer',
@@ -62,6 +67,7 @@ const jobs = [
     salary: 130000,
     description: 'Write and maintain automated test suites using Selenium and Cypress. Perform regression testing, API testing, and collaborate with developers to ensure software quality standards.',
     contactEmail: 'qa@99x.io',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Mobile App Developer',
@@ -72,6 +78,7 @@ const jobs = [
     salary: 280000,
     description: 'Develop cross-platform mobile applications using React Native and Flutter. Integrate REST APIs, push notifications, and implement offline-first architectures for mobile apps.',
     contactEmail: 'mobile@rootcodelabs.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Data Engineer',
@@ -82,6 +89,7 @@ const jobs = [
     salary: 400000,
     description: 'Design and build data pipelines using Apache Spark and Airflow. Create ETL processes, manage data warehouses, and work with big data technologies to support analytics teams.',
     contactEmail: 'data@calcey.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'UI/UX Designer',
@@ -92,6 +100,7 @@ const jobs = [
     salary: 100000,
     description: 'Create wireframes, prototypes, and high-fidelity mockups using Figma and Adobe XD. Conduct user research, usability testing, and design intuitive interfaces for web and mobile apps.',
     contactEmail: 'design@elegantmedia.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Cloud Solutions Architect',
@@ -102,6 +111,7 @@ const jobs = [
     salary: 500000,
     description: 'Architect cloud-native solutions on AWS and Azure. Lead migration projects, design microservices architectures, and mentor engineering teams on cloud best practices and security.',
     contactEmail: 'cloud@pearson.lk',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Machine Learning Engineer',
@@ -112,6 +122,7 @@ const jobs = [
     salary: 350000,
     description: 'Develop and deploy machine learning models for recommendation systems and computer vision. Work with TensorFlow, PyTorch, and implement MLOps pipelines for production environments.',
     contactEmail: 'ml@zone24x7.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Cybersecurity Analyst',
@@ -122,6 +133,7 @@ const jobs = [
     salary: 150000,
     description: 'Monitor and respond to security incidents, conduct vulnerability assessments, and implement security measures. Analyze threat intelligence and prepare security audit reports.',
     contactEmail: 'security@slcert.gov.lk',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'React Native Developer',
@@ -132,6 +144,7 @@ const jobs = [
     salary: 270000,
     description: 'Build high-performance mobile applications using React Native. Implement complex animations, integrate native modules, and optimize app performance for iOS and Android platforms.',
     contactEmail: 'careers@arimac.digital',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Python Developer',
@@ -142,6 +155,7 @@ const jobs = [
     salary: 160000,
     description: 'Develop backend services and automation scripts using Python and Django. Work on fintech solutions, integrate payment gateways, and write clean, testable, and maintainable code.',
     contactEmail: 'python@intellectdesign.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Database Administrator',
@@ -152,6 +166,7 @@ const jobs = [
     salary: 280000,
     description: 'Manage and optimize MySQL, PostgreSQL, and MongoDB databases. Perform backup and recovery operations, query optimization, and ensure database security and high availability.',
     contactEmail: 'dba@dialog.lk',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Technical Lead',
@@ -162,6 +177,7 @@ const jobs = [
     salary: 450000,
     description: 'Lead a team of 8 developers building SaaS products. Drive technical architecture decisions, conduct code reviews, mentor junior developers, and ensure delivery of high-quality software.',
     contactEmail: 'lead@wavenet.lk',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'WordPress Developer',
@@ -172,6 +188,7 @@ const jobs = [
     salary: 80000,
     description: 'Build custom WordPress themes and plugins for client websites. Implement responsive designs, optimize page speed, and manage hosting and deployment of WordPress sites.',
     contactEmail: 'wp@developerstarter.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Systems Engineer',
@@ -182,6 +199,7 @@ const jobs = [
     salary: 300000,
     description: 'Design and maintain IT infrastructure including servers, networks, and storage systems. Implement monitoring solutions, manage Linux/Windows environments, and ensure 99.9% uptime.',
     contactEmail: 'syseng@millenniumitesp.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Angular Developer',
@@ -192,6 +210,7 @@ const jobs = [
     salary: 110000,
     description: 'Develop enterprise web applications using Angular and TypeScript. Implement state management with NgRx, write unit tests, and integrate RESTful APIs for business applications.',
     contactEmail: 'angular@emblasoftware.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Site Reliability Engineer',
@@ -202,6 +221,7 @@ const jobs = [
     salary: 420000,
     description: 'Ensure reliability and scalability of distributed systems. Build observability platforms, manage incident response, and automate toil using Go and Python scripting.',
     contactEmail: 'sre@axiatadigitallabs.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Java Developer',
@@ -212,6 +232,7 @@ const jobs = [
     salary: 260000,
     description: 'Develop enterprise Java applications using Spring Boot and Hibernate. Build microservices, implement message queues with Kafka, and deploy applications on cloud infrastructure.',
     contactEmail: 'java@virtusa.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'IT Support Engineer',
@@ -222,6 +243,7 @@ const jobs = [
     salary: 75000,
     description: 'Provide technical support to faculty, staff, and students. Troubleshoot hardware and software issues, manage network configurations, and maintain IT lab equipment and systems.',
     contactEmail: 'it-support@sliit.lk',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Blockchain Developer',
@@ -232,6 +254,7 @@ const jobs = [
     salary: 550000,
     description: 'Develop smart contracts using Solidity and deploy on Ethereum and Polygon networks. Build decentralized applications with Web3.js and implement token standards and DeFi protocols.',
     contactEmail: 'blockchain@tradefinex.org',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'API Integration Specialist',
@@ -242,6 +265,7 @@ const jobs = [
     salary: 230000,
     description: 'Design and implement third-party API integrations for enterprise clients. Work with REST, GraphQL, and webhook architectures. Document API specifications using OpenAPI/Swagger.',
     contactEmail: 'api@creativesoftware.com',
+    postedByEmail: 'employer@example.com',
   },
   {
     title: 'Game Developer Intern',
@@ -252,13 +276,14 @@ const jobs = [
     salary: 45000,
     description: 'Assist in developing educational games using Unity 3D and C#. Create 2D/3D game assets, implement game mechanics, and test gameplay on multiple platforms including web and mobile.',
     contactEmail: 'games@bhashalanka.com',
+    postedByEmail: 'employer@example.com',
   },
 ];
 
 async function seed() {
   try {
     await mongoose.connect(
-      process.env.MONGO_URI || 'mongodb://localhost:27017/unihelp'
+      process.env.MONGO_URI || 'mongodb+srv://db_user:tharaka123@cluster0.xhawcbe.mongodb.net/unihelp?retryWrites=true&w=majority'
     );
     console.log('Connected to MongoDB');
 

@@ -149,7 +149,17 @@ function FindJobs() {
   };
 
   return (
-    <>
+    <div className="find-jobs-page-bg">
+      {/* Aurora glow layer */}
+      <div className="fj-bg-aurora" aria-hidden="true">
+        <div className="fj-aurora-blob fj-aurora-blob-1" />
+        <div className="fj-aurora-blob fj-aurora-blob-2" />
+        <div className="fj-aurora-blob fj-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="fj-bg-grain" aria-hidden="true" />
+
       <Navbar />
 
       <div className="container">
@@ -330,7 +340,7 @@ function FindJobs() {
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 }
 
