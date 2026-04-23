@@ -1,31 +1,38 @@
 /* ===== Apply Job Page ===== */
 
-.apply-job-page {
+.apply-job-page-bg {
   position: relative;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: transparent;
   overflow-x: hidden;
 }
 
-.apply-job-page::before {
+.apply-job-page-bg::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -3;
-  background: url('https://images.unsplash.com/photo-1454165833767-027ff33027b6?q=80&w=2070&auto=format&fit=crop') center / cover no-repeat;
+  background: url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2072&auto=format&fit=crop') center / cover no-repeat;
+  filter: brightness(1.05) saturate(1.1);
+  animation: ajBgCrossfade 20s infinite alternate;
 }
 
-.apply-job-page::after {
+.apply-job-page-bg::after {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   background: linear-gradient(
     135deg,
-    rgba(240, 243, 255, 0.65) 0%,
-    rgba(255, 255, 255, 0.60) 100%
+    rgba(243, 240, 251, 0.55) 0%,
+    rgba(255, 255, 255, 0.45) 100%
   );
+}
+
+@keyframes ajBgCrossfade {
+  0% { background-image: url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2072&auto=format&fit=crop'); }
+  50% { background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop'); }
+  100% { background-image: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop'); }
 }
 
 .aj-bg-aurora {
@@ -39,34 +46,37 @@
 .aj-aurora-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  animation: ajFloat 10s infinite alternate ease-in-out;
+  filter: blur(100px);
+  animation: ajFloat 15s infinite alternate ease-in-out;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  z-index: -1;
 }
 
 .aj-aurora-blob-1 {
-  width: 500px; height: 500px;
-  background: rgba(59, 130, 246, 0.18);
-  top: -140px; left: -100px;
+  width: 600px; height: 600px;
+  background: rgba(89, 56, 182, 0.2);
+  top: -200px; left: -150px;
 }
 
 .aj-aurora-blob-2 {
-  width: 400px; height: 400px;
-  background: rgba(16, 185, 129, 0.15);
-  bottom: -100px; right: -50px;
-  animation-delay: -5s;
+  width: 500px; height: 500px;
+  background: rgba(236, 72, 153, 0.18);
+  bottom: -150px; right: -100px;
+  animation-delay: -7s;
 }
 
 .aj-aurora-blob-3 {
-  width: 280px; height: 280px;
-  background: rgba(139, 92, 246, 0.12);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: -2s;
+  width: 400px; height: 400px;
+  background: rgba(245, 158, 11, 0.15);
+  top: 40%; left: 60%;
+  animation-delay: -3s;
 }
 
 @keyframes ajFloat {
-  0%   { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-35px) scale(1.1); }
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(30px, 50px) scale(1.1); }
+  100% { transform: translate(-20px, 20px) scale(0.9); }
 }
 
 .aj-bg-grain {
@@ -84,8 +94,6 @@
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
-  position: relative;
-  z-index: 1;
 }
 
 .apply-job-header {
@@ -135,10 +143,12 @@
 
 /* Form Wrapper & Box */
 .apply-form-wrapper {
-  background: var(--color-white);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: var(--shadow-lg);
   padding: var(--spacing-3xl);
   position: relative;
 }

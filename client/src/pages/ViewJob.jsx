@@ -65,21 +65,10 @@ function ViewJob() {
     return (
       <>
         <Navbar />
-      
-      {/* Aurora glow layer */}
-      <div className="vj-bg-aurora" aria-hidden="true">
-        <div className="vj-aurora-blob vj-aurora-blob-1" />
-        <div className="vj-aurora-blob vj-aurora-blob-2" />
-        <div className="vj-aurora-blob vj-aurora-blob-3" />
-      </div>
-
-      {/* Film grain layer */}
-      <div className="vj-bg-grain" aria-hidden="true" />
-
-      <main className="view-job-loading container">
+        <div className="view-job-loading">
           <div className="view-job-spinner" />
           <p>Loading job details...</p>
-        </main>
+        </div>
         <Footer />
       </>
     );
@@ -104,21 +93,20 @@ function ViewJob() {
   }
 
   return (
-    <>
+    <div className="view-job-page-bg">
+      {/* Aurora glow layer */}
+      <div className="vj-bg-aurora" aria-hidden="true">
+        <div className="vj-aurora-blob vj-aurora-blob-1" />
+        <div className="vj-aurora-blob vj-aurora-blob-2" />
+        <div className="vj-aurora-blob vj-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="vj-bg-grain" aria-hidden="true" />
+
       <Navbar />
 
-      <div className="view-job-page-bg">
-        {/* Aurora glow layer */}
-        <div className="vj-bg-aurora" aria-hidden="true">
-          <div className="vj-aurora-blob vj-aurora-blob-1" />
-          <div className="vj-aurora-blob vj-aurora-blob-2" />
-          <div className="vj-aurora-blob vj-aurora-blob-3" />
-        </div>
-
-        {/* Film grain layer */}
-        <div className="vj-bg-grain" aria-hidden="true" />
-
-        <div className="container view-job-container">
+      <div className="container view-job-container">
         {/* Breadcrumb */}
         <nav className="view-job-breadcrumb">
           <Link to="/careers">Job opportunities</Link>
@@ -201,10 +189,9 @@ function ViewJob() {
           </aside>
         </div>
       </div>
-    </div>
 
-    <Footer />
-  </>
+      <Footer />
+    </div>
   );
 }
 

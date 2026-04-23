@@ -164,7 +164,13 @@ function ApplyJob() {
 
   if (fetchingJob) {
     return (
-      <div className="apply-job-page">
+      <div className="apply-job-page-bg">
+        <div className="aj-bg-aurora" aria-hidden="true">
+          <div className="aj-aurora-blob aj-aurora-blob-1" />
+          <div className="aj-aurora-blob aj-aurora-blob-2" />
+          <div className="aj-aurora-blob aj-aurora-blob-3" />
+        </div>
+        <div className="aj-bg-grain" aria-hidden="true" />
         <Navbar />
         <div className="apply-loading-container">
           <div className="apply-spinner"></div>
@@ -176,7 +182,17 @@ function ApplyJob() {
   }
 
   return (
-    <div className="apply-job-page">
+    <div className="apply-job-page-bg">
+      {/* Aurora glow layer */}
+      <div className="aj-bg-aurora" aria-hidden="true">
+        <div className="aj-aurora-blob aj-aurora-blob-1" />
+        <div className="aj-aurora-blob aj-aurora-blob-2" />
+        <div className="aj-aurora-blob aj-aurora-blob-3" />
+      </div>
+
+      {/* Film grain layer */}
+      <div className="aj-bg-grain" aria-hidden="true" />
+
       <Navbar />
       
       <div className="aj-bg-aurora" aria-hidden="true">
