@@ -3,24 +3,30 @@ import { Link } from 'react-router-dom';
 import NoticeHero from '../../components/notices/NoticeHero';
 import CategoryCards from '../../components/notices/CategoryCards';
 import { Lock } from 'lucide-react';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
 
 const NoticesPage = () => {
   return (
     <div className="notices-page-wrapper">
-      <NoticeHero />
-      <div className="container">
-        <CategoryCards />
-        
-        <div className="admin-access-section">
-          <div className="admin-badge-container">
-            <span className="management-label">System Management</span>
-            <Link to="/dashboard" className="btn-admin-access">
-              <Lock size={16} />
-              Admin Dashboard
-            </Link>
+      <Navbar />
+      <div className="notices-content-push">
+        <NoticeHero />
+        <div className="container">
+          <CategoryCards />
+          
+          <div className="admin-access-section">
+            <div className="admin-badge-container">
+              <span className="management-label">System Management</span>
+              <Link to="/dashboard" className="btn-admin-access">
+                <Lock size={16} />
+                Admin Dashboard
+              </Link>
+            </div>
           </div>
         </div>
       </div>
+      <Footer />
       <style>{`
         .notices-page-wrapper {
           min-height: 100vh;
