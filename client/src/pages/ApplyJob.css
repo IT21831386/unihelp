@@ -1,10 +1,81 @@
 /* ===== Apply Job Page ===== */
 
 .apply-job-page {
-  background-color: var(--color-bg);
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+}
+
+.apply-job-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background: url('https://images.unsplash.com/photo-1454165833767-027ff33027b6?q=80&w=2070&auto=format&fit=crop') center / cover no-repeat;
+}
+
+.apply-job-page::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(240, 243, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.60) 100%
+  );
+}
+
+.aj-bg-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.aj-aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  animation: ajFloat 10s infinite alternate ease-in-out;
+}
+
+.aj-aurora-blob-1 {
+  width: 500px; height: 500px;
+  background: rgba(59, 130, 246, 0.18);
+  top: -140px; left: -100px;
+}
+
+.aj-aurora-blob-2 {
+  width: 400px; height: 400px;
+  background: rgba(16, 185, 129, 0.15);
+  bottom: -100px; right: -50px;
+  animation-delay: -5s;
+}
+
+.aj-aurora-blob-3 {
+  width: 280px; height: 280px;
+  background: rgba(139, 92, 246, 0.12);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -2s;
+}
+
+@keyframes ajFloat {
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-35px) scale(1.1); }
+}
+
+.aj-bg-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 .apply-job-main {
@@ -13,6 +84,8 @@
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .apply-job-header {

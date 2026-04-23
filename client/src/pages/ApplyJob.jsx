@@ -179,6 +179,13 @@ function ApplyJob() {
     <div className="apply-job-page">
       <Navbar />
       
+      <div className="aj-bg-aurora" aria-hidden="true">
+        <div className="aj-aurora-blob aj-aurora-blob-1" />
+        <div className="aj-aurora-blob aj-aurora-blob-2" />
+        <div className="aj-aurora-blob aj-aurora-blob-3" />
+      </div>
+      <div className="aj-bg-grain" aria-hidden="true" />
+
       <main className="apply-job-main container">
         {job && (
           <div className="apply-job-header">

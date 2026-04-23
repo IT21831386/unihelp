@@ -1,5 +1,36 @@
 /* ===== Find Jobs Page ===== */
 
+.find-jobs-page-bg {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.find-jobs-page-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background: url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2070&auto=format&fit=crop') center / cover no-repeat;
+}
+
+.find-jobs-page-bg::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(240, 243, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.60) 100%
+  );
+}
+
+.find-jobs-page-bg .container {
+  position: relative;
+  z-index: 1;
+}
+
 /* Breadcrumb */
 .find-jobs-breadcrumb {
   padding: calc(var(--navbar-height) + var(--spacing-xl)) 0 0;
@@ -35,12 +66,14 @@
 .find-jobs-search {
   display: flex;
   align-items: center;
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-xl);
+  padding: 10px;
   margin-bottom: var(--spacing-2xl);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   gap: var(--spacing-sm);
 }
 
@@ -97,10 +130,17 @@
 
 /* Filters Sidebar */
 .find-jobs-filters {
-  flex: 0 0 240px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  flex: 0 0 260px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-xl);
   padding: var(--spacing-xl);
+  height: fit-content;
+  position: sticky;
+  top: calc(var(--navbar-height) + var(--spacing-xl));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
 }
 
 .find-jobs-filters__header {
@@ -239,13 +279,16 @@
 
 /* Individual Job Card */
 .job-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-xl);
   padding: var(--spacing-xl);
-  background: var(--color-white);
   transition: all var(--transition-base);
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .job-card:hover {
@@ -286,6 +329,10 @@
   line-height: 1.6;
   margin-bottom: var(--spacing-lg);
   flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .job-card__apply {
@@ -430,4 +477,77 @@
   .find-jobs-search__divider {
     display: none;
   }
+}
+
+/* ===== Aurora Background ===== */
+.fj-bg-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fj-aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  animation: fjFloat 10s infinite alternate ease-in-out;
+}
+
+.fj-aurora-blob-1 {
+  width: 500px; height: 500px;
+  background: rgba(59, 130, 246, 0.15);
+  top: -140px; left: -100px;
+}
+
+.fj-aurora-blob-2 {
+  width: 400px; height: 400px;
+  background: rgba(16, 185, 129, 0.12);
+  bottom: -100px; right: -50px;
+  animation-delay: -5s;
+}
+
+.fj-aurora-blob-3 {
+  width: 280px; height: 280px;
+  background: rgba(139, 92, 246, 0.1);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -2s;
+}
+
+@keyframes fjFloat {
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-30px) scale(1.05); }
+}
+
+.fj-bg-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Improve Card Glassmorphism */
+.job-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.job-card:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(89, 56, 182, 0.1);
+}
+
+.find-jobs-filters {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
