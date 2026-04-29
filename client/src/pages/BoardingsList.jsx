@@ -117,15 +117,14 @@ const BoardingsList = () => {
   });
 
   return (
-    <div className="bl-page-wrapper">
+    <div className="unihelp-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
 
-      {/* Dynamic Background System */}
-      <div className="bg-images bl-bg-images" aria-hidden="true" />
-      <div className="bg-overlay" aria-hidden="true" />
+      {/* Aurora glow layer — Layer -2 */}
       <div className="bg-aurora" aria-hidden="true">
         <div className="aurora-blob aurora-blob-1" />
         <div className="aurora-blob aurora-blob-2" />
         <div className="aurora-blob aurora-blob-3" />
+        <div className="aurora-blob aurora-blob-4" />
       </div>
 
       {/* Film grain layer — Layer -1 */}
