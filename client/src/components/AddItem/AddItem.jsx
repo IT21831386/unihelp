@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../Navbar';
+import Footer from '../Footer';
 import './AddItem.css';
 import { getCurrentUser } from '../../utils/user';
 
@@ -8,6 +10,7 @@ const STEPS = ['Item Info', 'Pricing', 'Photos', 'Contact'];
 
 function AddItem() {
   const navigate = useNavigate();
+  // ... state ...
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedCat, setSelectedCat] = useState('');
   const [selectedCond, setSelectedCond] = useState('');
@@ -124,15 +127,17 @@ function AddItem() {
   ];
 
   return (
-    <div className="ai-page">
+    <div className="ai-page-wrapper">
+      <Navbar />
+      <div className="ai-page">
 
-      {/* BREADCRUMB */}
-      <div className="ai-breadcrumb">
-        <span onClick={() => navigate('/marketplace')}>Market Place</span>
-        &nbsp;›&nbsp;
-        <span onClick={() => navigate('/marketplace/sell')}>Sell Items</span>
-        &nbsp;›&nbsp; Add New Item
-      </div>
+        {/* BREADCRUMB */}
+        <div className="ai-breadcrumb">
+          <span onClick={() => navigate('/marketplace')}>Market Place</span>
+          &nbsp;›&nbsp;
+          <span onClick={() => navigate('/marketplace/sell')}>Sell Items</span>
+          &nbsp;›&nbsp; Add New Item
+        </div>
 
       {/* HERO */}
       <div className="ai-hero">
@@ -462,7 +467,9 @@ function AddItem() {
       <div className={`ai-toast ${toastVisible ? 'ai-toast--show' : ''}`}>
         {toast}
       </div>
+      <Footer />
     </div>
+  </div>
   );
 }
 

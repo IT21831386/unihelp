@@ -102,19 +102,24 @@
 }
 
 .apply-job-header h2 {
-  font-size: var(--font-size-2xl);
-  color: var(--color-text);
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-style: italic;
   margin-bottom: var(--spacing-sm);
+  letter-spacing: -0.5px;
 }
 
 .apply-job-header span {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 .apply-job-subtitle {
   color: var(--color-text-light);
-  font-size: var(--font-size-md);
+  font-size: 15px;
   font-weight: 500;
+  opacity: 0.8;
 }
 
 /* Loading */
@@ -143,13 +148,15 @@
 
 /* Form Wrapper & Box */
 .apply-form-wrapper {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: var(--shadow-lg);
-  padding: var(--spacing-3xl);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(27, 20, 100, 0.02);
+  padding: 48px;
   position: relative;
 }
 
@@ -184,18 +191,20 @@
 .apply-form input[type="text"],
 .apply-form input[type="email"],
 .apply-form input[type="tel"] {
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
   font-family: inherit;
-  font-size: var(--font-size-md);
-  transition: all var(--transition-fast);
+  font-size: 14.5px;
+  transition: all 0.25s ease;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .apply-form input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(8, 28, 122, 0.1);
+  border-color: var(--color-accent);
+  background-color: var(--color-white);
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.08);
 }
 
 /* File Upload Visals */
@@ -245,10 +254,23 @@
 }
 
 .btn-submit-app {
-  margin-top: var(--spacing-lg);
+  margin-top: 24px;
   width: 100%;
-  padding: var(--spacing-lg);
-  font-size: var(--font-size-md);
+  padding: 18px;
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #2a1f8a 100%);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px rgba(27, 20, 100, 0.2);
+}
+
+.btn-submit-app:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(27, 20, 100, 0.3);
 }
 
 /* Success Box */

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import Navbar from '../Navbar';
+import Footer from '../Footer';
 import './UpdateItem.css';
 
 const STEPS = ['Item Info', 'Pricing', 'Photos', 'Contact'];
@@ -158,7 +160,9 @@ function UpdateItem() {
   }
 
   return (
-    <div className="ui-page">
+    <div className="ui-page-wrapper">
+      <Navbar />
+      <div className="ui-page">
 
       <div className="ui-breadcrumb">
         <span onClick={() => navigate('/marketplace')}>Market Place</span>
@@ -473,7 +477,9 @@ function UpdateItem() {
       <div className={`ui-toast ${toastVisible ? 'ui-toast--show' : ''}`}>
         {toast}
       </div>
+      <Footer />
     </div>
+  </div>
   );
 }
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Navbar from '../Navbar';
+import Footer from '../Footer';
 import { getCurrentUser } from '../../utils/user';
 import './Chat.css';
 
@@ -170,7 +172,9 @@ function Chat() {
   }
 
   return (
-    <div className="ch-page">
+    <div className="ch-page-wrapper">
+      <Navbar />
+      <div className="ch-page">
       <div className="ch-breadcrumb">
         <span onClick={() => navigate('/marketplace')}>Market Place</span>
         &nbsp;›&nbsp;
@@ -345,7 +349,9 @@ function Chat() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
+  </div>
   );
 }
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import Navbar from '../Navbar';
+import Footer from '../Footer';
 import { getCurrentUser } from '../../utils/user';
 import './ItemDetail.css';
 
@@ -100,7 +102,9 @@ function ItemDetail() {
   const isOwner = currentUser && item.sellerId === currentUser.id;
 
   return (
-    <div className="id-page">
+    <div className="id-page-wrapper">
+      <Navbar />
+      <div className="id-page">
 
       <div className="id-breadcrumb">
         <span onClick={() => navigate('/marketplace')}>Market Place</span>
@@ -246,7 +250,9 @@ function ItemDetail() {
       <div className={`id-toast ${toastVisible ? 'id-toast--show' : ''}`}>
         {toast}
       </div>
+      <Footer />
     </div>
+  </div>
   );
 }
 

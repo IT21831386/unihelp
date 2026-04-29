@@ -4,6 +4,7 @@ import './Footer.css';
 function Footer() {
   return (
     <footer className="footer">
+      <div className="footer__glow" />
       <div className="container">
         <div className="footer__grid">
           {/* Brand */}
@@ -13,52 +14,69 @@ function Footer() {
               UNIHELP
             </Link>
             <p className="footer__brand-text">
-              Every support you need for your university life in one place. Connect, discover, and thrive with UniHelp.
+              Providing students with the ultimate toolkit for university life. Connect, discover, and thrive in your academic journey.
             </p>
             <div className="footer__socials">
-              <a href="#" className="footer__social-link" aria-label="Twitter">𝕏</a>
-              <a href="#" className="footer__social-link" aria-label="Facebook">f</a>
-              <a href="#" className="footer__social-link" aria-label="Instagram">◎</a>
+              <a href="#" className="footer__social-link" aria-label="Twitter">
+                <i className="fa-brands fa-x-twitter"></i>
+              </a>
+              <a href="#" className="footer__social-link" aria-label="Facebook">
+                <i className="fa-brands fa-facebook-f"></i>
+              </a>
+              <a href="#" className="footer__social-link" aria-label="Instagram">
+                <i className="fa-brands fa-instagram"></i>
+              </a>
+              <a href="#" className="footer__social-link" aria-label="LinkedIn">
+                <i className="fa-brands fa-linkedin-in"></i>
+              </a>
             </div>
           </div>
 
           {/* About */}
           <div className="footer__column">
-            <h4>About</h4>
+            <h4>Company</h4>
             <ul>
               <li><Link to="/about">About Us</Link></li>
-              <li><Link to="/contact">Contact</Link></li>
+              <li><Link to="/contact">Contact Support</Link></li>
               <li><Link to="/careers">Careers</Link></li>
-              <li><Link to="/privacy">GDPR / Other</Link></li>
+              <li><Link to="/blog">Student Blog</Link></li>
             </ul>
           </div>
 
           {/* Navigation */}
           <div className="footer__column">
-            <h4>Navigation</h4>
+            <h4>Quick Links</h4>
             <ul>
               <li><Link to="/">Home</Link></li>
-              <li><Link to="/notices">Notices</Link></li>
+              <li><Link to="/notices">Latest Notices</Link></li>
               <li><Link to="/marketplace">Marketplace</Link></li>
-              <li><Link to="/bookings">Bookings</Link></li>
-              <li><Link to="/boarding">Find a Boarding</Link></li>
+              <li><Link to="/bookings">Seat Bookings</Link></li>
+              <li><Link to="/boarding">Find Boarding</Link></li>
             </ul>
           </div>
 
           {/* Help */}
           <div className="footer__column">
-            <h4>Help</h4>
+            <h4>Support</h4>
             <ul>
-              <li><Link to="/login">Login</Link></li>
-              <li><Link to="/signup">Register</Link></li>
-              <li><Link to="/terms">Terms & Conditions</Link></li>
+              <li><Link to="/login">My Account</Link></li>
+              <li><Link to="/signup">Join Community</Link></li>
+              <li><Link to="/terms">Terms of Service</Link></li>
               <li><Link to="/privacy">Privacy Policy</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="footer__bottom">
-          <p>© {new Date().getFullYear()} UniHelp. All rights reserved.</p>
+          <div className="footer__bottom-line" />
+          <div className="footer__bottom-content">
+            <p>© {new Date().getFullYear()} UniHelp. Built with ❤️ for students.</p>
+            <div className="footer__bottom-links">
+              <Link to="/cookies">Cookies</Link>
+              <Link to="/security">Security</Link>
+              <Link to="/sitemap">Sitemap</Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
