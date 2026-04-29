@@ -12,6 +12,10 @@ function FeatureSection({ id, title, tags, description, image, imageAlt, linkTex
               src={image}
               alt={imageAlt || title}
               className="feature-section__image"
+              onError={(e) => {
+                e.target.src = 'https://images.unsplash.com/photo-1541339907198-e08756ebafe1?q=80&w=2070&auto=format&fit=crop';
+                e.target.onerror = null;
+              }}
             />
           </div>
           <div className="feature-section__content">
