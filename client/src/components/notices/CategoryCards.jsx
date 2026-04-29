@@ -37,7 +37,7 @@ const CategoryCards = () => {
             className={`custom-card ${c.featured ? 'featured' : ''}`}
           >
             <div className="card-image-wrap">
-              <img src={c.image} alt={c.title} />
+              <img src={c.image} alt={c.title} loading="lazy" />
               {c.featured && <div className="card-badge">Pinned</div>}
             </div>
             <div className="card-body">
@@ -53,7 +53,7 @@ const CategoryCards = () => {
 
       <style>{`
         .cards-section {
-          padding: 60px 0;
+          padding: 80px 0;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -62,136 +62,135 @@ const CategoryCards = () => {
 
         .cards-container {
           display: flex;
-          align-items: center;
+          align-items: stretch;
           justify-content: center;
-          gap: 30px; 
+          gap: 35px; 
+          max-width: 1200px;
+          width: 100%;
         }
 
         .custom-card {
-          background: rgba(255, 255, 255, 0.85);
-          border: 1px solid rgba(0, 0, 0, 0.05);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 24px;
-          padding: 12px;
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 32px;
+          padding: 16px;
           display: flex;
           flex-direction: column;
           text-decoration: none;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          width: 280px;
-          height: 280px;
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+          width: 320px;
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           position: relative;
+          overflow: hidden;
         }
         
         .custom-card:hover {
-          transform: translateY(-12px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+          transform: translateY(-15px);
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
           border-color: #FF6B35;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.95);
         }
 
         .custom-card.featured {
-          width: 320px;
-          height: 320px;
-          z-index: 2;
-          background: #ffffff;
-          border-color: rgba(255, 107, 53, 0.3);
-          box-shadow: 0 15px 45px rgba(255, 107, 53, 0.15);
+          background: rgba(255, 255, 255, 0.95);
+          border-color: rgba(255, 107, 53, 0.4);
+          box-shadow: 0 25px 50px rgba(255, 107, 53, 0.15);
+          transform: scale(1.05);
+        }
+        
+        .custom-card.featured:hover {
+          transform: scale(1.05) translateY(-15px);
         }
 
         .card-image-wrap {
           position: relative;
-          border-radius: 18px;
+          border-radius: 24px;
           overflow: hidden;
           width: 100%;
-        }
-
-        .custom-card .card-image-wrap {
-          height: 160px;
-        }
-
-        .custom-card.featured .card-image-wrap {
           height: 200px;
+          background: #f1f5f9; /* Fallback color */
         }
 
         .card-image-wrap img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.6s ease;
+          display: block;
+          transition: transform 0.8s ease;
         }
 
         .custom-card:hover .card-image-wrap img {
-          transform: scale(1.1);
+          transform: scale(1.15);
         }
 
         .card-badge {
           position: absolute;
-          top: 12px;
-          right: 12px;
+          top: 15px;
+          right: 15px;
           background: #FF6B35;
           color: white;
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.7rem;
+          padding: 6px 16px;
+          border-radius: 100px;
+          font-size: 11px;
           font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.1em;
+          box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
         }
 
         .card-body {
           text-align: center;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          flex: 1;
-          padding-top: 15px;
+          padding: 24px 10px 15px;
+          flex-grow: 1;
         }
 
         .card-body h3 {
-          font-size: 1.3rem;
-          font-weight: 800;
+          font-family: 'Playfair Display', serif;
+          font-size: 24px;
+          font-weight: 700;
           margin: 0;
-          color: #1e293b;
+          color: #1e1b4b;
+          letter-spacing: -0.5px;
         }
 
         .card-body p {
-          font-size: 0.9rem;
+          font-size: 14px;
           color: #64748b;
-          margin: 6px 0 0;
+          margin: 8px 0 20px;
           font-weight: 500;
         }
 
         .card-explore {
           margin-top: auto;
-          font-size: 0.85rem;
+          font-size: 14px;
           font-weight: 700;
           color: #FF6B35;
-          opacity: 0;
-          transform: translateY(10px);
           transition: all 0.3s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
+          gap: 8px;
+          padding-top: 15px;
+          border-top: 1px solid rgba(0,0,0,0.05);
         }
 
         .custom-card:hover .card-explore {
-          opacity: 1;
-          transform: translateY(0);
+          gap: 12px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
           .cards-container {
             flex-direction: column;
-            gap: 2rem;
+            gap: 30px;
+            align-items: center;
           }
-          .custom-card, .custom-card.featured {
+          .custom-card {
             width: 100%;
-            max-width: 320px;
-            height: auto;
-            min-height: 280px;
+            max-width: 400px;
           }
         }
       `}</style>
