@@ -14,7 +14,7 @@ const CategoryCards = () => {
       id: 'notices',
       title: 'Special Notices',
       desc: 'Important Announcements',
-      image: 'https://images.unsplash.com/photo-1521791136064-7986c2923216?q=80&w=2069&auto=format&fit=crop',
+      image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop',
       link: '/special-notices',
       featured: true
     },
