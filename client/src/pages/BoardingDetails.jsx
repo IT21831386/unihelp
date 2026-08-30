@@ -31,7 +31,27 @@ const BoardingDetails = () => {
     }
   };
 
-  const handleBookBoarding = async () => {
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [bookingDate, setBookingDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [bookingMessage, setBookingMessage] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  const handleOpenBookingModal = () => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      toast.error('Please login to book a boarding place');
+      return;
+    }
+    const user = JSON.parse(userStr);
+    if (user.role !== 'user') {
+      toast.error('Only students can book boarding places');
+      return;
+    }
+    setIsBookingModalOpen(true);
+  };
+
+  const handleConfirmBoardingBooking = async (e) => {
+    e.preventDefault();
     const userStr = localStorage.getItem('user');
     if (!userStr) {
       toast.error('Please login to book a boarding place');
@@ -46,23 +66,19 @@ const BoardingDetails = () => {
       return;
     }
 
-    if (user.role !== 'user') {
-      toast.error('Only students can book boarding places');
-      return;
-    }
-
-    const confirmBooking = window.confirm(`Confirm booking request for "${boarding.title}"?`);
-    if (!confirmBooking) return;
-
+    setBookingLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/api/boarding-bookings', {
         boardingId: boarding._id || boarding.id,
         userId: userId,
-        message: `Initial booking request for ${boarding.title}`
+        bookingDate: bookingDate,
+        message: bookingMessage.trim() || `Booking request for ${boarding.title} on ${bookingDate}`
       });
 
       if (response.data.success) {
-        toast.success('Booking request sent successfully!');
+        toast.success('🎉 Booking request submitted successfully to host!');
+        setIsBookingModalOpen(false);
+        setBookingMessage('');
       } else {
         toast.error(response.data.message || 'Failed to send booking request');
       }
@@ -70,6 +86,8 @@ const BoardingDetails = () => {
       console.error('Booking Error Details:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Error processing booking';
       toast.error(`Error: ${errorMsg}`);
+    } finally {
+      setBookingLoading(false);
     }
   };
 
@@ -193,11 +211,11 @@ const BoardingDetails = () => {
             
             {boarding.availabilityStatus === 'Available' && (
               <button 
-                onClick={handleBookBoarding}
+                onClick={handleOpenBookingModal}
                 className="btn btn-primary w-100 mt-3 rounded-pill fw-bold py-2 shadow-sm"
                 style={{ background: 'linear-gradient(135deg, #5938B6, #ec4899)', border: 'none' }}
               >
-                <i className="bi bi-bookmark-plus-fill me-2"></i>Book Now
+                <i className="bi bi-calendar-check-fill me-2"></i>Request Booking
               </button>
             )}
           </div>
@@ -454,6 +472,139 @@ const BoardingDetails = () => {
 
         </div>
       </div>
+
+      {/* ── Boarding Booking Request Modal ── */}
+      {isBookingModalOpen && (
+        <div
+          onClick={() => setIsBookingModalOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              maxWidth: '480px',
+              width: '100%',
+              padding: '28px',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Request Property Booking</h3>
+                <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>{boarding.title}</p>
+              </div>
+              <button
+                onClick={() => setIsBookingModalOpen(false)}
+                style={{
+                  border: 'none',
+                  background: '#f1f5f9',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  color: '#64748b'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmBoardingBooking}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
+                  Preferred Move-in / Viewing Visit Date
+                </label>
+                <input
+                  type="date"
+                  min={new Date().toISOString().split('T')[0]}
+                  value={bookingDate}
+                  onChange={e => setBookingDate(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '14px',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
+                  Inquiry Message or Question for Owner (Optional)
+                </label>
+                <textarea
+                  rows="3"
+                  value={bookingMessage}
+                  onChange={e => setBookingMessage(e.target.value)}
+                  placeholder="e.g. Hello, I would like to schedule a viewing visit this weekend before confirming..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '13px',
+                    outline: 'none',
+                    resize: 'none'
+                  }}
+                ></textarea>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsBookingModalOpen(false)}
+                  style={{
+                    padding: '10px 18px',
+                    background: '#f1f5f9',
+                    color: '#475569',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={bookingLoading}
+                  style={{
+                    padding: '10px 22px',
+                    background: 'linear-gradient(135deg, #5938B6, #ec4899)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(89, 56, 182, 0.3)'
+                  }}
+                >
+                  {bookingLoading ? 'Submitting...' : 'Send Booking Request'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

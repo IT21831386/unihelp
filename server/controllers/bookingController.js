@@ -78,8 +78,106 @@ const cancelBooking = async (req, res) => {
   }
 };
 
+// @desc    Get live booking and capacity stats across all areas
+// @route   GET /api/bookings/stats
+const getBookingStats = async (req, res) => {
+  try {
+    const AreaLayout = require('../models/AreaLayout');
+    const { date, time, endTime } = req.query;
+
+    const now = new Date();
+    const queryDate = date || now.toISOString().split('T')[0];
+    
+    let queryTime = time;
+    if (!queryTime) {
+      const h = now.getHours();
+      queryTime = `${String(h).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+    
+    let queryEndTime = endTime;
+    if (!queryEndTime) {
+      const parts = queryTime.split(':');
+      let endH = parseInt(parts[0], 10) + 1;
+      if (endH > 22) endH = 22;
+      queryEndTime = `${String(endH).padStart(2, '0')}:${parts[1] || '00'}`;
+    }
+
+    // Fetch all areas
+    let areas = await AreaLayout.find();
+    
+    // Fetch active bookings for the specified date
+    const bookings = await Booking.find({ date: queryDate, status: 'active' });
+
+    // Filter overlapping bookings
+    const overlapping = bookings.filter(b => {
+      return (queryTime < b.endTime && queryEndTime > b.time);
+    });
+
+    const facilityMap = {
+      'canteen': ['Food & Beverages', 'Casual Discussion', 'Group Seating', 'AC Lounge'],
+      'study-area': ['Silent Study', 'Power Outlets', 'High-Speed WiFi', 'Individual Desks', 'Whiteboards'],
+      'library': ['Ultra Quiet Pods', 'Research Terminals', 'Power Sockets', 'Air Conditioned', 'Ergonomic Chairs']
+    };
+
+    const stats = areas.map(area => {
+      let totalSeats = 0;
+      const allSeatIds = [];
+      
+      const countSeats = (groups) => {
+        if (!Array.isArray(groups)) return;
+        groups.forEach(g => {
+          if (Array.isArray(g.rows)) {
+            g.rows.forEach(r => {
+              if (Array.isArray(r)) {
+                r.forEach(seatId => {
+                  totalSeats++;
+                  allSeatIds.push(seatId);
+                });
+              }
+            });
+          }
+        });
+      };
+
+      if (area.layoutConfig) {
+        countSeats(area.layoutConfig.left);
+        countSeats(area.layoutConfig.right);
+      }
+
+      // Default fallback total seats if custom structure is empty
+      if (totalSeats === 0) totalSeats = 18;
+
+      const areaBookings = overlapping.filter(b => b.area === area.categoryId || b.category === area.categoryId);
+      const bookedSeatSet = new Set(areaBookings.flatMap(b => b.seats || []));
+      const bookedCount = bookedSeatSet.size;
+      const availableCount = Math.max(0, totalSeats - bookedCount);
+      const occupancyPercentage = Math.round((bookedCount / totalSeats) * 100);
+
+      return {
+        categoryId: area.categoryId,
+        label: area.label,
+        totalSeats,
+        bookedCount,
+        availableCount,
+        occupancyPercentage,
+        facilities: facilityMap[area.categoryId] || ['High-Speed WiFi', 'Power Outlets', 'Quiet Space']
+      };
+    });
+
+    res.json({
+      date: queryDate,
+      time: queryTime,
+      endTime: queryEndTime,
+      stats
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Server error' });
+  }
+};
+
 module.exports = {
   createBooking,
   getBookings,
-  cancelBooking
+  cancelBooking,
+  getBookingStats
 };
