@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import BoardingCard from '../components/BoardingCard';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -31,14 +32,32 @@ const BoardingsList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
-  }, []);
-  
+  // View Mode: 'grid' | 'map'
+  const [viewMode, setViewMode] = useState('grid');
+  const [selectedMapBoarding, setSelectedMapBoarding] = useState(null);
+
+  // Wishlist / Saved Favorites
+  const [savedFavorites, setSavedFavorites] = useState(() => {
+    try {
+      const saved = localStorage.getItem('unihelp_saved_boardings');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+
+  // Sorting
+  const [sortBy, setSortBy] = useState('recommended');
+
   // Filter States
   const [propertyType, setPropertyType] = useState('All');
   const [maxPrice, setMaxPrice] = useState('');
+  const [onlyHotDeals, setOnlyHotDeals] = useState(false);
+  const [onlyVerified, setOnlyVerified] = useState(false);
+  const [genderFilter, setGenderFilter] = useState('All');
+  const [billsIncludedFilter, setBillsIncludedFilter] = useState(false);
+
   const [amenities, setAmenities] = useState({
     wifi: false,
     attachedBathroom: false,
@@ -47,8 +66,13 @@ const BoardingsList = () => {
   });
 
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-  const [selectedToCompare, setSelectedToCompare] = useState([]); // Array of boarding objects
+  const [selectedToCompare, setSelectedToCompare] = useState([]);
   const [isComparing, setIsComparing] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
 
   useEffect(() => {
     fetchBoardings();
@@ -74,10 +98,30 @@ const BoardingsList = () => {
     });
   };
 
+  const toggleFavorite = (boardingId) => {
+    setSavedFavorites(prev => {
+      let updated;
+      if (prev.includes(boardingId)) {
+        updated = prev.filter(id => id !== boardingId);
+        toast('Removed from saved favorites', { icon: '🤍' });
+      } else {
+        updated = [...prev, boardingId];
+        toast.success('Saved to your favorites! ❤️');
+      }
+      localStorage.setItem('unihelp_saved_boardings', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const clearFilters = () => {
     setSearchQuery('');
     setPropertyType('All');
     setMaxPrice('');
+    setOnlyHotDeals(false);
+    setOnlyVerified(false);
+    setGenderFilter('All');
+    setBillsIncludedFilter(false);
+    setShowFavoritesOnly(false);
     setAmenities({ wifi: false, attachedBathroom: false, parking: false, furnished: false });
   };
 
@@ -87,39 +131,81 @@ const BoardingsList = () => {
       if (isSelected) {
         return prev.filter(item => (item._id || item.id) !== (boarding._id || boarding.id));
       }
-      if (prev.length >= 3) return prev; // Limit to 3
+      if (prev.length >= 3) {
+        toast.error('You can compare up to 3 properties at a time.');
+        return prev;
+      }
       return [...prev, boarding];
     });
   };
 
   // Filter Logic
-  const filteredBoardings = boardings.filter(b => {
-    // 1. Search Query (Location, Title, City)
+  let filteredBoardings = boardings.filter(b => {
+    const id = b._id || b.id;
+    // Favorites only
+    if (showFavoritesOnly && !savedFavorites.includes(id)) return false;
+
+    // Search Query (Location, Title, City, Address)
     const matchesSearch = searchQuery === '' || 
-      b.city.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      b.district.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.title.toLowerCase().includes(searchQuery.toLowerCase());
+      (b.city && b.city.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (b.district && b.district.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (b.address && b.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (b.title && b.title.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    // 2. Property Type
+    // Property Type
     const matchesType = propertyType === 'All' || b.propertyType === propertyType;
     
-    // 3. Max Price
+    // Max Price
     const matchesPrice = maxPrice === '' || b.price <= Number(maxPrice);
+
+    // Hot deals & Verified
+    const isHotDeal = b.isHotDeal || (b.price > 0 && ((b.propertyType === 'Room' && b.price < 15000) || ((b.propertyType === 'Apartment' || b.propertyType === 'House') && b.price < 40000)));
+    const matchesHotDeal = !onlyHotDeals || isHotDeal;
+    const matchesVerified = !onlyVerified || (b.isVerified || b.userId);
+
+    // Gender
+    const matchesGender = genderFilter === 'All' || !b.genderPreference || b.genderPreference === 'Any' || b.genderPreference === genderFilter;
+
+    // Bills Included
+    const matchesBills = !billsIncludedFilter || (b.waterIncluded && b.electricityIncluded);
     
-    // 4. Amenities
+    // Amenities
     const matchesWifi = !amenities.wifi || b.wifi;
     const matchesBathroom = !amenities.attachedBathroom || b.attachedBathroom;
     const matchesParking = !amenities.parking || b.parking;
     const matchesFurnished = !amenities.furnished || b.furnished;
 
-    return matchesSearch && matchesType && matchesPrice && matchesWifi && matchesBathroom && matchesParking && matchesFurnished;
+    return matchesSearch && matchesType && matchesPrice && matchesHotDeal && matchesVerified && matchesGender && matchesBills && matchesWifi && matchesBathroom && matchesParking && matchesFurnished;
   });
+
+  // Sorting Logic
+  if (sortBy === 'price-low') {
+    filteredBoardings.sort((a, b) => a.price - b.price);
+  } else if (sortBy === 'price-high') {
+    filteredBoardings.sort((a, b) => b.price - a.price);
+  } else if (sortBy === 'newest') {
+    filteredBoardings.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }
+
+  // Active filter count
+  const activeFilterCount = [
+    propertyType !== 'All',
+    maxPrice !== '',
+    onlyHotDeals,
+    onlyVerified,
+    genderFilter !== 'All',
+    billsIncludedFilter,
+    showFavoritesOnly,
+    amenities.wifi,
+    amenities.attachedBathroom,
+    amenities.parking,
+    amenities.furnished
+  ].filter(Boolean).length;
 
   return (
     <div className="unihelp-page-bg font-sans d-flex flex-column" style={{ fontFamily: "'Inter', sans-serif", paddingTop: '80px' }}>
 
-      {/* Aurora glow layer — Layer -2 */}
+      {/* Aurora glow layer */}
       <div className="bg-aurora" aria-hidden="true">
         <div className="aurora-blob aurora-blob-1" />
         <div className="aurora-blob aurora-blob-2" />
@@ -127,14 +213,13 @@ const BoardingsList = () => {
         <div className="aurora-blob aurora-blob-4" />
       </div>
 
-      {/* Film grain layer — Layer -1 */}
+      {/* Film grain layer */}
       <div className="bg-grain" aria-hidden="true" />
 
       <Navbar />
 
       {/* Modern Hero Section */}
       <section className="boardings-hero-modern">
-        {/* Animated Background Elements */}
         <div className="hero-shape hero-shape-1"></div>
         <div className="hero-shape hero-shape-2"></div>
         <div className="hero-shape hero-shape-3"></div>
@@ -144,14 +229,14 @@ const BoardingsList = () => {
             Discover Your <span className="highlight-text">Perfect Student Home</span>
           </h1>
           <p className="hero-subtitle-modern mt-3 mb-3">
-            Explore thousands of verified boarding places, apartments, and rooms near your university.
+            Explore verified boarding places, apartments, and rooms near your university campus.
           </p>
 
-          <div className="row justify-content-center w-100 mt-5 mx-0">
-            <div className="col-12 col-xl-8">
+          <div className="row justify-content-center w-100 mt-4 mx-0">
+            <div className="col-12 col-xl-9">
               
-              {/* Category Icons (Airbnb Style) */}
-              <div className="bl-hero-categories mb-4">
+              {/* Category Icons */}
+              <div className="bl-hero-categories mb-3">
                 {[
                   { label: 'All', icon: 'bi-grid-1x2-fill' },
                   { label: 'Room', icon: 'bi-door-open-fill' },
@@ -176,7 +261,7 @@ const BoardingsList = () => {
                 </div>
                 <input 
                   type="text" 
-                  placeholder="Search by city, district, or address..." 
+                  placeholder="Search by city, Malabe, Kaduwela, address..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bl-hero-search-input"
@@ -194,24 +279,53 @@ const BoardingsList = () => {
                 </button>
               </div>
 
+              {/* Quick Pills Row */}
+              <div className="bl-quick-filter-pills mt-3 d-flex justify-content-center flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={`bl-pill-btn ${showFavoritesOnly ? 'active' : ''}`}
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                >
+                  ❤️ Saved Favorites ({savedFavorites.length})
+                </button>
+                <button
+                  type="button"
+                  className={`bl-pill-btn ${onlyHotDeals ? 'active' : ''}`}
+                  onClick={() => setOnlyHotDeals(!onlyHotDeals)}
+                >
+                  🔥 Hot Deals
+                </button>
+                <button
+                  type="button"
+                  className={`bl-pill-btn ${onlyVerified ? 'active' : ''}`}
+                  onClick={() => setOnlyVerified(!onlyVerified)}
+                >
+                  🛡️ Verified Hosts
+                </button>
+                <button
+                  type="button"
+                  className={`bl-pill-btn ${maxPrice === '20000' ? 'active' : ''}`}
+                  onClick={() => setMaxPrice(maxPrice === '20000' ? '' : '20000')}
+                >
+                  ⚡ Under Rs. 20,000
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Content Area */}
-        <div className="container py-5 mb-5 flex-grow-1">
+      <div className="container py-4 mb-5 flex-grow-1">
         <div className="boardings-layout">
           {/* Sidebar Filters */}
-          <aside
-            className={`boardings-sidebar ${isMobileFiltersOpen ? 'open' : ''}`}
-          >
-            
+          <aside className={`boardings-sidebar ${isMobileFiltersOpen ? 'open' : ''}`}>
             <div className="card h-100 glass-filter-card d-flex flex-column" style={isMobileFiltersOpen ? { borderRadius: '0 !important', padding: '2rem 1.5rem' } : { padding: '2rem 1.5rem' }}>
               
               <div className="bl-filter-header">
                 <div className="bl-filter-header__icon"><i className="bi bi-funnel-fill" /></div>
-                <h5 className="bl-filter-header__title">Filters</h5>
+                <h5 className="bl-filter-header__title">Filters {activeFilterCount > 0 && `(${activeFilterCount})`}</h5>
                 {isMobileFiltersOpen && (
                   <button onClick={() => setIsMobileFiltersOpen(false)} className="btn btn-sm btn-link text-secondary p-0 ms-auto">
                     <i className="bi bi-x-lg fs-5"></i>
@@ -219,7 +333,7 @@ const BoardingsList = () => {
                 )}
               </div>
 
-              <div className="d-flex flex-column gap-5">
+              <div className="d-flex flex-column gap-4">
                 {/* Property Type */}
                 <div>
                   <h6 className="filter-heading">Property Type</h6>
@@ -242,21 +356,36 @@ const BoardingsList = () => {
                 </div>
 
                 {/* Price Range */}
-                <div className="border-top pt-4">
-                  <h6 className="filter-heading">Max Price (LKR)</h6>
+                <div className="border-top pt-3">
+                  <h6 className="filter-heading">Max Budget (LKR)</h6>
                   <div className="bl-price-input-group">
                     <span className="bl-price-input-group__prefix">Rs</span>
                     <input
                       type="number"
-                      placeholder="Any price"
+                      placeholder="e.g. 25000"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
                     />
                   </div>
                 </div>
 
+                {/* Gender Allowed */}
+                <div className="border-top pt-3">
+                  <h6 className="filter-heading">Gender Preference</h6>
+                  <select
+                    className="form-select form-select-sm rounded-3"
+                    value={genderFilter}
+                    onChange={(e) => setGenderFilter(e.target.value)}
+                    style={{ fontSize: '13px', fontWeight: '600' }}
+                  >
+                    <option value="All">Any Gender</option>
+                    <option value="Male">Male Students Only</option>
+                    <option value="Female">Female Students Only</option>
+                  </select>
+                </div>
+
                 {/* Amenities */}
-                <div className="border-top pt-4">
+                <div className="border-top pt-3">
                   <h6 className="filter-heading">Must Include</h6>
                   <div className="d-flex flex-column gap-2">
                     <div className="form-check d-flex align-items-center gap-2">
@@ -275,11 +404,15 @@ const BoardingsList = () => {
                       <input type="checkbox" id="furnish" name="furnished" checked={amenities.furnished} onChange={handleAmenityChange} className="form-check-input filter-checkbox m-0" />
                       <label className="filter-label" htmlFor="furnish">Fully Furnished</label>
                     </div>
+                    <div className="form-check d-flex align-items-center gap-2">
+                      <input type="checkbox" id="bills" checked={billsIncludedFilter} onChange={(e) => setBillsIncludedFilter(e.target.checked)} className="form-check-input filter-checkbox m-0" />
+                      <label className="filter-label" htmlFor="bills">Water &amp; Electricity Included</label>
+                    </div>
                   </div>
                 </div>
 
                 {/* Clear Filters */}
-                <div className="border-top pt-4 mt-auto">
+                <div className="border-top pt-3 mt-auto">
                    <button 
                     onClick={clearFilters}
                     className="btn w-100 py-2 text-secondary fw-semibold clear-filter-btn"
@@ -292,43 +425,145 @@ const BoardingsList = () => {
             </div>
           </aside>
 
-          {/* Results Grid */}
+          {/* Results Area */}
           <main className="boardings-results">
             <div className="bl-results-header">
-              <div className="bl-count-pill">
-                <i className="bi bi-grid-3x3-gap-fill" />
-                <span className="bl-count-pill__num">{filteredBoardings.length}</span>
-                {filteredBoardings.length === 1 ? 'place' : 'places'} found
+              <div className="d-flex align-items-center gap-3 flex-wrap">
+                <div className="bl-count-pill">
+                  <i className="bi bi-grid-3x3-gap-fill" />
+                  <span className="bl-count-pill__num">{filteredBoardings.length}</span>
+                  {filteredBoardings.length === 1 ? 'place' : 'places'} found
+                </div>
+
+                {/* View Switcher: Grid vs Map */}
+                <div className="bl-view-switcher">
+                  <button
+                    type="button"
+                    className={`bl-view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <i className="bi bi-grid-fill me-1" /> Grid
+                  </button>
+                  <button
+                    type="button"
+                    className={`bl-view-btn ${viewMode === 'map' ? 'active' : ''}`}
+                    onClick={() => setViewMode('map')}
+                  >
+                    <i className="bi bi-map-fill me-1" /> Campus Map
+                  </button>
+                </div>
               </div>
-              
-              {user && user.role === 'admin' && (
-                <div className="bl-admin-actions">
+
+              {/* Sort By Dropdown */}
+              <div className="d-flex align-items-center gap-2">
+                <label className="bl-sort-label d-none d-sm-inline">Sort by:</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bl-sort-select"
+                >
+                  <option value="recommended">Recommended</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="newest">Newest Added</option>
+                </select>
+                
+                {user && user.role === 'admin' && (
                   <button 
                     onClick={() => navigate('/dashboard?tab=boardings')} 
                     className="btn btn-premium-add d-flex align-items-center gap-2"
-                    style={{ padding: '8px 20px', fontSize: '14px', borderRadius: '50px' }}
+                    style={{ padding: '6px 16px', fontSize: '13px', borderRadius: '50px' }}
                   >
                     <i className="bi bi-shield-lock-fill"></i>
-                    Manage Boardings
+                    Admin Manage
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
             
             {loading ? (
              <div className="boardings-grid">
                {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
              </div>
+            ) : viewMode === 'map' ? (
+              /* ── Interactive Campus Proximity Map View ── */
+              <div className="bl-map-view-container">
+                <div className="bl-interactive-map-canvas">
+                  <div className="bl-map-grid-bg" />
+                  
+                  {/* Campus Epicenter */}
+                  <div className="bl-map-campus-center">
+                    <div className="bl-campus-pin">
+                      <span className="bl-campus-icon">🎓</span>
+                      <strong>SLIIT Main Campus</strong>
+                    </div>
+                    <div className="bl-campus-radius-ring r1"></div>
+                    <div className="bl-campus-radius-ring r2"></div>
+                  </div>
+
+                  {/* Property Pins */}
+                  {filteredBoardings.slice(0, 8).map((b, idx) => {
+                    const positions = [
+                      { top: '25%', left: '22%' },
+                      { top: '35%', left: '72%' },
+                      { top: '65%', left: '30%' },
+                      { top: '70%', left: '78%' },
+                      { top: '20%', left: '60%' },
+                      { top: '80%', left: '48%' },
+                      { top: '45%', left: '15%' },
+                      { top: '55%', left: '85%' },
+                    ];
+                    const pos = positions[idx % positions.length];
+                    const isSelected = selectedMapBoarding && (selectedMapBoarding._id === b._id);
+
+                    return (
+                      <div
+                        key={b._id || idx}
+                        className={`bl-map-property-pin ${isSelected ? 'active' : ''}`}
+                        style={pos}
+                        onClick={() => setSelectedMapBoarding(b)}
+                      >
+                        <span className="bl-pin-price">Rs.{(b.price / 1000).toFixed(0)}k</span>
+                        <div className="bl-pin-dot"></div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Map Preview Card */}
+                {selectedMapBoarding && (
+                  <div className="bl-map-preview-card">
+                    <button className="bl-map-preview-close" onClick={() => setSelectedMapBoarding(null)}>✕</button>
+                    <img src={selectedMapBoarding.imageUrls?.[0] || 'https://images.unsplash.com/photo-1522771731470-ea44358153a5?w=500&fit=crop'} alt={selectedMapBoarding.title} />
+                    <div className="bl-map-preview-body">
+                      <h6>{selectedMapBoarding.title}</h6>
+                      <p className="bl-map-preview-loc"><i className="bi bi-geo-alt-fill text-danger me-1" />{selectedMapBoarding.city}, {selectedMapBoarding.district}</p>
+                      <div className="bl-map-preview-price">Rs.{selectedMapBoarding.price.toLocaleString()} / mo</div>
+                      <button
+                        onClick={() => navigate(`/boarding/${selectedMapBoarding._id || selectedMapBoarding.id}`)}
+                        className="btn btn-primary btn-sm rounded-pill mt-2 w-100"
+                      >
+                        View Full Property &rarr;
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : filteredBoardings.length > 0 ? (
-            <div className="boardings-grid">
+              <div className="boardings-grid">
                 {filteredBoardings.map(boarding => {
-                  const isSelected = selectedToCompare.some(item => (item._id || item.id) === (boarding._id || boarding.id));
+                  const bId = boarding._id || boarding.id;
+                  const isSelected = selectedToCompare.some(item => (item._id || item.id) === bId);
+                  const isFav = savedFavorites.includes(bId);
+
                   return (
-                    <div key={boarding._id || boarding.id || Math.random()} className="boarding-grid-item">
+                    <div key={bId || Math.random()} className="boarding-grid-item">
                         <BoardingCard 
                           boarding={boarding} 
                           onCompareToggle={() => handleCompareToggle(boarding)}
                           isSelected={isSelected}
+                          isFavorite={isFav}
+                          onFavoriteToggle={toggleFavorite}
                         />
                     </div>
                   );
@@ -339,12 +574,14 @@ const BoardingsList = () => {
                   <div className="card-body py-5">
                     <i className="bi bi-geo-alt display-2 text-light mb-4 shadow-sm rounded-circle d-inline-block p-4 bg-primary text-white" style={{ background: 'linear-gradient(135deg, var(--bs-primary), #3f2a8c)' }}></i>
                     <h3 className="fw-bold text-dark mb-3">No places found</h3>
-                    <p className="text-secondary mb-4 mx-auto" style={{ maxWidth: '400px' }}>We couldn't find any boarding places matching your exact search and filters.</p>
+                    <p className="text-secondary mb-4 mx-auto" style={{ maxWidth: '400px' }}>
+                      {showFavoritesOnly ? 'You have not saved any boarding places to your favorites yet.' : "We couldn't find any boarding places matching your exact filters."}
+                    </p>
                     <button 
                       onClick={clearFilters}
                       className="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm"
                     >
-                      Clear filters and try again
+                      Clear filters and reset
                     </button>
                   </div>
                </div>
@@ -460,3 +697,4 @@ const BoardingsList = () => {
 };
 
 export default BoardingsList;
+

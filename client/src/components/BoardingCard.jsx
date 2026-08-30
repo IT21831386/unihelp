@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import './BoardingCard.css';
 
-const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
+const BoardingCard = ({ boarding, onCompareToggle, isSelected, isFavorite = false, onFavoriteToggle }) => {
   const [ratingData, setRatingData] = useState({ average: 0, count: 0 });
   const navigate = useNavigate();
 
@@ -44,6 +45,24 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
     { key: 'laundry',          icon: 'bi-wind',           label: 'Laundry' },
   ].filter((a) => boarding[a.key]);
 
+  // Commute distance heuristic
+  const getCommuteEstimate = (city = '') => {
+    const c = city.toLowerCase();
+    if (c.includes('malabe') || c.includes('kaduwela') || c.includes('sliit')) return '🚶 5-8 min walk to campus';
+    if (c.includes('battaramulla') || c.includes('thalahena')) return '🚌 10-15 min bus to campus';
+    if (c.includes('rajagiriya') || c.includes('kotte')) return '🚌 20-25 min transit';
+    return '🚗 10-15 min commute';
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/boarding/${boarding._id || boarding.id}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      toast.success('🔗 Listing link copied to clipboard!');
+    }
+  };
+
   return (
     <div
       className="bc-card"
@@ -83,6 +102,20 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
           </span>
         </div>
 
+        {/* Favorite Heart Button */}
+        <button
+          type="button"
+          className={`bc-fav-btn ${isFavorite ? 'is-fav' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onFavoriteToggle) onFavoriteToggle(boarding._id || boarding.id);
+          }}
+          title={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
+        >
+          <i className={`bi ${isFavorite ? 'bi-heart-fill' : 'bi-heart'}`} />
+        </button>
+
+        {/* Quick Compare Button */}
         <div 
           className={`bc-compare-checkbox ${isSelected ? 'is-selected' : ''}`}
           onClick={(e) => {
@@ -105,6 +138,10 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
       </div>
 
       <div className="bc-body">
+        <div className="bc-commute-tag">
+          {getCommuteEstimate(boarding.city || boarding.address)}
+        </div>
+
         <h5 className="bc-title" title={boarding.title}>{boarding.title}</h5>
 
         {ratingData.count === 0 && (
@@ -139,13 +176,25 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
               <span className="bc-price__value">{boarding.price.toLocaleString()}</span>
             </div>
           </div>
-          <button
-            className="bc-cta"
-            onClick={(e) => { e.stopPropagation(); navigate(`/boarding/${boarding._id || boarding.id}`); }}
-            aria-label="View details"
-          >
-            <i className="bi bi-arrow-right" />
-          </button>
+          
+          <div className="bc-actions-group">
+            <button
+              type="button"
+              className="bc-share-btn"
+              onClick={handleShare}
+              title="Share listing"
+            >
+              <i className="bi bi-share-fill" />
+            </button>
+            <button
+              className="bc-cta"
+              onClick={(e) => { e.stopPropagation(); navigate(`/boarding/${boarding._id || boarding.id}`); }}
+              aria-label="View details"
+              title="View property details"
+            >
+              <i className="bi bi-arrow-right" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -153,3 +202,4 @@ const BoardingCard = ({ boarding, onCompareToggle, isSelected }) => {
 };
 
 export default BoardingCard;
+
