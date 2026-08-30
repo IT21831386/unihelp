@@ -1,0 +1,283 @@
+/* ═══════════════════════════════════════════════
+   LiveWallpaper — Mesmerizing Animated Wallpaper
+   ═══════════════════════════════════════════════ */
+
+.live-wallpaper-container {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ── Animated Dynamic Aurora Orbs ── */
+.live-aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-direction: alternate;
+}
+
+.orb-1 {
+  width: 650px;
+  height: 650px;
+  top: -150px;
+  left: -100px;
+  animation: orbMovement1 14s infinite alternate;
+}
+
+.orb-2 {
+  width: 550px;
+  height: 550px;
+  top: 30%;
+  right: -120px;
+  animation: orbMovement2 18s infinite alternate -4s;
+}
+
+.orb-3 {
+  width: 600px;
+  height: 600px;
+  bottom: -150px;
+  left: 20%;
+  animation: orbMovement3 16s infinite alternate -8s;
+}
+
+.orb-4 {
+  width: 480px;
+  height: 480px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbMovement4 20s infinite alternate -2s;
+}
+
+@keyframes orbMovement1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(120px, 80px) scale(1.18);
+  }
+  100% {
+    transform: translate(60px, 160px) scale(0.95);
+  }
+}
+
+@keyframes orbMovement2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-140px, -60px) scale(1.15);
+  }
+  100% {
+    transform: translate(-80px, 120px) scale(0.9);
+  }
+}
+
+@keyframes orbMovement3 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-80px, -120px) scale(1.2);
+  }
+  100% {
+    transform: translate(100px, -40px) scale(0.85);
+  }
+}
+
+@keyframes orbMovement4 {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
+  }
+  50% {
+    transform: translate(-35%, -65%) scale(1.25) rotate(180deg);
+  }
+  100% {
+    transform: translate(-65%, -35%) scale(1) rotate(360deg);
+  }
+}
+
+/* ── Interactive Particle Canvas ── */
+.live-canvas-particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* ── Floating Campus Glyphs ── */
+.live-floating-glyphs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.live-glyph {
+  position: absolute;
+  font-size: 1.6rem;
+  opacity: 0.16;
+  filter: blur(0.5px);
+  animation-duration: 22s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+.glyph-1 { top: 18%; left: 12%; animation-name: glyphFloat1; }
+.glyph-2 { top: 28%; right: 15%; animation-name: glyphFloat2; animation-delay: -3s; }
+.glyph-3 { top: 62%; left: 8%; animation-name: glyphFloat3; animation-delay: -7s; }
+.glyph-4 { top: 75%; right: 18%; animation-name: glyphFloat1; animation-delay: -11s; }
+.glyph-5 { top: 45%; left: 82%; animation-name: glyphFloat2; animation-delay: -15s; }
+.glyph-6 { top: 85%; left: 45%; animation-name: glyphFloat3; animation-delay: -18s; }
+.glyph-7 { top: 12%; right: 35%; animation-name: glyphFloat1; animation-delay: -5s; }
+.glyph-8 { top: 52%; left: 25%; animation-name: glyphFloat2; animation-delay: -9s; }
+
+@keyframes glyphFloat1 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.12; }
+  50% { transform: translate(30px, -45px) rotate(15deg); opacity: 0.25; }
+  100% { transform: translate(-20px, 40px) rotate(-10deg); opacity: 0.14; }
+}
+
+@keyframes glyphFloat2 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.14; }
+  50% { transform: translate(-40px, 35px) rotate(-20deg); opacity: 0.28; }
+  100% { transform: translate(35px, -30px) rotate(12deg); opacity: 0.15; }
+}
+
+@keyframes glyphFloat3 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.15; }
+  50% { transform: translate(25px, 40px) rotate(18deg); opacity: 0.3; }
+  100% { transform: translate(-30px, -25px) rotate(-15deg); opacity: 0.12; }
+}
+
+/* ── Grid Overlay ── */
+.live-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(89, 56, 182, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(89, 56, 182, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+
+/* ── Live Theme Switcher Controller ── */
+.live-theme-controller {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  pointer-events: auto;
+}
+
+.live-theme-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(89, 56, 182, 0.25);
+  padding: 8px 18px;
+  border-radius: 50px;
+  color: #5938B6;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(89, 56, 182, 0.15);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.live-theme-trigger-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(89, 56, 182, 0.28);
+  border-color: #5938B6;
+}
+
+.live-theme-menu {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(89, 56, 182, 0.25);
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  min-width: 210px;
+  animation: themeMenuPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes themeMenuPop {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.live-theme-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.live-theme-header span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.live-theme-header button {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.live-theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.live-theme-opt {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.live-theme-opt:hover {
+  background: #f1f5f9;
+  color: #5938B6;
+  border-color: rgba(89, 56, 182, 0.3);
+}
+
+.live-theme-opt.active {
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(89, 56, 182, 0.3);
+}

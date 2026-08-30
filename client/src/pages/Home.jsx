@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import EventsBanner from '../components/EventsBanner';
 import Footer from '../components/Footer';
+import LiveWallpaper from '../components/LiveWallpaper';
 import './Home.css';
 
 const bentoFeatures = [
@@ -129,12 +130,8 @@ function Home() {
 
   return (
     <div className="home-page-bg">
-      {/* Aurora glow layer */}
-      <div className="hm-bg-aurora" aria-hidden="true">
-        <div className="hm-aurora-blob hm-aurora-blob-1" />
-        <div className="hm-aurora-blob hm-aurora-blob-2" />
-        <div className="hm-aurora-blob hm-aurora-blob-3" />
-      </div>
+      {/* Dynamic Animated Live Moving Wallpaper & Constellations */}
+      <LiveWallpaper />
 
       {/* Film grain layer */}
       <div className="hm-bg-grain" aria-hidden="true" />
