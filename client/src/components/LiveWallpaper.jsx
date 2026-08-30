@@ -1,6 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './LiveWallpaper.css';
 
+const CAMPUS_WALLPAPERS = [
+  {
+    id: 'quad',
+    title: 'University Modern Quad',
+    tag: 'Campus Hub',
+    url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2072&auto=format&fit=crop',
+  },
+  {
+    id: 'library',
+    title: 'Grand Research Library',
+    tag: 'Quiet Zone',
+    url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop',
+  },
+  {
+    id: 'techlab',
+    title: 'Student Innovation Lab',
+    tag: 'Tech & Careers',
+    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop',
+  },
+  {
+    id: 'grounds',
+    title: 'University Twilight Grounds',
+    tag: 'Campus Life',
+    url: 'https://images.unsplash.com/photo-1541339907198-e08756ebafe1?q=80&w=2070&auto=format&fit=crop',
+  },
+  {
+    id: 'lounge',
+    title: 'Student Commons & Lounge',
+    tag: 'Social & Market',
+    url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop',
+  }
+];
+
 const THEMES = {
   aurora: {
     name: 'Cosmic Aurora',
@@ -39,9 +72,29 @@ const floatingGlyphs = ['🎓', '⚡', '💡', '📚', '🌟', '🚀', '🎯', '
 const LiveWallpaper = () => {
   const canvasRef = useRef(null);
   const [currentTheme, setCurrentTheme] = useState('aurora');
+  const [activeWallpaperIndex, setActiveWallpaperIndex] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const mousePosRef = useRef({ x: -1000, y: -1000, radius: 140 });
 
+  // ── Live Wallpaper Auto-Change Timer ──
+  useEffect(() => {
+    if (!isAutoPlay) return;
+    const interval = setInterval(() => {
+      setActiveWallpaperIndex((prev) => (prev + 1) % CAMPUS_WALLPAPERS.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [isAutoPlay]);
+
+  const handleNext = () => {
+    setActiveWallpaperIndex((prev) => (prev + 1) % CAMPUS_WALLPAPERS.length);
+  };
+
+  const handlePrev = () => {
+    setActiveWallpaperIndex((prev) => (prev - 1 + CAMPUS_WALLPAPERS.length) % CAMPUS_WALLPAPERS.length);
+  };
+
+  // ── Canvas Particle Mesh Effect ──
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -88,20 +141,17 @@ const LiveWallpaper = () => {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw and update particles
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
         p.pulseVal += p.pulseSpeed;
 
-        // Wrap edges
         if (p.x < 0) p.x = width;
         if (p.x > width) p.x = 0;
         if (p.y < 0) p.y = height;
         if (p.y > height) p.y = 0;
 
-        // Mouse interaction attraction / repulse
         const dx = mousePosRef.current.x - p.x;
         const dy = mousePosRef.current.y - p.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -111,7 +161,6 @@ const LiveWallpaper = () => {
           p.y -= (dy / dist) * force * 2.5;
         }
 
-        // Draw particle
         const size = p.radius + Math.sin(p.pulseVal) * 0.7;
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(0.5, size), 0, Math.PI * 2);
@@ -121,7 +170,6 @@ const LiveWallpaper = () => {
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        // Connect nearby particles with glowing lines
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const distBetween = Math.hypot(p.x - p2.x, p.y - p2.y);
@@ -150,9 +198,24 @@ const LiveWallpaper = () => {
   }, [currentTheme]);
 
   const activeTheme = THEMES[currentTheme];
+  const activeWallpaper = CAMPUS_WALLPAPERS[activeWallpaperIndex];
 
   return (
     <div className="live-wallpaper-container" aria-hidden="true">
+      {/* ── Live Moving Photographic Background Layers with Smooth Cross-fade ── */}
+      <div className="live-bg-images-layer">
+        {CAMPUS_WALLPAPERS.map((wp, idx) => (
+          <div
+            key={wp.id}
+            className={`live-bg-slide ${idx === activeWallpaperIndex ? 'active' : ''}`}
+            style={{ backgroundImage: `url(${wp.url})` }}
+          />
+        ))}
+      </div>
+
+      {/* Glass Frost Scrim */}
+      <div className="live-bg-glass-scrim" />
+
       {/* Dynamic Animated Aurora Blobs */}
       <div 
         className="live-aurora-orb orb-1" 
@@ -189,38 +252,102 @@ const LiveWallpaper = () => {
       {/* Grid Pattern Overlay */}
       <div className="live-grid-overlay" />
 
-      {/* Interactive Theme Switcher Trigger */}
+      {/* ── Interactive Live Wallpaper Player & Theme Widget ── */}
       <div className="live-theme-controller" aria-hidden="false">
         {showControls ? (
           <div className="live-theme-menu">
             <div className="live-theme-header">
-              <span>Live Wallpaper</span>
+              <div className="d-flex align-items-center gap-2">
+                <span className="live-pulse-dot"></span>
+                <span>Live Wallpaper Studio</span>
+              </div>
               <button type="button" onClick={() => setShowControls(false)}>✕</button>
             </div>
-            <div className="live-theme-options">
-              {Object.entries(THEMES).map(([key, t]) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={`live-theme-opt ${currentTheme === key ? 'active' : ''}`}
-                  onClick={() => setCurrentTheme(key)}
-                >
-                  <i className={`bi ${t.icon} me-1`} />
-                  {t.name}
-                </button>
+
+            {/* Current Active Wallpaper Status */}
+            <div className="live-current-wp-card mb-2">
+              <div className="d-flex justify-content-between align-items-center">
+                <small className="text-muted">{activeWallpaper.tag}</small>
+                <span className="badge bg-primary rounded-pill" style={{ fontSize: '10px' }}>
+                  {activeWallpaperIndex + 1} / {CAMPUS_WALLPAPERS.length}
+                </span>
+              </div>
+              <strong className="d-block text-dark mt-1" style={{ fontSize: '12px' }}>
+                {activeWallpaper.title}
+              </strong>
+            </div>
+
+            {/* Playback Controls */}
+            <div className="live-playback-controls mb-3">
+              <button type="button" onClick={handlePrev} title="Previous Wallpaper" className="live-ctrl-btn">
+                <i className="bi bi-chevron-left" />
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setIsAutoPlay(!isAutoPlay)} 
+                title={isAutoPlay ? 'Pause Auto-Change' : 'Start Auto-Change'}
+                className="live-ctrl-btn primary"
+              >
+                <i className={`bi ${isAutoPlay ? 'bi-pause-fill' : 'bi-play-fill'}`} />
+                <span style={{ fontSize: '11px' }}>{isAutoPlay ? 'Auto-Live' : 'Paused'}</span>
+              </button>
+              <button type="button" onClick={handleNext} title="Next Wallpaper" className="live-ctrl-btn">
+                <i className="bi bi-chevron-right" />
+              </button>
+            </div>
+
+            {/* Wallpaper Thumbnails Switcher */}
+            <div className="live-wp-thumbnails mb-3">
+              {CAMPUS_WALLPAPERS.map((wp, idx) => (
+                <div
+                  key={wp.id}
+                  className={`live-wp-thumb ${idx === activeWallpaperIndex ? 'active' : ''}`}
+                  onClick={() => setActiveWallpaperIndex(idx)}
+                  title={wp.title}
+                  style={{ backgroundImage: `url(${wp.url})` }}
+                />
               ))}
+            </div>
+
+            {/* Aurora Palette Themes */}
+            <div className="border-top pt-2">
+              <small className="text-muted fw-bold d-block mb-1" style={{ fontSize: '11px' }}>AURORA PALETTES</small>
+              <div className="live-theme-options">
+                {Object.entries(THEMES).map(([key, t]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`live-theme-opt ${currentTheme === key ? 'active' : ''}`}
+                    onClick={() => setCurrentTheme(key)}
+                  >
+                    <i className={`bi ${t.icon} me-1`} />
+                    {t.name}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
-          <button 
-            type="button"
-            className="live-theme-trigger-btn"
-            onClick={() => setShowControls(true)}
-            title="Customize Live Moving Wallpaper Theme"
-          >
-            <i className={`bi ${activeTheme.icon}`} />
-            <span>Live Wallpaper</span>
-          </button>
+          <div className="live-min-bar d-flex align-items-center gap-2">
+            <button 
+              type="button"
+              className="live-theme-trigger-btn"
+              onClick={() => setShowControls(true)}
+              title="Live Moving Wallpaper Controls"
+            >
+              <span className="live-pulse-dot"></span>
+              <i className="bi bi-camera-reels-fill me-1" />
+              <span>Live: {activeWallpaper.title}</span>
+            </button>
+            <button
+              type="button"
+              className="live-quick-next-btn"
+              onClick={handleNext}
+              title="Switch to Next Live Wallpaper"
+            >
+              <i className="bi bi-arrow-repeat" />
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -228,3 +355,4 @@ const LiveWallpaper = () => {
 };
 
 export default LiveWallpaper;
+

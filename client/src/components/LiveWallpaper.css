@@ -10,6 +10,48 @@
   pointer-events: none;
 }
 
+/* ── Live Photographic Background Layer with Ken Burns Effect ── */
+.live-bg-images-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: -4;
+}
+
+.live-bg-slide {
+  position: absolute;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1), transform 12s ease-out;
+  pointer-events: none;
+}
+
+.live-bg-slide.active {
+  opacity: 0.88;
+  transform: scale(1.08) translate(-1%, -1%);
+}
+
+/* Glass Frost Scrim */
+.live-bg-glass-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background: linear-gradient(
+    135deg,
+    rgba(240, 243, 255, 0.58) 0%,
+    rgba(255, 255, 255, 0.52) 50%,
+    rgba(245, 243, 255, 0.55) 100%
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
 /* ── Animated Dynamic Aurora Orbs ── */
 .live-aurora-orb {
   position: absolute;
@@ -57,51 +99,27 @@
 }
 
 @keyframes orbMovement1 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(120px, 80px) scale(1.18);
-  }
-  100% {
-    transform: translate(60px, 160px) scale(0.95);
-  }
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(120px, 80px) scale(1.18); }
+  100% { transform: translate(60px, 160px) scale(0.95); }
 }
 
 @keyframes orbMovement2 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-140px, -60px) scale(1.15);
-  }
-  100% {
-    transform: translate(-80px, 120px) scale(0.9);
-  }
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-140px, -60px) scale(1.15); }
+  100% { transform: translate(-80px, 120px) scale(0.9); }
 }
 
 @keyframes orbMovement3 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-80px, -120px) scale(1.2);
-  }
-  100% {
-    transform: translate(100px, -40px) scale(0.85);
-  }
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-80px, -120px) scale(1.2); }
+  100% { transform: translate(100px, -40px) scale(0.85); }
 }
 
 @keyframes orbMovement4 {
-  0% {
-    transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
-  }
-  50% {
-    transform: translate(-35%, -65%) scale(1.25) rotate(180deg);
-  }
-  100% {
-    transform: translate(-65%, -35%) scale(1) rotate(360deg);
-  }
+  0% { transform: translate(-50%, -50%) scale(0.9) rotate(0deg); }
+  50% { transform: translate(-35%, -65%) scale(1.25) rotate(180deg); }
+  100% { transform: translate(-65%, -35%) scale(1) rotate(360deg); }
 }
 
 /* ── Interactive Particle Canvas ── */
@@ -170,7 +188,7 @@
   pointer-events: none;
 }
 
-/* ── Live Theme Switcher Controller ── */
+/* ── Live Theme Switcher & Player Widget ── */
 .live-theme-controller {
   position: fixed;
   bottom: 24px;
@@ -179,11 +197,26 @@
   pointer-events: auto;
 }
 
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+  animation: liveDotPulse 1.5s infinite;
+}
+
+@keyframes liveDotPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
 .live-theme-trigger-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1.5px solid rgba(89, 56, 182, 0.25);
@@ -198,21 +231,43 @@
 }
 
 .live-theme-trigger-btn:hover {
-  transform: translateY(-3px) scale(1.05);
+  transform: translateY(-3px) scale(1.03);
   background: #ffffff;
   box-shadow: 0 12px 32px rgba(89, 56, 182, 0.28);
   border-color: #5938B6;
 }
 
-.live-theme-menu {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+.live-quick-next-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
   border: 1.5px solid rgba(89, 56, 182, 0.25);
-  border-radius: 20px;
-  padding: 14px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
-  min-width: 210px;
+  color: #5938B6;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(89, 56, 182, 0.15);
+  transition: all 0.2s ease;
+}
+
+.live-quick-next-btn:hover {
+  transform: rotate(180deg);
+  background: #5938B6;
+  color: #ffffff;
+}
+
+.live-theme-menu {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(89, 56, 182, 0.25);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+  min-width: 260px;
   animation: themeMenuPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -225,17 +280,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .live-theme-header span {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  color: #1e293b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #0f172a;
 }
 
 .live-theme-header button {
@@ -243,14 +296,88 @@
   border: none;
   color: #94a3b8;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
+}
+
+.live-current-wp-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* Playback controls */
+.live-playback-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.live-ctrl-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.live-ctrl-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.live-ctrl-btn.primary {
+  background: linear-gradient(135deg, #5938B6, #ec4899);
+  color: #ffffff;
+  border-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+
+/* Thumbnails */
+.live-wp-thumbnails {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.live-wp-thumb {
+  width: 42px;
+  height: 28px;
+  border-radius: 6px;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.live-wp-thumb:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.live-wp-thumb.active {
+  opacity: 1;
+  border-color: #5938B6;
+  box-shadow: 0 2px 8px rgba(89, 56, 182, 0.4);
+  transform: scale(1.1);
 }
 
 .live-theme-options {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .live-theme-opt {
@@ -259,9 +386,9 @@
   width: 100%;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-size: 0.8rem;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #475569;
   cursor: pointer;
@@ -272,12 +399,11 @@
 .live-theme-opt:hover {
   background: #f1f5f9;
   color: #5938B6;
-  border-color: rgba(89, 56, 182, 0.3);
 }
 
 .live-theme-opt.active {
   background: linear-gradient(135deg, #5938B6, #ec4899);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(89, 56, 182, 0.3);
 }
+
